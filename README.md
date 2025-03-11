@@ -4,6 +4,10 @@
 <h2>Contributions</h2>
 <p>All the contributions to the project!</p>
 <h3>Ronald Mundell</h3>
+<l>
+<li>Basic setup of app and navigation</li>
+</l>
+
 <p></p>
 <h3>Sisi You</h3>
 <p></p>
