@@ -11,6 +11,7 @@ export type UserData = {
     score: number;
     friends: FriendMiniData[];
     puzzles: PuzzleMiniData[];
+    geoLocation: geoLocationData;
 };
 
 // A puzzle mini structure which stores the name and ID of the puzzle
