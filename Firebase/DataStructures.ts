@@ -7,10 +7,16 @@ export type UserData = {
     code: string;
     uid: string;
     photoURL: string;
-    //combination of all plays
     score: number;
     friends: FriendMiniData[];
     puzzles: PuzzleMiniData[];
+    geoLocation: geoLocationData;
+};
+
+export type UserCreateData = {
+    name: string;
+    email: string;
+    uid: string;
     geoLocation: geoLocationData;
 };
 
