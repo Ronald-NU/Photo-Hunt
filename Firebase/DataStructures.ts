@@ -29,6 +29,8 @@ export type UserCreateData = {
 export type PuzzleMiniData = {
     id: string;
     name: string;
+    status: string;
+    difficulty: number;
 };
 
 // A friend mini structure which stores the name and code of the friend

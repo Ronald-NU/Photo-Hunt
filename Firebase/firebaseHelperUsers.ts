@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, deleteDoc, getDocs, getDoc, updateDoc, setDoc } from "firebase/firestore"; 
+import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
 import { database } from "./firebaseSetup";
 import { UserCreateData, UserData, CollectionUser } from "@/Firebase/DataStructures";
 
