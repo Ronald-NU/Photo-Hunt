@@ -1,6 +1,6 @@
 import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
 import { database } from "./firebaseSetup";
-import { UserCreateData, UserData, CollectionUser } from "@/Firebase/DataStructures";
+import { UserCreateData, UserData, CollectionUser, geoLocationData } from "@/Firebase/DataStructures";
 
 //New User Creation
 export const createUserDocument = async (data: UserCreateData) => {
@@ -64,6 +64,24 @@ export const updateUserDocument = async (docId: string, data: any) => {
     try {
         await updateDoc(doc(database, CollectionUser, docId), data);
         return true;
+    } catch (e) {
+        return e;
+    }
+}
+
+//querys the puzzle leaderboard data by querying the playdata collection
+export const getLocalLeaderBoard = async (location: geoLocationData) => {
+    try {
+        const querySnapshot = await getDocs(collection(database, CollectionUser)); 
+        var leaderboard : UserData[] = [];
+        querySnapshot.forEach((doc) => {
+            var docData = doc.data() as UserData
+            //within 100 miles of a location add to the leaderboard array
+            if (Math.abs(docData.geoLocation.latitude - location.latitude) < 1 && Math.abs(docData.geoLocation.longitude - location.longitude) < 1) {
+                leaderboard.push(docData as UserData);
+            }
+        });
+        return leaderboard;
     } catch (e) {
         return e;
     }

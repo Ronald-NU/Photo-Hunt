@@ -16,14 +16,15 @@ export const createLeaderBoardDocument = async (data: PuzzleData) => {
 //querys the puzzle leaderboard data by querying the playdata collection
 export const getPuzzleLeaderBoard = async (puzzleID: string) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionPlay)); 
+        const querySnapshot = await getDocs(collection(database, CollectionPlay));
+        var leaderboard:PlayData[] = []; 
         querySnapshot.forEach((doc) => {
-            var docData = doc.data() as PlayData
+            var docData = doc.data() as PlayData;
             if (puzzleID === docData.puzzleId) {
-                doc.data();
+                leaderboard.push(doc.data() as PlayData);
             }
         });
-        return null;
+        return leaderboard;
     } catch (e) {
         return e;
     }
