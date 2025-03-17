@@ -1,13 +1,6 @@
 import { collection, addDoc, doc, deleteDoc, getDocs, getDoc, updateDoc, setDoc } from "firebase/firestore"; 
-import { auth, database } from "./firebaseSetup";
-import { UserCreateData, UserData } from "@/Firebase/DataStructures";
-/*
-Create new documents in the database
-*/
-const CollectionUser = "Users";
-const CollectionPuzzle = "Puzzles";
-const CollectionLeaderBoard = "LeaderBoards";
-const CollectionPlay = "Plays";
+import { database } from "./firebaseSetup";
+import { UserCreateData, UserData, CollectionUser } from "@/Firebase/DataStructures";
 
 //New User Creation
 export const createUserDocument = async (data: UserCreateData) => {
@@ -34,10 +27,6 @@ export const createUserDocument = async (data: UserCreateData) => {
 const generateFriendCode = () => {
     return "#" + Math.random().toString(36).slice(2,8).toUpperCase();
 }
-
-/*
-Get documents from the database
-*/
 //Gets user data from the database based on the user's uid
 export const getUserData = async (uid: string) => {
     try {
@@ -54,12 +43,12 @@ export const getUserData = async (uid: string) => {
 }
 
 //querys the database by friend code to get the user's uid
-export const getUserUID = async (code: string) => {
+export const getFriend = async (code: string) => {
     try {
         const querySnapshot = await getDocs(collection(database, CollectionUser));
         querySnapshot.forEach((doc) => {
             if (doc.data().code === code) {
-                return doc.data().uid;
+                return doc.data();
             }
         });
         return null;
@@ -69,11 +58,11 @@ export const getUserUID = async (code: string) => {
 }
 
 /*
-Update documents in the database
+Update User document in the database
 */
-export const updateUserDocument = async (collectionName: string, docId: string, data: any) => {
+export const updateUserDocument = async (docId: string, data: any) => {
     try {
-        await updateDoc(doc(database, collectionName, docId), data);
+        await updateDoc(doc(database, CollectionUser, docId), data);
         return true;
     } catch (e) {
         return e;
@@ -81,11 +70,11 @@ export const updateUserDocument = async (collectionName: string, docId: string, 
 }
 
 /*
-Delete documents in the database
+Delete user document in the database
 */
-export const deleteUserDocument = async (collectionName: string, docId: string) => {
+export const deleteUserDocument = async (docId: string) => {
     try {
-        await deleteDoc(doc(database, collectionName, docId));
+        await deleteDoc(doc(database, CollectionUser, docId));
         return true;
     } catch (e) {
         return e;

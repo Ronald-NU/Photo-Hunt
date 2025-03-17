@@ -1,6 +1,11 @@
 // A user of the file which stores there 
 // name, email, uid, photoURL, code,
 // list of all friends ministructures (Codes, Name) and puzzle mini structure (Name, ID)
+export const CollectionUser = "Users";
+export const CollectionPuzzle = "Puzzles";
+export const CollectionLeaderBoard = "LeaderBoards";
+export const CollectionPlay = "Plays";
+
 export type UserData = {
     name: string;
     email: string;
@@ -32,8 +37,10 @@ export type FriendMiniData = {
     name: string;
 };
 
-export type PuzzlenData = {
+export type PuzzleData = {
     id: string;
+    userID: string;
+    leaderBoardId: string;
     name: string;
     geoLocation: geoLocationData;
     photoURL: string;
