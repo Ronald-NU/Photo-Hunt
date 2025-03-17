@@ -1,5 +1,5 @@
 import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
-import { database } from "./firebaseSetup";
+import { db } from "./firebaseSetup";
 import { UserCreateData, UserData, CollectionUser, geoLocationData } from "@/Firebase/DataStructures";
 
 //New User Creation
@@ -16,7 +16,7 @@ export const createUserDocument = async (data: UserCreateData) => {
             mypuzzles: [],
             geoLocation: data.geoLocation,
         }
-        const docRef = await addDoc(collection(database, CollectionUser), NewUserData);
+        const docRef = await addDoc(collection(db, CollectionUser), NewUserData);
         return docRef.id;
     } catch (e) {
         return e;
@@ -30,7 +30,7 @@ const generateFriendCode = () => {
 //Gets user data from the database based on the user's uid
 export const getUserData = async (uid: string) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionUser));
+        const querySnapshot = await getDocs(collection(db, CollectionUser));
         querySnapshot.forEach((doc) => {
             if (doc.data().uid === uid) {
                 return doc.data();
@@ -45,7 +45,7 @@ export const getUserData = async (uid: string) => {
 //querys the database by friend code to get the user's uid
 export const getFriend = async (code: string) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionUser));
+        const querySnapshot = await getDocs(collection(db, CollectionUser));
         querySnapshot.forEach((doc) => {
             if (doc.data().code === code) {
                 return doc.data();
@@ -62,7 +62,7 @@ Update User document in the database
 */
 export const updateUserDocument = async (docId: string, data: any) => {
     try {
-        await updateDoc(doc(database, CollectionUser, docId), data);
+        await updateDoc(doc(db, CollectionUser, docId), data);
         return true;
     } catch (e) {
         return e;
@@ -72,7 +72,7 @@ export const updateUserDocument = async (docId: string, data: any) => {
 //querys the puzzle leaderboard data by querying the playdata collection
 export const getLocalLeaderBoard = async (location: geoLocationData) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionUser)); 
+        const querySnapshot = await getDocs(collection(db, CollectionUser)); 
         var leaderboard : UserData[] = [];
         querySnapshot.forEach((doc) => {
             var docData = doc.data() as UserData
@@ -92,7 +92,7 @@ Delete user document in the database
 */
 export const deleteUserDocument = async (docId: string) => {
     try {
-        await deleteDoc(doc(database, CollectionUser, docId));
+        await deleteDoc(doc(db, CollectionUser, docId));
         return true;
     } catch (e) {
         return e;

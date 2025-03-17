@@ -1,5 +1,5 @@
 import { collection, addDoc, doc, deleteDoc, getDocs } from "firebase/firestore"; 
-import { database } from "./firebaseSetup";
+import { db } from "./firebaseSetup";
 import { CollectionPuzzle, PuzzleData, geoLocationData } from "@/Firebase/DataStructures";
 
 //New puzzle Creation
@@ -13,7 +13,7 @@ export const createPuzzleDocument = async (userID: string, leaderBoardId:string,
             photoURL: data.photoURL,
             difficulty: data.difficulty,
         }
-        const docRef = await addDoc(collection(database, CollectionPuzzle), NewPuzzleData);
+        const docRef = await addDoc(collection(db, CollectionPuzzle), NewPuzzleData);
         return docRef.id;
     } catch (e) {
         return e;
@@ -23,7 +23,7 @@ export const createPuzzleDocument = async (userID: string, leaderBoardId:string,
 //Gets puzzle data from the database puzzle's id
 export const getPuzzleData = async (id: string) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionPuzzle));
+        const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
         querySnapshot.forEach((doc) => {
             if (doc.data().id === id) {
                 return doc.data();
@@ -38,7 +38,7 @@ export const getPuzzleData = async (id: string) => {
 //querys the database by location puzzles near the user
 export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
     try {
-        const querySnapshot = await getDocs(collection(database, CollectionPuzzle));
+        const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
         querySnapshot.forEach((doc) => {
             var loc = doc.data().geoLocation as geoLocationData
             //return puzzles within 10 miles
@@ -57,7 +57,7 @@ Delete user document in the database
 */
 export const deletePuzzleDocument = async (id: string) => {
     try {
-        await deleteDoc(doc(database, CollectionPuzzle, id));
+        await deleteDoc(doc(db, CollectionPuzzle, id));
         return true;
     } catch (e) {
         return e;
