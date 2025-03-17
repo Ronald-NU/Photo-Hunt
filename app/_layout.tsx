@@ -1,5 +1,10 @@
-import { Stack } from "expo-router";
+import { NavigationContainer } from '@react-navigation/native';
+import StackNavigator from './navigation/StackNavigator';
 
 export default function Layout() {
-  return <Stack />;
+  return (
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
+  );
 }
