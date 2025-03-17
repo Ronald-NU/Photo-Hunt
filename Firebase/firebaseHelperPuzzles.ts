@@ -2,14 +2,13 @@ import { collection, addDoc, doc, deleteDoc, getDocs, getDoc, updateDoc, setDoc 
 import { database } from "./firebaseSetup";
 import { CollectionPuzzle, PuzzleData, geoLocationData } from "@/Firebase/DataStructures";
 
-//New puzzle Creation (called after leaderboard has been created)
+//New puzzle Creation
 export const createPuzzleDocument = async (userID: string, leaderBoardId:string, data: PuzzleData) => {
     try {
         const NewPuzzleData : PuzzleData = {
             id: data.id,
-            userID: userID,
+            creatorID: userID,
             name: data.name,
-            leaderBoardId: leaderBoardId,
             geoLocation: data.geoLocation,
             photoURL: data.photoURL,
             difficulty: data.difficulty,

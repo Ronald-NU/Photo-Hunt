@@ -13,7 +13,7 @@ export const createUserDocument = async (data: UserCreateData) => {
             code: generateFriendCode(),
             score: 0,
             friends: [],
-            puzzles: [],
+            mypuzzles: [],
             geoLocation: data.geoLocation,
         }
         const docRef = await addDoc(collection(database, CollectionUser), NewUserData);

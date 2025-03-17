@@ -3,7 +3,6 @@
 // list of all friends ministructures (Codes, Name) and puzzle mini structure (Name, ID)
 export const CollectionUser = "Users";
 export const CollectionPuzzle = "Puzzles";
-export const CollectionLeaderBoard = "LeaderBoards";
 export const CollectionPlay = "Plays";
 
 export type UserData = {
@@ -14,7 +13,7 @@ export type UserData = {
     photoURL: string;
     score: number;
     friends: FriendMiniData[];
-    puzzles: PuzzleMiniData[];
+    mypuzzles: PuzzleMiniData[];
     geoLocation: geoLocationData;
 };
 
@@ -29,7 +28,6 @@ export type UserCreateData = {
 export type PuzzleMiniData = {
     id: string;
     name: string;
-    status: string;
     difficulty: number;
 };
 
@@ -41,8 +39,7 @@ export type FriendMiniData = {
 
 export type PuzzleData = {
     id: string;
-    userID: string;
-    leaderBoardId: string;
+    creatorID: string;
     name: string;
     geoLocation: geoLocationData;
     photoURL: string;
@@ -54,15 +51,8 @@ export type geoLocationData = {
     longitude: number;
 };
 
-export type LeaderBoardData = {
-    id: string;
-    location?: geoLocationData;
-    players: PlayData[];
-};
-
 export type PlayData = {
     puzzleId: string;
-    LeaderBoardId: string;
     playerId: string;
     name: string;
     score: number;
