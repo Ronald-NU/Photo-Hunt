@@ -10,7 +10,7 @@ export const createUserDocument = async (data: UserCreateData) => {
             email: data.email,
             uid: data.uid,
             photoURL: "",
-            code: generateFriendCode(),
+            code: await generateFriendCode(),
             score: 0,
             friends: [],
             mypuzzles: [],
@@ -23,9 +23,20 @@ export const createUserDocument = async (data: UserCreateData) => {
     }
 }
 
-//generates a random "unquie" friend code (add query to make sure hasn't been used)
-const generateFriendCode = () => {
-    return "#" + Math.random().toString(36).slice(2,8).toUpperCase();
+//generates a random unquie friend code (add query to make sure hasn't been used)
+const generateFriendCode = async () => {
+    var unquieCode = false;
+    var code = "";
+    while(!unquieCode){
+    var code = "#" + Math.random().toString(36).slice(2,8).toUpperCase();
+    //check if code is already in use
+    await getFriend(code).then((data) => {
+        if(data === null){
+            unquieCode = true;
+        }
+    });
+    }
+    return code;
 }
 //Gets user data from the database based on the user's uid
 export const getUserData = async (uid: string) => {
