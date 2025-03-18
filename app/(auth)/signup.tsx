@@ -1,12 +1,18 @@
-import { Text, StyleSheet, View, TextInput, Button, Alert } from 'react-native'
+import { Text, StyleSheet, View, TextInput, Button, Alert, Pressable, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from 'react'
 import { router } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
 import { FirebaseError } from 'firebase/app';
+import PressableAuthButton from '@/components/PressableAuthButton';
+import PressableTextLink from '@/components/PressableTextLink';
+import { AuthStyles, GeneralStyle } from '@/constants/Styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { createUserDocument } from '@/Firebase/firebaseHelperUsers';
 
 export default function signup() {
     const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
 
@@ -27,7 +33,14 @@ export default function signup() {
                 }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                router.replace('./login');
+                if(user){
+                    const id = await createUserDocument({
+                        name: name, 
+                        email: email, 
+                        uid: user.uid, 
+                        geoLocation: {latitude: 0, longitude: 0}
+                    });
+                }
             } catch (error: any) {
                 if(error.code == "auth/password-does-not-meet-requirements"){
                     Alert.alert('Could not Register', 
@@ -42,42 +55,41 @@ export default function signup() {
         }
     }
     return (
-    <View style={styles.container}>
-        <Text style={styles.text}>Email Address</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <SafeAreaView style={GeneralStyle.container}>
+         <Text style={GeneralStyle.TitleText}>Register</Text>
+        <View style={AuthStyles.ViewBox}>
+        <Text style={GeneralStyle.BoldInputLabelText}>Name</Text>
+        <TextInput 
+        placeholder='Name' 
+        style={GeneralStyle.textInput}
+        value={name}
+        onChangeText={text => {setName(text)}}/>
+        <Text style={GeneralStyle.BoldInputLabelText}>Email Address</Text>
         <TextInput 
         placeholder='Email Address' 
-        style={styles.textInput} 
+        style={GeneralStyle.textInput}
         value={email}
         keyboardType='email-address'
         onChangeText={text => {setEmail(text)}}/>
-        <Text style={styles.text}>Password</Text>
+        <Text style={GeneralStyle.BoldInputLabelText}>Password</Text>
         <TextInput 
         placeholder='Password' 
-        style={styles.textInput}
+        style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={password}
         onChangeText={text => {setPassword(text)}}/>
-         <Text style={styles.text}>Confirm Password</Text>
+         <Text style={GeneralStyle.BoldInputLabelText}>Confirm Password</Text>
          <TextInput 
         placeholder='Password' 
-        style={styles.textInput}
+        style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={confirmpassword}
         onChangeText={text => {setConfirmPassword(text)}}/>
-        <Button title="Register" onPress={()=>{createUser()}}/>
-        <Button title="Already Registered? Login" onPress={() => router.replace('./login')}/>
-    </View>
+        <PressableAuthButton onPress={createUser} title="Register"/>
+        <PressableTextLink onPress={() => router.replace('./login')} title="Already Registered? Login"/>
+        </View>
+       </SafeAreaView>
+       </TouchableWithoutFeedback>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    textInput:{fontSize:20,color:'orange', margin:10, height:40,
-      borderWidth: 1, borderRadius: 8, width: '80%', textAlign: 'center'},
-      buttonContainer:{flexDirection:'row', justifyContent:'space-between'},
-    text:{fontSize:16, margin:2, width:'80%', textAlign:'left'},
-});
