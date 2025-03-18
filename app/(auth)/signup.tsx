@@ -54,6 +54,11 @@ export default function signup() {
                 "Make sure the passwords match and have at least 8 characters and 1 captial letter!");
         }
     }
+
+    const anonymousSignIn =  async () => {
+       
+    }
+    
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={GeneralStyle.container}>
@@ -87,6 +92,7 @@ export default function signup() {
         value={confirmpassword}
         onChangeText={text => {setConfirmPassword(text)}}/>
         <PressableAuthButton onPress={createUser} title="Register"/>
+        <PressableTextLink onPress={anonymousSignIn} title="Don't want to make an account? Sign in Anonymously with limited features"/>
         <PressableTextLink onPress={() => router.replace('./login')} title="Already Registered? Login"/>
         </View>
        </SafeAreaView>

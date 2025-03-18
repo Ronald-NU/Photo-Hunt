@@ -5,6 +5,8 @@ import PressableAuthButton from '@/components/PressableAuthButton';
 import PressableTextLink from '@/components/PressableTextLink';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '@/Firebase/firebaseSetup';
 
 export default function forgot() {
     const [email, setEmail] = useState('');
@@ -21,10 +23,12 @@ export default function forgot() {
                     return;
                 }
                 setMadeRequest(true);
+                sendPasswordResetEmail(auth, email);
             } catch (error) {
 
             }
     }
+
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={GeneralStyle.container}>
@@ -44,7 +48,7 @@ export default function forgot() {
         { madeRequest && 
             <>
             <Text style={[GeneralStyle.BoldInputLabelText, {textAlign:'center'}]}>Request Sent!</Text>
-            <Text style={[GeneralStyle.BoldInputLabelText, {textAlign:'center', fontSize:12, margin:8}]}>Check your email for a recouvery link!</Text>
+            <Text style={[GeneralStyle.BoldInputLabelText, {textAlign:'center', fontSize:12, margin:8}]}>Check your email for a the reset link!</Text>
             </>
         }
         <PressableTextLink onPress={() => router.replace('./login')} title="Remeber your password? Login"/>

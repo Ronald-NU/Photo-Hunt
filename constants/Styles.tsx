@@ -6,7 +6,8 @@ export const AuthStyles = StyleSheet.create({
         color: colors.Primary,
         textDecorationLine: 'underline',
         fontSize: 14,
-        marginTop: 4
+        marginTop: 4,
+        textAlign:'center'
     },
     ViewBox: {
         width: '90%',
