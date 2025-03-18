@@ -1,7 +1,7 @@
 import { Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from 'react'
 import { router } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
 import { FirebaseError } from 'firebase/app';
 import PressableAuthButton from '@/components/PressableAuthButton';
@@ -56,7 +56,7 @@ export default function signup() {
     }
 
     const anonymousSignIn =  async () => {
-       
+       signInAnonymously(auth);
     }
     
     return (
