@@ -70,7 +70,7 @@ export default function login(){
         onChangeText={text => {setPassword(text)}}/>
         <PressableAuthButton onPress={loginUser} title="Log in"/>
         <PressableTextLink onPress={() => router.replace('./signup')} title="New User? Create an account"/>
-        <PressableTextLink onPress={() => router.replace('./forgotpassword')} title="Forgot Password?"/>
+        <PressableTextLink onPress={() => router.replace('./forgot')} title="Forgot Password?"/>
         </View>
         </SafeAreaView>
         </TouchableWithoutFeedback>

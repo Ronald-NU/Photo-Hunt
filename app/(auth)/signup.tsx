@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, TextInput, Button, Alert, Pressable, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from 'react'
 import { router } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
@@ -19,7 +19,7 @@ export default function signup() {
     const createUser = async () => {
         if (password === confirmpassword) {
             try {
-                if(email=="" || password=="" || confirmpassword==""){
+                if(name =="" || email=="" || password=="" || confirmpassword==""){
                     Alert.alert("Please fill out all fields");
                     return;
                 }

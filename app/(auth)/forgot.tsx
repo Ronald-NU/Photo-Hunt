@@ -1,0 +1,55 @@
+import { Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import React, { useState } from 'react'
+import { router } from 'expo-router';
+import PressableAuthButton from '@/components/PressableAuthButton';
+import PressableTextLink from '@/components/PressableTextLink';
+import { AuthStyles, GeneralStyle } from '@/constants/Styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function forgot() {
+    const [email, setEmail] = useState('');
+    const [madeRequest, setMadeRequest] = useState(false);
+
+    const forgotPasswordRequest = async () => {
+            try {
+                if(email==""){
+                    Alert.alert("Please fill out all fields");
+                    return;
+                }
+                if(!email.includes("@") || !email.includes(".")){
+                    Alert.alert("Invalid Email");
+                    return;
+                }
+                setMadeRequest(true);
+            } catch (error) {
+
+            }
+    }
+    return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <SafeAreaView style={GeneralStyle.container}>
+         <Text style={GeneralStyle.TitleText}>Forgot Your Password?</Text>
+        <View style={AuthStyles.ViewBox}>
+        { !madeRequest && <>
+        <Text style={GeneralStyle.BoldInputLabelText}>Email</Text>
+        <TextInput 
+        placeholder='Email Address' 
+        style={GeneralStyle.textInput}
+        value={email}
+        keyboardType='email-address'
+        onChangeText={text => {setEmail(text)}}/>
+         <PressableAuthButton onPress={forgotPasswordRequest} title="Forgot Password"/>
+           </>
+        }
+        { madeRequest && 
+            <>
+            <Text style={[GeneralStyle.BoldInputLabelText, {textAlign:'center'}]}>Request Sent!</Text>
+            <Text style={[GeneralStyle.BoldInputLabelText, {textAlign:'center', fontSize:12, margin:8}]}>Check your email for a recouvery link!</Text>
+            </>
+        }
+        <PressableTextLink onPress={() => router.replace('./login')} title="Remeber your password? Login"/>
+        </View>
+       </SafeAreaView>
+       </TouchableWithoutFeedback>
+    )
+}

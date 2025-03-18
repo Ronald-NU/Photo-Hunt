@@ -48,6 +48,7 @@ export const GeneralStyle = StyleSheet.create({
         },
         TitleText: {
             fontSize: 48,
+            textAlign:'center',
             color: colors.White,
             fontWeight: 'bold',  
             shadowColor: colors.Black,
