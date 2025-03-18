@@ -1,6 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
-import { auth, db } from "./firebaseSetup";
+import { auth, db, storage } from "./firebaseSetup";
+import { ref, uploadBytesResumable } from "firebase/storage";
 
 interface FirestoreUser {
     id: string;
@@ -84,3 +85,13 @@ export const fetchUsers = async (): Promise<FirestoreUser[]> => {
       return [];
     }
   };
+
+  export const storeImage = async (imageURI :string) =>{
+    const response = await fetch(imageURI);
+    const blob = await response.blob();
+
+    const imageName = imageURI.substring(imageURI.lastIndexOf('/') + 1);
+    const imageRef = ref(storage, `images/${imageName}`)
+    const uploadResult = await uploadBytesResumable(imageRef, blob);
+    return uploadResult.ref.fullPath;
+  }
