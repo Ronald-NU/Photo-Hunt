@@ -10,7 +10,7 @@ export default function MapScreen() {
   const router = useRouter();
 
   const navigateToLeaderboard = () => {
-    router.push("/(tabs)/leaderboard");
+    router.push("leaderboard");
   };
 
   return (
@@ -18,7 +18,7 @@ export default function MapScreen() {
       {/* Make the leaderboard button bigger and more visible for testing */}
       <TouchableOpacity 
       style={styles.leaderboardButton} 
-      onPress={() => router.push("leaderboard")}  
+      onPress={() => navigateToLeaderboard()}  
     >
       <Ionicons name="trophy-outline" size={30} color="black" />
     </TouchableOpacity>

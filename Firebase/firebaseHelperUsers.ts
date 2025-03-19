@@ -39,17 +39,17 @@ const generateFriendCode = async () => {
     return code;
 }
 //Gets user data from the database based on the user's uid
-export const getUserData = async (uid: string) => {
+export const getUserData = async (uid: string)=> {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
-        querySnapshot.forEach((doc) => {
+        for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
                 return doc.data();
             }
-        });
+        }
         return null;
     } catch (e) {
-        return e;
+        return null;
     }
 }
 
