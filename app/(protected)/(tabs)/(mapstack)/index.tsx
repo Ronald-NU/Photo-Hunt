@@ -11,7 +11,7 @@ export default function MapScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* Leaderboard button */}
-      <TouchableOpacity style={styles.leaderboardButton} onPress={() => router.push('/(protected)/leaderboard')}>
+      <TouchableOpacity style={styles.leaderboardButton} onPress={() => router.push('leaderboard')}>
         <Ionicons name="trophy-outline" size={30} color="black" />
       </TouchableOpacity>
 

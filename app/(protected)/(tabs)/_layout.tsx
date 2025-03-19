@@ -1,20 +1,12 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack } from 'expo-router';
 
-// Screens
-import MapScreen from './index';
-import NewGameScreen from './(newGame-stack)/newGame';
-import ProfileScreen from './(profile-stack)/profile';
+import { Tabs } from 'expo-router';
 
-const Tab = createBottomTabNavigator();
-
-export default function TabsLayout() {
+export default function Layout() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen
-        name="NewGameTab"
-        component={NewGameScreen}
+    <Tabs screenOptions={{ headerShown: false }} initialRouteName="(mapstack)">
+      <Tabs.Screen
+        name="(newgamestack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" size={size} color={color} />
@@ -22,9 +14,8 @@ export default function TabsLayout() {
           title: "New Game",
         }}
       />
-      <Tab.Screen
-        name="MapTab"
-        component={MapScreen}
+      <Tabs.Screen
+        name="(mapstack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map-outline" size={size} color={color} />
@@ -32,9 +23,8 @@ export default function TabsLayout() {
           title: "Map",
         }}
       />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileScreen}
+      <Tabs.Screen
+        name="(profilestack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
@@ -42,6 +32,6 @@ export default function TabsLayout() {
           title: "Profile",
         }}
       />
-    </Tab.Navigator>
+    </Tabs>
   );
 }
