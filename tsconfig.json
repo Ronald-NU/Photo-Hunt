@@ -2,13 +2,15 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": "./",
     "paths": {
     "@/*": [
       "./*"
     ],
     "@firebase/auth": [
       "./node_modules/@firebase/auth/dist/index.rn.d.ts"
-    ]
+    ],
+    "@protected/*": ["app/(protected)/*"]
     },
     "noImplicitAny": true,
     "strictNullChecks": true,

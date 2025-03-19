@@ -1,24 +1,18 @@
+// firebaseSetup.ts
 import { initializeApp } from "firebase/app";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { initializeAuth , getReactNativePersistence} from 'firebase/auth'
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth'
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import {
-    FIREBASE_API_KEY,
-    FIREBASE_AUTH_DOMAIN,
-    FIREBASE_PROJECT_ID,
-    FIREBASE_STORAGE_BUCKET,
-    FIREBASE_MESSAGING_SENDER_ID,
-    FIREBASE_APP_ID
-  } from '@env';
 
+// Directly hardcode config for troubleshooting
 const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY,
-  authDomain: FIREBASE_AUTH_DOMAIN,
-  projectId: FIREBASE_PROJECT_ID,
-  storageBucket: FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-  appId: FIREBASE_APP_ID
+  apiKey: "AIzaSyAseQdbjnB5cJrJi-mMuUu4mbtpNDHWQ00",
+  authDomain: "photo-hunt-9b1da.firebaseapp.com",
+  projectId: "photo-hunt-9b1da",
+  storageBucket: "photo-hunt-9b1da.appspot.com",
+  messagingSenderId: "1038253365648",
+  appId: "1:1038253365648:web:6544227fe296587715fb15"
 };
 
 const app = initializeApp(firebaseConfig);
