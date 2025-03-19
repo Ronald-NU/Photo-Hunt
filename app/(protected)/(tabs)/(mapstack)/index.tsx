@@ -60,9 +60,10 @@ export default function MapScreen() {
       <TouchableOpacity style={styles.leaderboardButton} onPress={() => router.push('leaderboard')}>
 =======
       {/* Leaderboard button - Fix the path */}
+      // In MapScreen (index.tsx)
       <TouchableOpacity 
         style={styles.leaderboardButton} 
-        onPress={() => router.push("/leaderboard")}
+        onPress={() => router.push("/(protected)/(tabs)/leaderboard")}
       >
 >>>>>>> 383b733 (Refactor tab navigation and screens):app/(protected)/(tabs)/index.tsx
         <Ionicons name="trophy-outline" size={30} color="black" />

@@ -1,11 +1,5 @@
-// app/(protected)/(tabs)/_layout.tsx
-import { Tabs } from 'expo-router';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import MapScreen from './index';
-import NewGameScreen from './(newGame-stack)/newGame';
-import ProfileScreen from './(profile-stack)/profile';
-
-const Tab = createBottomTabNavigator();
 
 export default function TabsLayout() {
   return (
@@ -37,14 +31,6 @@ export default function TabsLayout() {
           title: "Profile",
         }}
       />
-      
-      {/* Use one approach or the other, not both */}
-      <Tabs.Screen
-        name="leaderboard"
-        options={{
-          tabBarButton: () => null,
-        }}
-      />
-    </Tabs>
+    </Tab.Navigator>
   );
 }
