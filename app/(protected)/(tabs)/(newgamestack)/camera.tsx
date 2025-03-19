@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from "react-n
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CameraScreen() {

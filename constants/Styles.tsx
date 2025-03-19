@@ -118,6 +118,7 @@ export const GeneralStyle = StyleSheet.create({
 
 export const NavStyle = StyleSheet.create({
     tabBar: {
+        position:'absolute',
         width:'95%',
         marginHorizontal:'2.5%',
         bottom:'5%',
