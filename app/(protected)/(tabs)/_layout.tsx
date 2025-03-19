@@ -1,24 +1,17 @@
-
-import { Ionicons } from '@expo/vector-icons';
-
-import { Tabs } from 'expo-router';
-
-export default function Layout() {
-  return (
-    <Tabs screenOptions={{ headerShown: false }} initialRouteName="(mapstack)">
-      <Tabs.Screen
-        name="(newgamestack)"
-
 // app/(protected)/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import MapScreen from './index';
+import NewGameScreen from './(newGame-stack)/newGame';
+import ProfileScreen from './(profile-stack)/profile';
+
+const Tab = createBottomTabNavigator();
 
 export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="(newGame-stack)"
-
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" size={size} color={color} />
@@ -27,11 +20,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-<<<<<<< HEAD
-        name="(mapstack)"
-=======
         name="index"
->>>>>>> 383b733 (Refactor tab navigation and screens)
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map-outline" size={size} color={color} />
@@ -40,11 +29,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-<<<<<<< HEAD
-        name="(profilestack)"
-=======
         name="(profile-stack)"
->>>>>>> 383b733 (Refactor tab navigation and screens)
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
@@ -52,7 +37,6 @@ export default function TabsLayout() {
           title: "Profile",
         }}
       />
-
       
       {/* Use one approach or the other, not both */}
       <Tabs.Screen
@@ -61,7 +45,6 @@ export default function TabsLayout() {
           tabBarButton: () => null,
         }}
       />
-
     </Tabs>
   );
 }
