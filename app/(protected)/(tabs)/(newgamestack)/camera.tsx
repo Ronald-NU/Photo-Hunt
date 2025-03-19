@@ -1,13 +1,13 @@
 import { useRouter } from "expo-router";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, SafeAreaView } from "react-native";
 
 export default function CameraScreen() {
   const router = useRouter();
 
   return (
-    <View>
+    <SafeAreaView>
       <Text>Camera Screen</Text>
       <Button title="Back" onPress={() => router.back()} />
-    </View>
+    </SafeAreaView>
   );
 }
