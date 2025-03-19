@@ -9,11 +9,11 @@
 <li>Created CRUD operations for the collections found under <b>CRUD Operations</b></li>
 <li>Created components PressableAuthButton and PressableTextLink</li>
 <li>Implmented User creation process including forgot password and anoynmous sign in found under <b>Authentication/User Creation Proccess</b></li>
-<li>Assisted in app navigation logic specifically fixing bugs</li>
+<li>Assisted in app navigation logic/bug fixs</li>
 </l>
 
 <h3>Sisi You</h3>
-<li>Implemented Stack & Tab Navigation under </li>
+<li>Implemented Stack & Tab Navigation under <b>Navigation</b></li>
 
 <h2>Naviagtion</h2>
 

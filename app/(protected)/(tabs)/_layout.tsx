@@ -6,7 +6,7 @@ export default function TabsLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="(newGame-stack)"
+        name="(newgamestack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" size={size} color={color} />
@@ -15,7 +15,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="(mapstack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map-outline" size={size} color={color} />
@@ -24,7 +24,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="(profile-stack)"
+        name="(profilestack)"
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
