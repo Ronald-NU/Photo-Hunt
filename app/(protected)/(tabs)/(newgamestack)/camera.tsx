@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GeneralStyle } from "@/constants/Styles";
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -43,13 +44,13 @@ export default function CameraScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GeneralStyle.container}>
       
       <View style={styles.imagePreview}>
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
-          <Text>No image taken yet.</Text>
+          <Text style={{position:'absolute',top:'40%'}}>No image taken yet.</Text>
         )}
       </View>
       
@@ -78,10 +79,6 @@ export default function CameraScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -108,6 +105,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   cameraButton: {
+    position:'absolute',
+    bottom:'20%',
     width: 70,
     height: 70,
     borderRadius: 35,
