@@ -9,6 +9,7 @@ import PressableTextLink from '@/components/PressableTextLink';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserDocument } from '@/Firebase/firebaseHelperUsers';
+import { colors } from '@/constants/Colors';
 
 export default function signup() {
     const [email, setEmail] = useState('');
@@ -61,8 +62,8 @@ export default function signup() {
     
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={GeneralStyle.container}>
-         <Text style={GeneralStyle.TitleText}>Register</Text>
+    <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
+         <Text style={AuthStyles.TitleText}>Register</Text>
         <View style={AuthStyles.ViewBox}>
         <Text style={GeneralStyle.BoldInputLabelText}>Name</Text>
         <TextInput 

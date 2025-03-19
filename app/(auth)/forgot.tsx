@@ -7,6 +7,7 @@ import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
+import { colors } from '@/constants/Colors';
 
 export default function forgot() {
     const [email, setEmail] = useState('');
@@ -31,8 +32,8 @@ export default function forgot() {
 
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={GeneralStyle.container}>
-         <Text style={GeneralStyle.TitleText}>Forgot Your Password?</Text>
+    <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
+         <Text style={AuthStyles.TitleText}>Forgot Your Password?</Text>
         <View style={AuthStyles.ViewBox}>
         { !madeRequest && <>
         <Text style={GeneralStyle.BoldInputLabelText}>Email</Text>

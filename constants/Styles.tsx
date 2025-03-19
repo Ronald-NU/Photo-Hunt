@@ -40,25 +40,47 @@ export const AuthStyles = StyleSheet.create({
         color: colors.White, 
         fontSize:16, 
         fontWeight:'600'
-    }
+    },
+    TitleText: {
+        fontSize: 48,
+        textAlign:'center',
+        color: colors.White,
+        fontWeight: 'bold',  
+        shadowColor: colors.Black,
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        position: 'absolute',
+        top: '15%'
+    },
 })
 
 export const GeneralStyle = StyleSheet.create({
         Pressed: {
             opacity: 0.5
         },
-        TitleText: {
-            fontSize: 48,
-            textAlign:'center',
-            color: colors.White,
-            fontWeight: 'bold',  
+        profileSection: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: 15,
+            marginHorizontal: 20,
+            marginBottom: 10,
+            backgroundColor: colors.LightGrey,
+            borderRadius: 10,
+          },
+          profileSectionText : {
+             fontSize: 16, fontWeight: "bold" },
+        title: {
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: colors.Primary,
             shadowColor: colors.Black,
-            shadowOffset: {width: 0, height: 2},
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
-            elevation: 5,
-            position: 'absolute',
-            top: '15%'
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
         },
         textInput:{
             fontSize:18,
@@ -72,14 +94,42 @@ export const GeneralStyle = StyleSheet.create({
             textAlign: 'center'},
         container: {
             flex: 1,
-            width: '100%',
-            alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.Primary
+            alignItems:'center',
+            backgroundColor: colors.White
           },
           BoldInputLabelText:{
             fontSize:18, 
             fontWeight:600,
             width:'80%', 
             textAlign:'left'},
-    });
+            button: {
+                backgroundColor: colors.Primary,
+                paddingVertical: 12,
+                paddingHorizontal: 32,
+                borderRadius: 8,
+              },
+              buttonText: {
+                color: 'white',
+                fontSize: 16,
+                fontWeight: 'bold',
+              }
+});
+
+export const NavStyle = StyleSheet.create({
+    tabBar: {
+        width:'95%',
+        marginHorizontal:'2.5%',
+        bottom:'5%',
+        elevation: 5,
+        backgroundColor: colors.White,
+        borderRadius: 25,
+        height: 60,
+        paddingTop: 4,
+        shadowColor: colors.Black,
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 10 },
+        shadowRadius: 10,
+        alignSelf: 'center'
+      },
+});

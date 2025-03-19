@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import ProfileNavSections from "@/components/ProfileNavSections";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -18,18 +19,9 @@ export default function ProfileScreen() {
 
       {/* 按钮列表 */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("myPuzzles")}>
-          <Text style={styles.buttonText}>My Puzzles</Text>
-          <Ionicons name="chevron-forward-outline" size={20} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("viewFriends")}>
-          <Text style={styles.buttonText}>Friends</Text>
-          <Ionicons name="chevron-forward-outline" size={20} color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => router.push("reminder")}>
-          <Text style={styles.buttonText}>Reminders</Text>
-          <Ionicons name="chevron-forward-outline" size={20} color="black" />
-        </TouchableOpacity>
+        <ProfileNavSections title="My Puzzles" onPress={()=>router.push("myPuzzles")} />
+        <ProfileNavSections title="Friends" onPress={()=>router.push("viewFriends")} />
+        <ProfileNavSections title="Reminders" onPress={()=>router.push("reminder")} />
       </View>
     </SafeAreaView>
   );
@@ -44,15 +36,4 @@ const styles = StyleSheet.create({
   scoreTitle: { marginTop: 10, fontSize: 18, fontWeight: "bold" },
   score: { fontSize: 14, color: "gray" },
   buttonContainer: { marginTop: 20 },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#f0f0f0",
-    padding: 15,
-    marginHorizontal: 20,
-    marginBottom: 10,
-    borderRadius: 10,
-  },
-  buttonText: { fontSize: 16, fontWeight: "bold" },
 });

@@ -8,6 +8,7 @@ import PressableAuthButton from '@/components/PressableAuthButton';
 import PressableTextLink from '@/components/PressableTextLink';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
+import { colors } from '@/constants/Colors';
 
 export default function login(){
     const [email, setEmail] = useState('');
@@ -52,8 +53,8 @@ export default function login(){
     
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-    <SafeAreaView style={GeneralStyle.container}>
-        <Text style={GeneralStyle.TitleText}>Photo Hunt</Text>
+    <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
+        <Text style={AuthStyles.TitleText}>Photo Hunt</Text>
     <View style={AuthStyles.ViewBox}>
         <Text style={GeneralStyle.BoldInputLabelText}>Email Address</Text>
         <TextInput 

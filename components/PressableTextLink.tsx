@@ -1,7 +1,7 @@
 import { Text, Pressable } from 'react-native'
 import React from 'react'
-import { colors } from '@/constants/Colors'
 import { AuthStyles, GeneralStyle } from '@/constants/Styles'
+
 type PressableTextLink = {
     onPress: () => void
     title: string

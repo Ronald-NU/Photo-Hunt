@@ -1,7 +1,7 @@
 import { Text, Pressable, View } from 'react-native'
 import React from 'react'
 import { AuthStyles, GeneralStyle } from '@/constants/Styles'
-import { colors } from '@/constants/Colors'
+
 type PressableAuthButtonProps = {
     onPress: () => void
     title: string

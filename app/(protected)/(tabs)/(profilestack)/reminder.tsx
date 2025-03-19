@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { GeneralStyle } from "@/constants/Styles";
 
 export default function ReminderScreen() {
   const router = useRouter();
@@ -18,13 +19,14 @@ export default function ReminderScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GeneralStyle.container}>
       {/* ❌ 删除这里的 header，StackLayout 已经提供返回按钮 */}
       <FlatList
+        style={{width:'100%'}}
         data={reminders}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.reminderItem}>
+          <View style={GeneralStyle.profileSection}>
             <Text style={styles.reminderText}>{item.text}</Text>
             <TouchableOpacity onPress={() => deleteReminder(item.id)}>
               <Ionicons name="trash-outline" size={24} color="red" />
@@ -37,17 +39,6 @@ export default function ReminderScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "white", paddingTop: 20 },
-  reminderItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 15,
-    marginHorizontal: 20,
-    marginBottom: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-  },
   reminderText: {
     fontSize: 16,
     flexShrink: 1,
