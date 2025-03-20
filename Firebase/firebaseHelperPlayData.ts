@@ -3,7 +3,7 @@ import { db } from "./firebaseSetup";
 import { CollectionPlay, PlayData, PuzzleData } from "@/Firebase/DataStructures";
 
 //New Leaderboard Creation (called before puzzle has been created)
-export const createLeaderBoardDocument = async (data: PuzzleData) => {
+export const createPlayDocument = async (data: PuzzleData) => {
     try {
         const docRef = await addDoc(collection(db, CollectionPlay), data);
         return docRef.id;

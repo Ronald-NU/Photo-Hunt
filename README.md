@@ -93,13 +93,35 @@
 <p>All the implemented crud operation within the app.</p>
 
 <h3>Create</h3>
-<p><b>createUserDocument:</b> </p>
+<l>
+<li><b>createUserDocument:</b> creates the user document within the "Users" collection and generates a unquie friend code for this user.</li>
+<li><b>createPlayDocument:</b> creates the a playdata document within the "Plays" collection.</li>
+<li><b>createPuzzleDocument:</b> creates the Puzzle document within the "Puzzles" collection.</li>
+</l>
 
 <h3>Read</h3>
+<l>
+<li><b>getPuzzleLeaderBoard:</b> gets the information of all play data from a specific puzzle within the "Plays" collection.</li>
+<li><b> getLocalLeaderBoard:</b> gets the information of all scores for players with 100 miles of a location within the "Users" collection.</li>
+<li><b>getLocalPuzzles:</b> gets the puzzles within 10 miles of a specific location within the "Puzzles" collection.</li>
+<li><b>getPuzzleData:</b> gets the puzzle data of a specific puzzle within the "Puzzles" collection.</li>
+<li><b> getFriend:</b> gets the information a User by their friend code within the "Users" collection.</li>
+<li><b> getUserData:</b> gets the specific information of a User by their uid within the "Users" collection.</li>
+</l>
 
 <h3>Update</h3>
+<l>
+<li><b>updateUserDocument:</b> updates the user document within the "Users" collection.</li>
+<li><b>updatePlayDataDocument:</b> updates a specific playdata document within the "Plays" collection.</li>
+</l>
+
 
 <h3>Delete</h3>
+<l>
+<li><b>deleteUserDocument:</b> deletes a users Document within the "Users" collection.</li>
+<li><b>deletePlayDataDocument:</b> deletes a specific playdata document within the "Plays" collection.</li>
+<li><b>deletePuzzleDocument:</b> deletes a specific puzzle document within the "Puzzles" collection.</li>
+</l>
 
 <h2>Citations</h2>
 <p></p>
