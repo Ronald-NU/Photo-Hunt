@@ -25,6 +25,35 @@
 <h2>Authentication/User Creation Proccess</h2>
 <p>The files and screens that handle the user creation process and what crud operations are involved.</p>
 
+
+<h2>Screenshots</h2>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/login.png" alt="Login Screen" style="width: 100%;">
+    <p><strong>Login Screen</strong></p>
+  </div>
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/signup.png" alt="Signup Screen" style="width: 100%;">
+    <p><strong>Signup Screen</strong></p>
+  </div>
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/map.png" alt="Map Screen" style="width: 100%;">
+    <p><strong>Map Screen</strong></p>
+  </div>
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/profile.PNG" alt="Profile Screen" style="width: 100%;">
+    <p><strong>Profile Screen</strong></p>
+  </div>
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 100%;">
+    <p><strong>Camera Screen</strong></p>
+  </div>
+  <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/newGame.png" alt="New Game Screen" style="width: 100%;">
+    <p><strong>New Game Screen</strong></p>
+  </div>
+</div>
+
 <h2>Data Model</h2>
 <p>The app uses three main collections in the database:</p>
 <h3>Collections</h3>
