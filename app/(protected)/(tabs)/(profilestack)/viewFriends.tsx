@@ -1,10 +1,10 @@
+import ProfileNavSections from "@/components/ProfileNavSections";
 import { GeneralStyle } from "@/constants/Styles";
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ViewFriendsScreen() {
   const friends = ["Friend One", "Friend Two", "Friend Three", "Friend Four"];
-
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <FlatList
@@ -12,9 +12,7 @@ export default function ViewFriendsScreen() {
         data={friends}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <View style={GeneralStyle.profileSection}>
-            <Text style={GeneralStyle.profileSectionText}>{item}</Text>
-          </View>
+          <ProfileNavSections onPress={()=>{}} title={item}/>
         )}
       />
     </SafeAreaView>
