@@ -1,5 +1,5 @@
 import { colors } from "@/constants/Colors";
-import { GeneralStyle } from "@/constants/Styles";
+import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import React from "react";
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
 import TouchableButton from "./TouchableButton";
@@ -19,8 +19,8 @@ const CreateAccountModal = ({ isOpen, onClose, onSignUp }: ModalProps) => {
     >
       <View style={GeneralStyle.overlay}>
         <View style={GeneralStyle.modalContainer}>
-          <Text style={styles.title}>Create an Account</Text>
-          <Text style={styles.message}>You need to create an account to view your profile.</Text>
+          <Text style={[styles.title, TextStyles.LargeText]}>Create an Account</Text>
+          <Text style={[styles.message,TextStyles.smallText]}>You need to create an account to view your profile.</Text>
           <View style={styles.buttonContainer}>
             <TouchableButton title="Sign Up" onPress={onSignUp} widthBut={'48%'}/>
             <TouchableButton title="Cancel" onPress={onClose} widthBut={'48%'} colors={colors.DarkGrey}/>
@@ -33,13 +33,10 @@ const CreateAccountModal = ({ isOpen, onClose, onSignUp }: ModalProps) => {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
   message: {
-    fontSize: 14,
-    color: colors.DarkGrey,
     marginBottom: 20,
     textAlign: "center",
   },

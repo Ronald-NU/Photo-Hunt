@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GeneralStyle } from "@/constants/Styles";
+import { GeneralStyle, TextStyles } from "@/constants/Styles";
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function CameraScreen() {
         {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.image} />
         ) : (
-          <Text style={{position:'absolute',top:'40%'}}>No image taken yet.</Text>
+          <Text style={[TextStyles.mediumText,{position:'absolute',top:'40%'}]}>No image taken yet.</Text>
         )}
       </View>
       

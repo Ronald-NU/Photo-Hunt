@@ -48,8 +48,6 @@ export const GeneralStyle = StyleSheet.create({
             marginTop: 4,
             textAlign:'center'
         },
-          profileSectionText : {
-             fontSize: 16, fontWeight: "bold" },
         title: {
             fontSize: 24,
             fontWeight: 'bold',
@@ -102,6 +100,12 @@ export const GeneralStyle = StyleSheet.create({
                 alignItems: "center",
               },
 });
+
+export const TextStyles = StyleSheet.create({
+    mediumText: { fontSize: 16, color: colors.DarkGrey },
+    smallText: { fontSize: 14, color: colors.DarkGrey },
+    LargeText: { fontSize: 18, color: colors.Black },
+})
 
 export const NavStyle = StyleSheet.create({
     tabBar: {

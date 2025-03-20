@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { GeneralStyle, TextStyles } from "@/constants/Styles";
 
 export default function LeaderboardScreen() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function LeaderboardScreen() {
       }
       
       <View style={styles.content}>
-        <Text style={styles.text}>Leaderboard Content</Text>
+        <Text style={TextStyles.mediumText}>Leaderboard Content</Text>
       </View>
 </SafeAreaView>);
 }
@@ -50,7 +51,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  text: {
-    fontSize: 16,
-  }
 });
