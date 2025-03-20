@@ -7,14 +7,18 @@
 <l>
 <li>Setup of app and github</li>
 <li>Created CRUD operations for the collections found under <b>CRUD Operations</b></li>
-<li>Created components PressableAuthButton and PressableTextLink</li>
+<li>Created and refactored the app into components</li>
+<li>Created the UserContext</li>
+<li>Created the CreateAccountModal</li>
 <li>Implmented User creation process including forgot password and anoynmous sign in found under <b>Authentication/User Creation Proccess</b></li>
 <li>Assisted in app navigation logic/bug fixs</li>
 </l>
 
 <h3>Sisi You</h3>
+<l>
 <li>Implemented Stack & Tab Navigation under <b>Navigation</b></li>
 <li>Co-developed Firebase setup</li>
+</l>
 
 <h2>Naviagtion</h2>
 <p>The navigation system is handled using expo-router, organizing pages under auth (authentication) and protected (gameplay). Navigation includes:</p>
@@ -22,35 +26,59 @@
 <li><b>Tab Navigation</b> for switching between the new game, map or profile stacks.</li>
 <li><b>Nested Navigation</b> within mapstack, newgamestack, and profilestack.</li>
 
-<h2>Authentication/User Creation Proccess</h2>
-<p>The files and screens that handle the user creation process and what crud operations are involved.</p>
-
-
-<h2>Screenshots</h2>
+<h2>Screenshots Navigatoin</h2>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-  <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/login.png" alt="Login Screen" style="width: 40%;">
-    <p><strong>Login Screen</strong></p>
-  </div>
-  <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/signup.png" alt="Signup Screen" style="width: 40%;">
-    <p><strong>Signup Screen</strong></p>
-  </div>
-  <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
-    <p><strong>Map Screen</strong></p>
-  </div>
-  <div style="width: 30%; margin-bottom: 20px;">
+    <div style="width: 30%; margin-bottom: 20px;">
     <img src="screenshots/profile.PNG" alt="Profile Screen" style="width: 40%;">
     <p><strong>Profile Screen</strong></p>
   </div>
+    <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/signup.png" alt="Signup Screen" style="width: 40%;">
+    <p><strong>Reminder Screen</strong></p>
+  </div>
   <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 40%;">
-    <p><strong>Camera Screen</strong></p>
+    <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
+    <p><strong>Friend Screen</strong></p>
+  </div>
+    <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
+    <p><strong>Puzzle Screen</strong></p>
   </div>
   <div style="width: 30%; margin-bottom: 20px;">
     <img src="screenshots/newGame.png" alt="New Game Screen" style="width: 40%;">
     <p><strong>New Game Screen</strong></p>
+  </div>
+    <div style="width: 30%; margin-bottom: 20px;">
+    <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 40%;">
+    <p><strong>Camera Screen</strong></p>
+  </div>
+</div>
+
+<h2>Authentication/User Creation Proccess</h2>
+<p>The files and screens that handle authentication and user creation process.</p>
+
+
+<h2>Screenshots Authentication</h2>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+  <div style="width: 20%; margin-bottom: 20px;">
+    <img src="screenshots/login.png" alt="Login Screen" style="width: 40%;">
+    <p><strong>Login Screen</strong></p>
+  </div>
+  <div style="width: 20%; margin-bottom: 20px;">
+    <img src="screenshots/signup.png" alt="Signup Screen" style="width: 40%;">
+    <p><strong>Signup Screen</strong></p>
+  </div>
+  <div style="width: 20%; margin-bottom: 20px;">
+    <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
+    <p><strong>Fogot Password Screen</strong></p>
+  </div>
+  <div style="width: 20%; margin-bottom: 20px;">
+    <img src="screenshots/profile.PNG" alt="Profile Screen" style="width: 40%;">
+    <p><strong>Profile Screen</strong></p>
+  </div>
+  <div style="width: 20%; margin-bottom: 20px;">
+    <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 40%;">
+    <p><strong>Profile Anoynmous Screen</strong></p>
   </div>
 </div>
 
@@ -90,7 +118,7 @@
 </ul>
 
 <h2>CRUD Operations</h2>
-<p>All the implemented crud operation within the app.</p>
+<p>All the implemented CRUD operation within the app.</p>
 
 <h3>Create</h3>
 <l>
@@ -106,7 +134,7 @@
 <li><b>getLocalPuzzles:</b> gets the puzzles within 10 miles of a specific location within the "Puzzles" collection.</li>
 <li><b>getPuzzleData:</b> gets the puzzle data of a specific puzzle within the "Puzzles" collection.</li>
 <li><b> getFriend:</b> gets the information a User by their friend code within the "Users" collection.</li>
-<li><b> getUserData:</b> gets the specific information of a User by their uid within the "Users" collection.</li>
+<li><b> getUserData:</b> gets the specific information of User by their uid within the "Users" collection.</li>
 </l>
 
 <h3>Update</h3>
