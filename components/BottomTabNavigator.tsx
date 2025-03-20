@@ -8,7 +8,8 @@ export default function BottomTabNavigator() {
   return (
     <Tabs screenOptions={{ headerShown: false, 
     tabBarActiveTintColor:colors.Primary, 
-    tabBarStyle: NavStyle.tabBar
+    tabBarStyle: NavStyle.tabBar,
+    tabBarInactiveTintColor:colors.Black
     }}>
     <Tabs.Screen
       name="(newgamestack)"
