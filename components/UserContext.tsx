@@ -6,11 +6,13 @@ import { getUserData } from '@/Firebase/firebaseHelperUsers';
 interface UserContextType {
     user: UserData | null;
     loading: boolean;
+    setLoading:(value:boolean)=>void
   }
   
   const UserContext = createContext<UserContextType>({
     user: null,
     loading: true,
+    setLoading:(value:boolean)=>{}
   });
   
   export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,11 +34,10 @@ interface UserContextType {
         }
        }
       setUserData();
-      console.log(user);
-      }, [auth]);
+      },[auth]);
     
       return (
-        <UserContext.Provider value={{ user, loading }}>
+        <UserContext.Provider value={{ user, loading, setLoading }}>
           {children}
         </UserContext.Provider>
       );
