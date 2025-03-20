@@ -2,13 +2,6 @@ import { StyleSheet } from "react-native";
 import { colors } from "./Colors";
 
 export const AuthStyles = StyleSheet.create({
-    linkText: {
-        color: colors.Primary,
-        textDecorationLine: 'underline',
-        fontSize: 14,
-        marginTop: 4,
-        textAlign:'center'
-    },
     ViewBox: {
         width: '90%',
         alignItems: 'center',
@@ -21,25 +14,6 @@ export const AuthStyles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5
-    },
-    PressableBox: {
-        width:'100%',
-        alignItems:'center',
-        margin:4
-    },
-    AuthViewButtonBox:{
-        width:'80%',
-        backgroundColor: colors.Primary, 
-        height:40,
-        justifyContent: 'center',
-        padding: 8, 
-        borderRadius: 8, 
-        alignItems: 'center',
-    },
-    AuthTextButton:{
-        color: colors.White, 
-        fontSize:16, 
-        fontWeight:'600'
     },
     TitleText: {
         fontSize: 48,
@@ -57,9 +31,6 @@ export const AuthStyles = StyleSheet.create({
 })
 
 export const GeneralStyle = StyleSheet.create({
-        Pressed: {
-            opacity: 0.5
-        },
         profileSection: {
             flexDirection: "row",
             justifyContent: "space-between",
@@ -70,6 +41,13 @@ export const GeneralStyle = StyleSheet.create({
             backgroundColor: colors.LightGrey,
             borderRadius: 10,
           },
+          linkText: {
+            color: colors.Primary,
+            textDecorationLine: 'underline',
+            fontSize: 14,
+            marginTop: 4,
+            textAlign:'center'
+        },
           profileSectionText : {
              fontSize: 16, fontWeight: "bold" },
         title: {
@@ -98,12 +76,12 @@ export const GeneralStyle = StyleSheet.create({
             fontSize:16,
             fontWeight:'bold',
         },
-            button: {
-                backgroundColor: colors.Primary,
-                paddingVertical: 12,
-                paddingHorizontal: 32,
-                borderRadius: 8,
-              },
+        button: {
+            backgroundColor: colors.Primary,
+            paddingVertical: 12,
+            paddingHorizontal: 32,
+            borderRadius: 8,
+          },
               buttonText: {
                 color: 'white',
                 fontSize: 16,

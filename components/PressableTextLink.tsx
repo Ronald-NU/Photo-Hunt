@@ -1,6 +1,6 @@
-import { Text, Pressable } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { AuthStyles, GeneralStyle } from '@/constants/Styles'
+import { GeneralStyle } from '@/constants/Styles'
 
 type PressableTextLink = {
     onPress: () => void
@@ -8,10 +8,9 @@ type PressableTextLink = {
 }
 const PressableTextLink = ({onPress, title}:PressableTextLink) => {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => {
-        return [pressed && GeneralStyle.Pressed]; }}>
-      <Text style={AuthStyles.linkText}>{title}</Text>
-    </Pressable>
+    <TouchableOpacity onPress={onPress}>
+      <Text style={GeneralStyle.linkText}>{title}</Text>
+    </TouchableOpacity>
   )
 }
 
