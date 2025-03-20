@@ -1,5 +1,6 @@
+import ProfileNavSections from "@/components/ProfileNavSections";
 import { GeneralStyle } from "@/constants/Styles";
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MyPuzzlesScreen() {
@@ -12,9 +13,7 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <View style={GeneralStyle.profileSection}>
-            <Text style={GeneralStyle.profileSectionText}>{item}</Text>
-          </View>
+          <ProfileNavSections onPress={()=>{}} title={item}/>
         )}
       />
     </SafeAreaView>
