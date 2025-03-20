@@ -31,6 +31,13 @@ export const AuthStyles = StyleSheet.create({
 })
 
 export const GeneralStyle = StyleSheet.create({
+        header:{
+          width:'100%',
+          height:60,
+          borderBottomWidth:0.5,
+          backgroundColor:colors.White,
+          borderBottomColor:colors.Black
+        },
         profileSection: {
             flexDirection: "row",
             justifyContent: "space-between",
