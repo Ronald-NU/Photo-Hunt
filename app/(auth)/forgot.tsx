@@ -1,13 +1,13 @@
 import { Text, View, TextInput, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React, { useState } from 'react'
 import { router } from 'expo-router';
-import PressableAuthButton from '@/components/PressableAuthButton';
 import PressableTextLink from '@/components/PressableTextLink';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
 import { colors } from '@/constants/Colors';
+import TouchableButton from '@/components/TouchableButton';
 
 export default function forgot() {
     const [email, setEmail] = useState('');
@@ -36,14 +36,14 @@ export default function forgot() {
          <Text style={AuthStyles.TitleText}>Forgot Your Password?</Text>
         <View style={AuthStyles.ViewBox}>
         { !madeRequest && <>
-        <Text style={GeneralStyle.BoldInputLabelText}>Email</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Email</Text>
         <TextInput 
         placeholder='Email Address' 
         style={GeneralStyle.textInput}
         value={email}
         keyboardType='email-address'
         onChangeText={text => {setEmail(text)}}/>
-         <PressableAuthButton onPress={forgotPasswordRequest} title="Forgot Password"/>
+        <TouchableButton onPress={forgotPasswordRequest} title="Forgot Password" widthBut={'80%'}  />
            </>
         }
         { madeRequest && 

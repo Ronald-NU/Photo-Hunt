@@ -4,12 +4,12 @@ import { router } from 'expo-router';
 import { createUserWithEmailAndPassword, signInAnonymously } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
 import { FirebaseError } from 'firebase/app';
-import PressableAuthButton from '@/components/PressableAuthButton';
 import PressableTextLink from '@/components/PressableTextLink';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserDocument } from '@/Firebase/firebaseHelperUsers';
 import { colors } from '@/constants/Colors';
+import TouchableButton from '@/components/TouchableButton';
 
 export default function signup() {
     const [email, setEmail] = useState('');
@@ -65,34 +65,34 @@ export default function signup() {
     <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
          <Text style={AuthStyles.TitleText}>Register</Text>
          <View style={[AuthStyles.ViewBox, { top: 45 }]}>
-        <Text style={GeneralStyle.BoldInputLabelText}>Name</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Name</Text>
         <TextInput 
         placeholder='Name' 
         style={GeneralStyle.textInput}
         value={name}
         onChangeText={text => {setName(text)}}/>
-        <Text style={GeneralStyle.BoldInputLabelText}>Email Address</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Email Address</Text>
         <TextInput 
         placeholder='Email Address' 
         style={GeneralStyle.textInput}
         value={email}
         keyboardType='email-address'
         onChangeText={text => {setEmail(text)}}/>
-        <Text style={GeneralStyle.BoldInputLabelText}>Password</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Password</Text>
         <TextInput 
         placeholder='Password' 
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={password}
         onChangeText={text => {setPassword(text)}}/>
-         <Text style={GeneralStyle.BoldInputLabelText}>Confirm Password</Text>
+         <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Confirm Password</Text>
          <TextInput 
         placeholder='Password' 
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={confirmpassword}
         onChangeText={text => {setConfirmPassword(text)}}/>
-        <PressableAuthButton onPress={createUser} title="Register"/>
+        <TouchableButton onPress={createUser} title="Register" widthBut={'80%'} />
         <PressableTextLink onPress={anonymousSignIn} title="Don't want to make an account? Sign in Anonymously with limited features"/>
         <PressableTextLink onPress={() => router.replace('./login')} title="Already Registered? Login"/>
         </View>

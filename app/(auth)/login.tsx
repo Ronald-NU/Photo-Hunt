@@ -4,11 +4,11 @@ import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/Firebase/firebaseSetup';
 import { FirebaseError } from 'firebase/app';
-import PressableAuthButton from '@/components/PressableAuthButton';
 import PressableTextLink from '@/components/PressableTextLink';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthStyles, GeneralStyle } from '@/constants/Styles';
 import { colors } from '@/constants/Colors';
+import TouchableButton from '@/components/TouchableButton';
 
 export default function login(){
     const [email, setEmail] = useState('');
@@ -56,21 +56,21 @@ export default function login(){
     <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
         <Text style={AuthStyles.TitleText}>Photo Hunt</Text>
     <View style={AuthStyles.ViewBox}>
-        <Text style={GeneralStyle.BoldInputLabelText}>Email Address</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Email Address</Text>
         <TextInput 
         placeholder='Enter Email Address' 
         style={GeneralStyle.textInput}
         value={email}
         keyboardType='email-address'
         onChangeText={text => {setEmail(text)}}/>
-        <Text style={GeneralStyle.BoldInputLabelText}>Password</Text>
+        <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Password</Text>
         <TextInput 
         placeholder='Enter Password' 
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={password}
         onChangeText={text => {setPassword(text)}}/>
-        <PressableAuthButton onPress={loginUser} title="Log in"/>
+        <TouchableButton onPress={loginUser} title="Log in" widthBut={'80%'}  />
         <PressableTextLink onPress={() => router.replace('./signup')} title="New User? Create an account"/>
         <PressableTextLink onPress={() => router.replace('./forgot')} title="Forgot Password?"/>
         </View>

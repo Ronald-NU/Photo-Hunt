@@ -76,22 +76,18 @@ export const GeneralStyle = StyleSheet.create({
             fontSize: 24,
             fontWeight: 'bold',
             color: colors.Primary,
-            shadowColor: colors.Black,
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
         },
         textInput:{
-            fontSize:18,
+            fontSize:16,
             color: colors.Black, 
-            marginTop:4,
-            marginBottom:8, 
-            height:40,
+            marginHorizontal: 20,
+            marginBottom: 10,
+            padding:8,
+            paddingHorizontal:15,
             borderWidth: 1, 
-            borderRadius: 8, 
+            borderRadius: 10, 
             width: '80%', 
-            textAlign: 'center'},
+        },
         container: {
             flex: 1,
             justifyContent: 'center',
@@ -99,10 +95,9 @@ export const GeneralStyle = StyleSheet.create({
             backgroundColor: colors.White
           },
           BoldInputLabelText:{
-            fontSize:18, 
-            fontWeight:600,
-            width:'80%', 
-            textAlign:'left'},
+            fontSize:16,
+            fontWeight:'bold',
+        },
             button: {
                 backgroundColor: colors.Primary,
                 paddingVertical: 12,
@@ -113,7 +108,21 @@ export const GeneralStyle = StyleSheet.create({
                 color: 'white',
                 fontSize: 16,
                 fontWeight: 'bold',
-              }
+                textAlign:'center'
+              },
+              overlay: {
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+              },
+              modalContainer: {
+                backgroundColor: colors.White,
+                padding: 20,
+                borderRadius: 10,
+                width: '90%',
+                alignItems: "center",
+              },
 });
 
 export const NavStyle = StyleSheet.create({

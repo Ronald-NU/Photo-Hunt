@@ -9,12 +9,16 @@ export default function LeaderboardScreen() {
 
   return (
 <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      {
+        /*
+        <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>Leaderboard</Text>
       </View>
+      */
+      }
       
       <View style={styles.content}>
         <Text style={styles.text}>Leaderboard Content</Text>

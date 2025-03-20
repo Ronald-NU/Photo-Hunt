@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { GeneralStyle } from "@/constants/Styles";
 import CreateAccountModal from "@/components/CreateAccountModal";
 import { auth } from "@/Firebase/firebaseSetup";
+import { colors } from "@/constants/Colors";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
     <CreateAccountModal isOpen={createAccountModal} onSignUp={()=>{auth.signOut();router.replace("signup");setCreatAccountModal(false);}} onClose={()=>{router.replace("(mapstack)");setCreatAccountModal(false);}} />
 <View style={styles.profileContainer}>
-  <Ionicons name="person-circle" size={80} color="#6200ea" style={styles.profileImage} />
+  <Ionicons name="person-circle" size={80} color={colors.Primary} style={styles.profileImage} />
   <Text style={styles.profileName}>{user?.name!=null?user.name:"Profile Name"}</Text>
   <Text style={styles.friendCode}>{user?.code!=null?user.code:"#Friend Code"}</Text>
   <Text style={styles.scoreTitle}>Score</Text>
@@ -53,12 +54,12 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "white", paddingTop: 20 },
+  container: { flex: 1, backgroundColor: colors.White, paddingTop: 20 },
   profileContainer: { alignItems: "center", marginBottom: 20 },
   profileImage: { width: 80, height: 80, borderRadius: 40, marginBottom: 10 },
   profileName: { fontSize: 22, fontWeight: "bold" },
-  friendCode: { fontSize: 16, color: "gray" },
+  friendCode: { fontSize: 16, color: colors.DarkGrey },
   scoreTitle: { marginTop: 10, fontSize: 18, fontWeight: "bold" },
-  score: { fontSize: 14, color: "gray" },
+  score: { fontSize: 14, color: colors.DarkGrey },
   buttonContainer: { marginTop: 20 },
 });
