@@ -64,7 +64,7 @@ export default function signup() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
          <Text style={AuthStyles.TitleText}>Register</Text>
-        <View style={AuthStyles.ViewBox}>
+         <View style={[AuthStyles.ViewBox, { top: 45 }]}>
         <Text style={GeneralStyle.BoldInputLabelText}>Name</Text>
         <TextInput 
         placeholder='Name' 
