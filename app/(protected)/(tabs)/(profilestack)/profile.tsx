@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,9 +32,33 @@ export default function ProfileScreen() {
     )
   }
 
+  const logout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => auth.signOut(),
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
     <CreateAccountModal isOpen={createAccountModal} onSignUp={()=>{auth.signOut();router.replace("signup");setCreatAccountModal(false);}} onClose={()=>{router.replace("(mapstack)");setCreatAccountModal(false);}} />
+            <TouchableOpacity 
+            style={styles.logoutButton} 
+            onPress={logout}  
+          >  
+          <Ionicons name="exit-outline" size={30} color={colors.Black} />
+          </TouchableOpacity>
 <View style={styles.profileContainer}>
   <Ionicons name="person-circle" size={80} color={colors.Primary} style={styles.profileImage} />
   <Text style={styles.profileName}>{user?.name!=null?user.name:"Profile Name"}</Text>
@@ -62,4 +86,11 @@ const styles = StyleSheet.create({
   scoreTitle: { marginTop: 10, fontSize: 18, fontWeight: "bold" },
   score: { fontSize: 14, color: colors.DarkGrey },
   buttonContainer: { marginTop: 20 },
+  logoutButton: {    position: 'absolute',
+    top: 50,
+    right: 20,
+    padding: 10,
+    borderRadius: 30,
+    zIndex: 10,
+  },
 });

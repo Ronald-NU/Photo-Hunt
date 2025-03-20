@@ -24,8 +24,6 @@ export default function MapScreen() {
     </TouchableOpacity>
 
       <Text style={GeneralStyle.title}>Map</Text>
-
-      <Button title="Sign out" onPress={() => auth.signOut()} />
     </SafeAreaView>
   );
 }
