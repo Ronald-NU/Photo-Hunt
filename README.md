@@ -19,7 +19,7 @@
 <h2>Naviagtion</h2>
 <p>The navigation system is handled using expo-router, organizing pages under auth (authentication) and protected (gameplay). Navigation includes:</p>
 <li><b>Stack Navigation</b> for login and signup.</li>
-<li><b>Tab Navigation</b> for switching between game modes.</li>
+<li><b>Tab Navigation</b> for switching between the new game, map or profile stacks.</li>
 <li><b>Nested Navigation</b> within mapstack, newgamestack, and profilestack.</li>
 
 <h2>Authentication/User Creation Proccess</h2>
@@ -60,7 +60,7 @@
 <ul>
   <li><strong>Users</strong>: Stores user profiles and related information</li>
   <li><strong>Puzzles</strong>: Contains all created puzzles with their properties</li>
-  <li><strong>Plays</strong>: Records gameplay sessions and scores</li>
+  <li><strong>Plays</strong>: Records user gameplay sessions and scores</li>
 </ul>
 <h3>Data Structures</h3>
 <h4>User Data</h4>
