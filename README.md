@@ -4,6 +4,7 @@
 <h2>Contributions</h2>
 <p>All the contributions to the project currently!</p>
 <h3>Ronald Mundell</h3>
+<p><a href="https://northeastern-my.sharepoint.com/:v:/g/personal/mundell_r_northeastern_edu/EZr8R2x1DWxGr4flVdmqEoUBCb0oMJN_SYaRO2ERJ7RP5A?e=yJxoDd">CodeWalk Iteration 1</a></p>
 <l>
 <li>Setup of app and github</li>
 <li>Created CRUD operations for the collections found under <b>CRUD Operations</b></li>
