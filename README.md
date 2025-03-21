@@ -39,10 +39,8 @@
   <div style="width: 30%; margin-bottom: 20px;">
     <img src="screenshots/friend.png" alt="Friend Screen" style="width: 40%;">
     <p><strong>Friend Screen</strong></p>
-  </div>
-    </div>
-    <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/mypuzzle.PNG" alt="MyPuzzle Screen" style="width: 40%;">
+  <div style="width: 30%; margin-bottom: 20px; text-align: center;">
+    <img src="screenshots/mypuzzle.PNG" alt="MyPuzzle Screen" style="width: 100%; max-width: 200px;">
     <p><strong>MyPuzzle Screen</strong></p>
   </div>
     <div style="width: 30%; margin-bottom: 20px;">
