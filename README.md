@@ -34,11 +34,11 @@
   </div>
     <div style="width: 30%; margin-bottom: 20px;">
     <img src="screenshots/signup.png" alt="Signup Screen" style="width: 40%;">
-    <p><strong>Reminder Screen</strong></p>
+    <p><strong>Signup Screen</strong></p>
   </div>
   <div style="width: 30%; margin-bottom: 20px;">
-    <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
-    <p><strong>Friend Screen</strong></p>
+    <img src="screenshots/login.png" alt="Login Screen" style="width: 40%;">
+    <p><strong>Login Screen</strong></p>
   </div>
     <div style="width: 30%; margin-bottom: 20px;">
     <img src="screenshots/map.png" alt="Map Screen" style="width: 40%;">
