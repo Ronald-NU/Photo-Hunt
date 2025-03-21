@@ -74,7 +74,7 @@
     <p><strong>Signup Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
-    <img src="screenshots/map.png" alt="ForgotPassword Screen" style="width: 40%;">
+    <img src="screenshots/forgot.png" alt="ForgotPassword Screen" style="width: 40%;">
     <p><strong>Fogot Password Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
@@ -82,7 +82,7 @@
     <p><strong>Profile Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
-    <img src="screenshots/camera.PNG" alt="Anoynmous Profile Screen" style="width: 40%;">
+    <img src="screenshots/anoynmousProfile.png" alt="Anoynmous Profile Screen" style="width: 40%;">
     <p><strong>Profile Anoynmous Screen</strong></p>
   </div>
 </div>
