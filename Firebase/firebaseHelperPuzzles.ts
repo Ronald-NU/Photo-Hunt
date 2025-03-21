@@ -3,7 +3,7 @@ import { db } from "./firebaseSetup";
 import { CollectionPuzzle, PuzzleData, geoLocationData } from "@/Firebase/DataStructures";
 
 //New puzzle Creation
-export const createPuzzleDocument = async (userID: string, leaderBoardId:string, data: PuzzleData) => {
+export const createPuzzleDocument = async (userID: string, data: PuzzleData) => {
     try {
         const NewPuzzleData : PuzzleData = {
             id: data.id,

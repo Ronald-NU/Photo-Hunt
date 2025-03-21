@@ -24,6 +24,7 @@ export default function ProfileScreen() {
       }
     }, [user])
   );
+
   if(loading){
     return (
     <SafeAreaView style={GeneralStyle.container}>
@@ -50,9 +51,19 @@ export default function ProfileScreen() {
     );
   }
 
+  const signUp = () => {
+    auth.signOut();router.replace("signup");setCreatAccountModal(false);
+  }
+
+  const cancel = () => {
+    router.replace("(mapstack)");setCreatAccountModal(false);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-    <CreateAccountModal isOpen={createAccountModal} onSignUp={()=>{auth.signOut();router.replace("signup");setCreatAccountModal(false);}} onClose={()=>{router.replace("(mapstack)");setCreatAccountModal(false);}} />
+    <CreateAccountModal isOpen={createAccountModal} 
+    onSignUp={()=>{signUp()}} 
+    onClose={()=>{cancel()}} />
             <TouchableOpacity 
             style={styles.logoutButton} 
             onPress={logout}  

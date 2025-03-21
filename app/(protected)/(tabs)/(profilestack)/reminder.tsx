@@ -13,14 +13,14 @@ export default function ReminderScreen() {
     { id: "3", text: 'Complete "Puzzle 3" on July 25th' },
   ]);
 
-  // 删除提醒的函数
+
   const deleteReminder = (id: string) => {
     setReminders((prev) => prev.filter((reminder) => reminder.id !== id));
   };
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
-      {/* ❌ 删除这里的 header，StackLayout 已经提供返回按钮 */}
+
       <FlatList
         style={{width:'100%'}}
         data={reminders}
