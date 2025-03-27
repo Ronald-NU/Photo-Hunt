@@ -6,7 +6,6 @@ import { geoLocationData, UserData } from "@/Firebase/DataStructures";
 import MapView from "react-native-maps";
 import TouchableButton from "./TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
-import { auth } from "@/Firebase/firebaseSetup";
 import { updateUserDocument } from "@/Firebase/firebaseHelperUsers";
 
 const LocationManager = () => {
@@ -53,23 +52,6 @@ const LocationManager = () => {
 
     const locateUserHandler = async () => {
         await verifyPermissions();
-        try{
-        if(response?.granted){
-            const location = await getCurrentPositionAsync();
-            if(user){
-            var userData : UserData = user;
-            userData.geoLocation = location.coords;
-            updateUserDocument(id,userData);
-            }
-            setLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
-        }
-        }
-        catch (err) {
-            console.log(err);
-        }
     }
     const verifyPermissions = async () => {
         if(response?.granted) return true;

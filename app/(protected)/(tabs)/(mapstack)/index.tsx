@@ -1,9 +1,7 @@
 import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { auth } from '@/Firebase/firebaseSetup';
 import { GeneralStyle } from '@/constants/Styles';
 import LocationManager from '@/components/LocationManager';
 
