@@ -39,14 +39,16 @@ export const getPuzzleData = async (id: string) => {
 export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
+        const nearbyPuzzles: PuzzleData[] = []; // Store all matching puzzles
+
         querySnapshot.forEach((doc) => {
             var loc = doc.data().geoLocation as geoLocationData
             //return puzzles within 10 miles
-            if (Math.abs(loc.latitude - currentLocation.latitude) < 0.1 && Math.abs(loc.longitude - currentLocation.longitude) < 0.1) {
-                return doc.data();
+            if (haversineDistance(loc,currentLocation) <= 100) {
+                nearbyPuzzles.push(doc.data() as PuzzleData);
             }
         });
-        return null;
+        return nearbyPuzzles.length > 0 ? nearbyPuzzles : null;
     } catch (e) {
         return e;
     }

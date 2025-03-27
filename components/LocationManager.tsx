@@ -1,17 +1,25 @@
 import { View, Text, Alert } from "react-native";
 import { getCurrentPositionAsync, useForegroundPermissions, Accuracy, watchPositionAsync } from "expo-location";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "./UserContext";
-import { geoLocationData, UserData } from "@/Firebase/DataStructures";
-import MapView from "react-native-maps";
+import { geoLocationData, PuzzleData, UserData } from "@/Firebase/DataStructures";
+import MapView, { Marker } from "react-native-maps";
 import TouchableButton from "./TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
 import { updateUserDocument } from "@/Firebase/firebaseHelperUsers";
+import { getLocalPuzzles } from "@/Firebase/firebaseHelperPuzzles";
 
 const LocationManager = () => {
     const [response, requestPermission] = useForegroundPermissions();
     const [mylocation, setLocation] = useState<geoLocationData>();
+    const [puzzles, setPuzzles] = useState<PuzzleData[]>();
+    const prevLocationRef = useRef<geoLocationData | undefined>();
     const { user, id } = useUser();
+
+    const lastFetchTimeRef = useRef<number | undefined>(); // Track the last fetch time
+    const fetchInterval = 30 * 60 * 1000;
+
+
     useEffect(()=>{
     const trackLocation = async () => {
         if(await verifyPermissions()){
@@ -50,6 +58,62 @@ const LocationManager = () => {
     trackLocation();
     },[,response])
 
+    //Gets puzzzle changes based on distance
+    useEffect(() => {
+        const getPuzzlesDistance = async () => {
+            if (mylocation && prevLocationRef.current) {
+                const prevLocation = prevLocationRef.current;
+                const distance = haversineDistance(
+                    { latitude: prevLocation.latitude, longitude: prevLocation.longitude },
+                    { latitude: mylocation.latitude, longitude: mylocation.longitude }
+                );
+
+                if (distance >= 40) {
+                    const puzzles = await getLocalPuzzles(mylocation) as PuzzleData[];
+                    setPuzzles(puzzles);
+                }
+            } else {
+                if (mylocation) {
+                    const puzzles = await getLocalPuzzles(mylocation) as PuzzleData[];
+                    setPuzzles(puzzles);
+                }
+            }
+
+            // Update the previous location reference
+            prevLocationRef.current = mylocation;
+        };
+
+        getPuzzlesDistance();
+    }, [mylocation]);
+
+    useEffect(() => {
+        const getPuzzlesTime = async () => {
+            const currentTime = Date.now(); // Get the current timestamp
+
+            // Check if enough time has passed since the last fetch
+            if (!lastFetchTimeRef.current || currentTime - lastFetchTimeRef.current >= fetchInterval) {
+                if (mylocation) {
+                    const puzzles = await getLocalPuzzles(mylocation) as PuzzleData[];
+                    setPuzzles(puzzles);
+                    lastFetchTimeRef.current = currentTime; // Update the last fetch time
+                }
+            }
+        };
+
+        // Fetch puzzles on first mount or when the location changes
+        getPuzzlesTime();
+
+        // Set up an interval to periodically check for new puzzles
+        const intervalId = setInterval(() => {
+            getPuzzlesTime();
+        }, fetchInterval);
+
+        // Cleanup the interval on component unmount
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
     const locateUserHandler = async () => {
         await verifyPermissions();
     }
@@ -74,6 +138,12 @@ if(response?.granted && mylocation){
         showsUserLocation={true}
         followsUserLocation={true}
         >
+            {
+             puzzles?.map((puzzle)=>{
+                console.log(puzzle);
+                return null;
+             })
+            }
     </MapView>
   )
 }else{
