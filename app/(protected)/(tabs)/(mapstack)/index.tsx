@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '@/Firebase/firebaseSetup';
 import { GeneralStyle } from '@/constants/Styles';
+import LocationManager from '@/components/LocationManager';
 
 export default function MapScreen() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function MapScreen() {
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
+      <LocationManager />
       {/* Make the leaderboard button bigger and more visible for testing */}
       <TouchableOpacity 
       style={styles.leaderboardButton} 
@@ -22,8 +24,6 @@ export default function MapScreen() {
     >
       <Ionicons name="trophy-outline" size={30} color="black" />
     </TouchableOpacity>
-
-      <Text style={GeneralStyle.title}>Map</Text>
     </SafeAreaView>
   );
 }
