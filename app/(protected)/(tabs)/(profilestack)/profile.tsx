@@ -66,8 +66,7 @@ export default function ProfileScreen() {
     onClose={()=>{cancel()}} />
             <TouchableOpacity 
             style={styles.logoutButton} 
-            onPress={logout}  
-          >  
+            onPress={logout} >  
           <Ionicons name="exit-outline" size={30} color={colors.Black} />
           </TouchableOpacity>
 <View style={styles.profileContainer}>

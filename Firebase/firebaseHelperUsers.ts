@@ -44,7 +44,7 @@ export const getUserData = async (uid: string)=> {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
         for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
-                return doc.data();
+                return doc;
             }
         }
         return null;
