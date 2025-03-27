@@ -15,7 +15,7 @@ export default function MapScreen() {
   };
 
   return (
-    <SafeAreaView style={GeneralStyle.container}>
+    <View style={GeneralStyle.container}>
       <LocationManager />
       {/* Make the leaderboard button bigger and more visible for testing */}
       <TouchableOpacity 
@@ -24,7 +24,7 @@ export default function MapScreen() {
     >
       <Ionicons name="trophy-outline" size={30} color="black" />
     </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 
