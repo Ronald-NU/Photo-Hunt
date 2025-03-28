@@ -24,6 +24,15 @@ export default function signup() {
                     Alert.alert("Please fill out all fields");
                     return;
                 }
+                if(password.length < 8){
+                    Alert.alert("Make sure password is at least 8 characters");
+                    return;
+                }
+
+                if(!/[A-Z]/.test(password)){
+                    Alert.alert("Make sure has at least 1 capital letter");
+                    return;
+                }
                 if(password != confirmpassword){
                     Alert.alert("Passwords do not match");
                     return;

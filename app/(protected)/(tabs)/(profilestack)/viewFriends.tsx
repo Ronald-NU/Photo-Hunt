@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ViewFriendsScreen() {
   const [friends, setFriends] = useState<FriendMiniData[]>([]);
-  const {user, setLoading} = useUser();
+  const {user} = useUser();
 
   useFocusEffect(
     useCallback(() => {
