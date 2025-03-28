@@ -142,7 +142,7 @@ if(response?.granted && mylocation){
              puzzles?.map((puzzle)=>{
                 console.log(puzzle);
                 if(haversineDistance(puzzle.geoLocation, mylocation)<= 10){
-                return null;
+                return (<Marker pinColor="red" coordinate={puzzle.geoLocation} />);
                 }
              })
             }
