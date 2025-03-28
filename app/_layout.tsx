@@ -10,8 +10,7 @@ export default function Layout() {
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
-          if (user) {
-            
+          if (user) {        
             setUserLoggedIn(true);
           } else {
             setUserLoggedIn(false);

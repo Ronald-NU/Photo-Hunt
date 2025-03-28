@@ -4,6 +4,7 @@
 export const CollectionUser = "Users";
 export const CollectionPuzzle = "Puzzles";
 export const CollectionPlay = "Plays";
+export const CollectionRequests = "Requests";
 
 export type UserData = {
     name: string;
@@ -57,3 +58,11 @@ export type PlayData = {
     name: string;
     score: number;
 };
+
+export type FriendRequest = {
+    friendCode: string;
+    requesterCode: string;
+    name:string;
+    status: STATUS;
+}
+export type STATUS = 'PENDING'|'ACCEPTED'|'REJECTED';
