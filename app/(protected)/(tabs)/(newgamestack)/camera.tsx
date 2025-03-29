@@ -149,14 +149,14 @@ export default function CameraScreen() {
 
 const styles = StyleSheet.create({
   safeArea: {
-    paddingBottom: Platform.OS === 'ios' ? 100 : 80, // Add padding to account for bottom tab bar
+    paddingBottom: Platform.OS === 'ios' ? 100 : 80,
   },
   imagePreview: {
-    flex: 1,
+    width: '100%',
+    height: '70%', // Reduce height to leave space for buttons
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
-    width: '100%',
+    marginTop: -180,
   },
   image: {
     width: '90%',
@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 120 : 100,
     paddingHorizontal: 20,
+    backgroundColor: 'transparent',
   },
   cameraButton: {
     width: 70,
