@@ -1,52 +1,75 @@
-import { View, Text, StyleSheet, Image, Button, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { View, Text, StyleSheet, Image, Button, TouchableOpacity, Platform } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useState, useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 
 export default function CameraScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { locationName, difficulty } = params;
+  
   const [imageUri, setImageUri] = useState('');
   const [loading, setLoading] = useState(false);
-  const [cameraPermission, requestPermission] = ImagePicker.useCameraPermissions();
-  
-  const verifyPermission = async () => {
-    if (cameraPermission?.granted) {
-      return true;
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
+  const [locationPermission, requestLocationPermission] = Location.useForegroundPermissions();
+
+  useEffect(() => {
+    (async () => {
+      if (!locationPermission?.granted) {
+        const permissionResult = await requestLocationPermission();
+        if (!permissionResult.granted) {
+          alert("You need to grant location permissions to create a puzzle");
+          router.back();
+        }
+      }
+    })();
+  }, []);
+
+  const verifyPermissions = async () => {
+    // Verify camera permission
+    if (!cameraPermission?.granted) {
+      const cameraResult = await requestCameraPermission();
+      if (!cameraResult.granted) {
+        alert("You need to grant camera permissions to take a photo");
+        return false;
+      }
     }
-    
-    const permissionResult = await requestPermission();
-    return permissionResult.granted;
+
+    // Verify location permission
+    if (!locationPermission?.granted) {
+      const locationResult = await requestLocationPermission();
+      if (!locationResult.granted) {
+        alert("You need to grant location permissions to create a puzzle");
+        return false;
+      }
+    }
+
+    return true;
   };
   
   const takeImageHandler = async () => {
     setLoading(true);
     try {
-      const hasPermission = await verifyPermission();
-      
-      if (!hasPermission) {
-        alert("You need to grant camera permissions to take a photo");
-        return;
-      }
+      const hasPermissions = await verifyPermissions();
+      if (!hasPermissions) return;
+
+      // Get current location
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
       
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.5,
+        aspect: [1, 1], // Changed to 1:1 for better puzzle creation
+        quality: 0.8,
       });
-      
-      console.log("Camera Result:", JSON.stringify(result, null, 2));
       
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const uri = result.assets[0].uri;
-        console.log("Setting image URI to:", uri);
         setImageUri(uri);
-        
-        // For debugging purposes
-        setTimeout(() => {
-          console.log("Current imageUri state:", imageUri);
-        }, 100);
       } else {
         alert("No image was selected.");
       }
@@ -57,9 +80,28 @@ export default function CameraScreen() {
       setLoading(false);
     }
   };
+
+  const handleCreatePuzzle = () => {
+    if (!location) {
+      alert("Location data is not available. Please try again.");
+      return;
+    }
+
+    // Navigate to puzzle screen with all necessary data
+    router.push({
+      pathname: "puzzle",
+      params: {
+        imageUri,
+        difficulty,
+        locationName,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      }
+    });
+  };
   
   return (
-    <SafeAreaView style={GeneralStyle.container}>
+    <SafeAreaView style={[GeneralStyle.container, styles.safeArea]}>
       <View style={styles.imagePreview}>
         {loading ? (
           <Text style={TextStyles.mediumText}>Loading image...</Text>
@@ -76,38 +118,81 @@ export default function CameraScreen() {
         )}
       </View>
       
-      <TouchableOpacity 
-        style={styles.cameraButton} 
-        onPress={takeImageHandler}
-        disabled={loading}
-      >
-        <View style={[
-          styles.cameraButtonInner, 
-          loading && {backgroundColor: 'darkgray'}
-        ]} />
-      </TouchableOpacity>
-      
-      {imageUri && !loading && (
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Use This Photo"
-            onPress={() => {
-              // Here you would save the photo URI to pass back to NewGame
-              // For now, just go back
-              router.back();
-            }}
-          />
-          <Button
-            title="Take Another"
-            onPress={takeImageHandler}
-          />
-        </View>
-      )}
+      <View style={styles.bottomContainer}>
+        <TouchableOpacity 
+          style={styles.cameraButton} 
+          onPress={takeImageHandler}
+          disabled={loading}
+        >
+          <View style={[
+            styles.cameraButtonInner, 
+            loading && {backgroundColor: 'darkgray'}
+          ]} />
+        </TouchableOpacity>
+        
+        {imageUri && !loading && (
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create Puzzle"
+              onPress={handleCreatePuzzle}
+            />
+            <Button
+              title="Take Another"
+              onPress={takeImageHandler}
+            />
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    paddingBottom: Platform.OS === 'ios' ? 100 : 80, // Add padding to account for bottom tab bar
+  },
+  imagePreview: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+    width: '100%',
+  },
+  image: {
+    width: '90%',
+    height: '90%',
+    borderRadius: 8,
+  },
+  bottomContainer: {
+    width: '100%',
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 120 : 100,
+    paddingHorizontal: 20,
+  },
+  cameraButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
+    borderWidth: 4,
+    borderColor: 'gray',
+  },
+  cameraButtonInner: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'lightgray',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 20,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -122,44 +207,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  imagePreview: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 20,
-    width: '100%',
-  },
-  image: {
-    width: '90%',
-    height: '90%',
-    borderRadius: 8,
-    bottom: 70,
-
-  },
-  cameraButton: {
-    position:'absolute',
-    bottom:'20%',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 30,
-    borderWidth: 4,
-    borderColor: 'gray',
-  },
-  cameraButtonInner: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'lightgray',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginBottom: 30,
-  }
 });
