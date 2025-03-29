@@ -1,29 +1,47 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TouchableButton from "@/components/TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
+import { Ionicons } from '@expo/vector-icons';
+import { useSelectedLocation } from '@/components/SelectedLocationContext';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
 export default function NewGameScreen() {
-  const [locationName, setLocationName] = useState('');
+  const [puzzleName, setPuzzleName] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
   const router = useRouter();
+  const { selectedLocation } = useSelectedLocation();
 
   const handleTakePhoto = () => {
-    if (!locationName.trim()) {
-      Alert.alert("Notice", "Please enter a location name");
+    if (!puzzleName.trim()) {
+      Alert.alert("Notice", "Please enter a puzzle name");
+      return;
+    }
+
+    if (!selectedLocation) {
+      Alert.alert(
+        "Location Required",
+        "Please select a location on the map first",
+        [
+          {
+            text: "OK",
+            onPress: () => router.back()
+          }
+        ]
+      );
       return;
     }
     
-    // Navigate to camera with location and difficulty params
     router.push({
       pathname: "camera",
       params: {
-        locationName,
+        locationName: puzzleName,
         difficulty,
+        latitude: selectedLocation.latitude.toString(),
+        longitude: selectedLocation.longitude.toString(),
       }
     });
   };
@@ -37,10 +55,20 @@ export default function NewGameScreen() {
       <Text style={styles.label}>Name</Text>
       <TextInput
         style={styles.input}
-        placeholder="Enter location name"
-        value={locationName}
-        onChangeText={setLocationName}
+        placeholder="Enter puzzle name"
+        value={puzzleName}
+        onChangeText={setPuzzleName}
       />
+
+      <Text style={styles.label}>Selected Location</Text>
+      <View style={styles.locationContainer}>
+        <View style={styles.locationContent}>
+          <Ionicons name="location" size={24} color="#00A9E0" />
+          <Text style={styles.locationText}>
+            {selectedLocation?.name || "No location selected"}
+          </Text>
+        </View>
+      </View>
 
       <Text style={styles.label}>Puzzle Difficulty</Text>
       <View style={styles.difficultyContainer}>
@@ -97,6 +125,25 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 15,
     marginBottom: 20,
+    fontSize: 16,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 25,
+    padding: 15,
+    marginBottom: 20,
+  },
+  locationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  locationText: {
+    fontSize: 16,
+    marginLeft: 10,
+    color: '#666',
   },
   difficultyContainer: {
     flexDirection: 'row',

@@ -1,23 +1,51 @@
 import { View, Text, Alert } from "react-native";
-import { getCurrentPositionAsync, useForegroundPermissions, Accuracy, watchPositionAsync } from "expo-location";
+import { getCurrentPositionAsync, useForegroundPermissions, Accuracy, watchPositionAsync, reverseGeocodeAsync } from "expo-location";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "./UserContext";
 import { geoLocationData, PuzzleData, UserData } from "@/Firebase/DataStructures";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, MapPressEvent } from "react-native-maps";
 import TouchableButton from "./TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
 import { updateUserDocument } from "@/Firebase/firebaseHelperUsers";
 import { getLocalPuzzles, haversineDistance } from "@/Firebase/firebaseHelperPuzzles";
+import { SelectedLocation } from "@/app/(protected)/(tabs)/(mapstack)";
 
-const LocationManager = () => {
+interface LocationManagerProps {
+  onLocationSelect?: (location: SelectedLocation) => void;
+}
+
+const LocationManager: React.FC<LocationManagerProps> = ({ onLocationSelect }) => {
     const [response, requestPermission] = useForegroundPermissions();
     const [mylocation, setLocation] = useState<geoLocationData>();
     const [puzzles, setPuzzles] = useState<PuzzleData[]>();
+    const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
     const prevLocationRef = useRef<geoLocationData | undefined>();
     const { user, id } = useUser();
 
     const lastFetchTimeRef = useRef<number | undefined>(); // Track the last fetch time
     const fetchInterval = 30 * 60 * 1000;
+
+    const handleMapPress = async (event: MapPressEvent) => {
+      const { coordinate } = event.nativeEvent;
+      try {
+        const address = await reverseGeocodeAsync({
+          latitude: coordinate.latitude,
+          longitude: coordinate.longitude
+        });
+
+        if (address.length > 0) {
+          const location: SelectedLocation = {
+            name: address[0].name || `${address[0].street || ''} ${address[0].city || ''}`.trim(),
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude
+          };
+          setSelectedMarker(location);
+          onLocationSelect?.(location);
+        }
+      } catch (error) {
+        console.error('Error getting location name:', error);
+      }
+    };
 
     useEffect(()=>{
     const trackLocation = async () => {
@@ -141,6 +169,7 @@ if(response?.granted && mylocation){
         latitudeDelta:0.05}}
         showsUserLocation={true}
         followsUserLocation={true}
+        onPress={handleMapPress}
         >
             {puzzles && puzzles.map((puzzle) => {
                 if (haversineDistance(puzzle.geoLocation, mylocation) <= 10) {
@@ -155,6 +184,16 @@ if(response?.granted && mylocation){
                 }
                 return null;
             })}
+            {selectedMarker && (
+                <Marker
+                    coordinate={{
+                        latitude: selectedMarker.latitude,
+                        longitude: selectedMarker.longitude
+                    }}
+                    pinColor="blue"
+                    title={selectedMarker.name}
+                />
+            )}
     </MapView>
   )
 }else{
