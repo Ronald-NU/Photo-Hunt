@@ -30,7 +30,9 @@ export default function NewGameScreen() {
 
   return (
     <SafeAreaView style={[GeneralStyle.container, styles.container]}>
-      <Text style={GeneralStyle.title}>New Game</Text>
+      <View style={styles.titleContainer}>
+        <Text style={[GeneralStyle.title, styles.title]}>New Game</Text>
+      </View>
       
       <Text style={styles.label}>Name</Text>
       <TextInput
@@ -77,9 +79,17 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
+  titleContainer: {
+    marginBottom: 40,
+    marginTop: -20,
+  },
+  title: {
+    fontSize: 32,
+    color: '#00A9E0',
+  },
   label: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 18,
   },
   input: {
     borderWidth: 1,
