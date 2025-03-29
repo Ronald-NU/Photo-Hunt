@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert, Image, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +8,8 @@ import { useUser } from "@/components/UserContext";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 
 const PUZZLE_SIZE = {
   Easy: 3, // 3x3 grid
@@ -26,6 +28,27 @@ export default function PuzzleScreen() {
   const [docId, setDocId] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
 
+  const { imageUri, difficulty, locationName, latitude, longitude, isFromMyPuzzles } = params;
+  const isViewMode = isFromMyPuzzles === "true";
+  const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
+  const totalPieces = gridSize * gridSize;
+
+  useEffect(() => {
+    // Initialize puzzle pieces
+    const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
+    // Only shuffle pieces if not in view mode
+    if (!isViewMode) {
+      for (let i = initialPieces.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [initialPieces[i], initialPieces[j]] = [initialPieces[j], initialPieces[i]];
+      }
+      setHidden(totalPieces - 1);
+    } else {
+      setHidden(null);
+    }
+    setPieces(initialPieces);
+  }, [isViewMode, totalPieces]);
+
   useEffect(() => {
     // Get user document ID when component mounts
     const fetchDocId = async () => {
@@ -36,26 +59,13 @@ export default function PuzzleScreen() {
         }
       }
     };
-    fetchDocId();
-  }, [user]);
-
-  const { imageUri, difficulty, locationName, latitude, longitude } = params;
-  const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
-  const totalPieces = gridSize * gridSize;
-
-  useEffect(() => {
-    // Initialize puzzle pieces
-    const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
-    // Shuffle pieces
-    for (let i = initialPieces.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [initialPieces[i], initialPieces[j]] = [initialPieces[j], initialPieces[i]];
+    if (!isViewMode) {
+      fetchDocId();
     }
-    setPieces(initialPieces);
-    setHidden(totalPieces - 1);
-  }, []);
+  }, [user, isViewMode]);
 
   const handleChange = (nextPieces: readonly number[], nextHidden: number | null) => {
+    if (isViewMode) return; // Disable puzzle interaction in view mode
     setPieces([...nextPieces]);
     setHidden(nextHidden);
     setMoves(prev => prev + 1);
@@ -69,53 +79,66 @@ export default function PuzzleScreen() {
   };
 
   const handleSave = async () => {
-    if (!user || !docId) return;
-
-    const puzzleData: PuzzleData = {
-      id: Date.now().toString(),
-      creatorID: user.uid,
-      name: locationName as string,
-      photoURL: imageUri as string,
-      difficulty: Number(gridSize),
-      geoLocation: {
-        latitude: Number(latitude),
-        longitude: Number(longitude)
-      }
-    };
+    if (!user) {
+      Alert.alert("Error", "Please log in to save puzzles.");
+      return;
+    }
 
     try {
+      const puzzleData: PuzzleData = {
+        id: Date.now().toString(),
+        creatorID: user.uid,
+        name: locationName as string,
+        photoURL: imageUri as string,
+        difficulty: Number(gridSize),
+        geoLocation: {
+          latitude: Number(latitude),
+          longitude: Number(longitude)
+        }
+      };
+
       // Create puzzle in Firebase Puzzles collection
       const puzzleDocId = await createPuzzleDocument(user.uid, puzzleData);
-      if (puzzleDocId) {
-        // Add to user's mypuzzles array
-        const newPuzzle: PuzzleMiniData = {
-          id: puzzleData.id,
-          name: puzzleData.name,
-          difficulty: puzzleData.difficulty
-        };
-
-        const updatedMypuzzles = user.mypuzzles ? [...user.mypuzzles, newPuzzle] : [newPuzzle];
-
-        // Update user document with new puzzle
-        await updateUserDocument(docId, {
-          mypuzzles: updatedMypuzzles
-        });
-        setIsSaved(true);
-        Alert.alert(
-          "Puzzle Saved",
-          "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
-          [
-            {
-              text: "View My Puzzles",
-              onPress: () => router.push("/(protected)/(tabs)/(profilestack)/myPuzzles")
-            },
-            {
-              text: "Continue Playing",
-              style: "cancel"
-            }
-          ]
-        );
+      
+      if (!puzzleDocId) {
+        throw new Error("Failed to create puzzle document");
       }
+
+      // Get current user data to ensure we have the latest mypuzzles array
+      const currentUserData = await getUserData(user.uid);
+      if (!currentUserData) {
+        throw new Error("Failed to get user data");
+      }
+
+      // Add to user's mypuzzles array
+      const newPuzzle: PuzzleMiniData = {
+        id: puzzleData.id,
+        name: puzzleData.name,
+        difficulty: puzzleData.difficulty
+      };
+
+      const updatedMypuzzles = currentUserData.mypuzzles ? [...currentUserData.mypuzzles, newPuzzle] : [newPuzzle];
+
+      // Update user document with new puzzle
+      await updateUserDocument(currentUserData.id, {
+        mypuzzles: updatedMypuzzles
+      });
+
+      setIsSaved(true);
+      Alert.alert(
+        "Puzzle Saved",
+        "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
+        [
+          {
+            text: "View My Puzzles",
+            onPress: () => router.push("/(protected)/(tabs)/(profilestack)/myPuzzles")
+          },
+          {
+            text: "Continue Playing",
+            style: "cancel"
+          }
+        ]
+      );
     } catch (error) {
       console.error('Error saving puzzle:', error);
       Alert.alert("Error", "Failed to save puzzle. Please try again.");
@@ -123,7 +146,11 @@ export default function PuzzleScreen() {
   };
 
   const handleBack = () => {
-    if (!isSaved) {
+    if (isViewMode) {
+      // If viewing from MyPuzzles, go back directly
+      router.back();
+    } else if (!isSaved) {
+      // If creating new puzzle and not saved, show confirmation
       Alert.alert(
         "Leave without saving?",
         "Your puzzle hasn't been saved yet. Are you sure you want to leave?",
@@ -153,33 +180,52 @@ export default function PuzzleScreen() {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={handleSave}>
-              <Text style={styles.headerButton}>Save</Text>
-            </TouchableOpacity>
+            !isViewMode ? (
+              <TouchableOpacity onPress={handleSave}>
+                <Text style={styles.headerButton}>Save</Text>
+              </TouchableOpacity>
+            ) : null
           ),
           title: locationName as string,
           headerTitle: () => (
             <View style={styles.headerCenter}>
               <Text style={styles.title}>{locationName as string}</Text>
-              <Text style={styles.moves}>Moves: {moves}</Text>
+              <Text style={styles.moves}>
+                {isViewMode ? `Difficulty: ${difficulty}` : `Moves: ${moves}`}
+              </Text>
             </View>
           )
         }}
       />
 
       <View style={styles.puzzleContainer}>
-        {pieces.length > 0 && (
-          <PicturePuzzle
-            size={Dimensions.get('window').width - 40}
-            pieces={pieces}
-            hidden={hidden}
-            onChange={handleChange}
-            source={{ uri: imageUri as string }}
-          />
+        {pieces.length > 0 ? (
+          isViewMode ? (
+            <Image
+              style={{
+                width: Dimensions.get('window').width - 40,
+                height: Dimensions.get('window').width - 40,
+                resizeMode: 'contain'
+              }}
+              source={{ uri: imageUri as string }}
+            />
+          ) : (
+            <PicturePuzzle
+              size={Dimensions.get('window').width - 40}
+              pieces={pieces}
+              hidden={hidden}
+              onChange={handleChange}
+              source={{ uri: imageUri as string }}
+            />
+          )
+        ) : (
+          <View style={styles.loadingContainer}>
+            <Text>Loading puzzle...</Text>
+          </View>
         )}
       </View>
 
-      {isComplete && (
+      {isComplete && !isViewMode && (
         <View style={styles.completeContainer}>
           <Text style={styles.completeText}>Puzzle Complete!</Text>
           <Text style={styles.completeSubText}>Total Moves: {moves}</Text>
@@ -249,5 +295,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }); 
