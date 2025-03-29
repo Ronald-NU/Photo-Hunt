@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
@@ -24,6 +24,7 @@ export default function PuzzleScreen() {
   const [hidden, setHidden] = useState<number | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [docId, setDocId] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     // Get user document ID when component mounts
@@ -63,11 +64,11 @@ export default function PuzzleScreen() {
     const isCorrect = nextPieces.every((piece, index) => piece === index);
     if (isCorrect) {
       setIsComplete(true);
-      savePuzzle();
+      handleSave();
     }
   };
 
-  const savePuzzle = async () => {
+  const handleSave = async () => {
     if (!user || !docId) return;
 
     const puzzleData: PuzzleData = {
@@ -75,7 +76,7 @@ export default function PuzzleScreen() {
       creatorID: user.uid,
       name: locationName as string,
       photoURL: imageUri as string,
-      difficulty: Number(difficulty),
+      difficulty: Number(gridSize),
       geoLocation: {
         latitude: Number(latitude),
         longitude: Number(longitude)
@@ -84,49 +85,87 @@ export default function PuzzleScreen() {
 
     try {
       // Create puzzle in Firebase Puzzles collection
-      await createPuzzleDocument(user.uid, puzzleData);
+      const puzzleDocId = await createPuzzleDocument(user.uid, puzzleData);
+      if (puzzleDocId) {
+        // Add to user's mypuzzles array
+        const newPuzzle: PuzzleMiniData = {
+          id: puzzleData.id,
+          name: puzzleData.name,
+          difficulty: puzzleData.difficulty
+        };
 
-      // Add to user's mypuzzles array
-      const newPuzzle: PuzzleMiniData = {
-        id: puzzleData.id,
-        name: puzzleData.name,
-        difficulty: puzzleData.difficulty
-      };
+        const updatedMypuzzles = user.mypuzzles ? [...user.mypuzzles, newPuzzle] : [newPuzzle];
 
-      const updatedMypuzzles = user.mypuzzles ? [...user.mypuzzles, newPuzzle] : [newPuzzle];
-
-      // Update user document with new puzzle
-      await updateUserDocument(docId, {
-        mypuzzles: updatedMypuzzles
-      });
+        // Update user document with new puzzle
+        await updateUserDocument(docId, {
+          mypuzzles: updatedMypuzzles
+        });
+        setIsSaved(true);
+        Alert.alert(
+          "Puzzle Saved",
+          "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
+          [
+            {
+              text: "View My Puzzles",
+              onPress: () => router.push("/(protected)/(tabs)/(profilestack)/myPuzzles")
+            },
+            {
+              text: "Continue Playing",
+              style: "cancel"
+            }
+          ]
+        );
+      }
     } catch (error) {
       console.error('Error saving puzzle:', error);
+      Alert.alert("Error", "Failed to save puzzle. Please try again.");
     }
   };
 
-  const handleBackToHome = () => {
-    // Show completion alert
-    Alert.alert(
-      "Puzzle Saved",
-      "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            // Navigate back to the profile/myPuzzles screen
-            router.push("/(protected)/(tabs)/(profilestack)/myPuzzles");
+  const handleBack = () => {
+    if (!isSaved) {
+      Alert.alert(
+        "Leave without saving?",
+        "Your puzzle hasn't been saved yet. Are you sure you want to leave?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Leave",
+            onPress: () => router.back()
           }
-        }
-      ]
-    );
+        ]
+      );
+    } else {
+      router.back();
+    }
   };
 
   return (
-    <SafeAreaView style={[GeneralStyle.container, styles.container]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{locationName as string}</Text>
-        <Text style={styles.moves}>Moves: {moves}</Text>
-      </View>
+    <SafeAreaView style={GeneralStyle.container}>
+      <Stack.Screen 
+        options={{
+          headerLeft: () => (
+            <TouchableOpacity onPress={handleBack}>
+              <Text style={styles.headerButton}>Back</Text>
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={handleSave}>
+              <Text style={styles.headerButton}>Save</Text>
+            </TouchableOpacity>
+          ),
+          title: locationName as string,
+          headerTitle: () => (
+            <View style={styles.headerCenter}>
+              <Text style={styles.title}>{locationName as string}</Text>
+              <Text style={styles.moves}>Moves: {moves}</Text>
+            </View>
+          )
+        }}
+      />
 
       <View style={styles.puzzleContainer}>
         {pieces.length > 0 && (
@@ -146,7 +185,7 @@ export default function PuzzleScreen() {
           <Text style={styles.completeSubText}>Total Moves: {moves}</Text>
           <TouchableOpacity 
             style={styles.button}
-            onPress={handleBackToHome}
+            onPress={() => router.push("/(protected)/(tabs)/(profilestack)/myPuzzles")}
           >
             <Text style={styles.buttonText}>View My Puzzles</Text>
           </TouchableOpacity>
@@ -157,26 +196,27 @@ export default function PuzzleScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  headerButton: {
+    color: '#007AFF',
+    fontSize: 17,
+    padding: 10,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  headerCenter: {
     alignItems: 'center',
-    marginBottom: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontWeight: '600',
   },
   moves: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
   },
   puzzleContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
   completeContainer: {
     position: 'absolute',
