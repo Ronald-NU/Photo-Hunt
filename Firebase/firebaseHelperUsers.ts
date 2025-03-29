@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
+import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc, query, where } from "firebase/firestore"; 
 import { db } from "./firebaseSetup";
 import { UserCreateData, UserData, CollectionUser, geoLocationData } from "@/Firebase/DataStructures";
 
@@ -39,16 +39,22 @@ const generateFriendCode = async () => {
     return code;
 }
 //Gets user data from the database based on the user's uid
-export const getUserData = async (uid: string)=> {
+export const getUserData = async (uid: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
         for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
-                return doc;
+                const userData = doc.data() as UserData;
+                return {
+                    ...userData,
+                    id: doc.id,
+                    mypuzzles: userData.mypuzzles || []
+                };
             }
         }
         return null;
     } catch (e) {
+        console.error("Error getting user data:", e);
         return null;
     }
 }

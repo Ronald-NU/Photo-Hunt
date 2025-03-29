@@ -30,9 +30,11 @@ export const createPuzzleDocument = async (userID: string, data: PuzzleData) => 
             difficulty: data.difficulty,
         }
         const docRef = await addDoc(collection(db, CollectionPuzzle), NewPuzzleData);
+        console.log("Puzzle document created with ID:", docRef.id);
         return docRef.id;
     } catch (e) {
-        return e;
+        console.error("Error creating puzzle document:", e);
+        return null;
     }
 }
 
@@ -45,10 +47,23 @@ export const getPuzzleData = async (id: string): Promise<PuzzleData | null> => {
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             if (data.id === id) {
-                foundPuzzle = data as PuzzleData;
+                foundPuzzle = {
+                    id: data.id,
+                    creatorID: data.creatorID,
+                    name: data.name,
+                    photoURL: data.photoURL,
+                    difficulty: data.difficulty,
+                    geoLocation: {
+                        latitude: data.geoLocation.latitude,
+                        longitude: data.geoLocation.longitude
+                    }
+                } as PuzzleData;
             }
         });
         
+        if (!foundPuzzle) {
+            console.log("No puzzle found with id:", id);
+        }
         return foundPuzzle;
     } catch (e) {
         console.error("Error getting puzzle data:", e);
