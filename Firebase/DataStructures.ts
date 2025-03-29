@@ -6,17 +6,18 @@ export const CollectionPuzzle = "Puzzles";
 export const CollectionPlay = "Plays";
 export const CollectionRequests = "Requests";
 
-export type UserData = {
+export interface UserData {
+    id?: string;  // Optional because it's added after fetching from Firestore
     name: string;
     email: string;
-    code: string;
     uid: string;
     photoURL: string;
+    code: string;
     score: number;
-    friends: FriendMiniData[];
+    friends: never[];
     mypuzzles: PuzzleMiniData[];
     geoLocation: geoLocationData;
-};
+}
 
 export type UserCreateData = {
     name: string;
