@@ -20,7 +20,7 @@ export default function MapScreen() {
     router.push("leaderboard");
   };
 
-  const handleLocationSelect = (location: SelectedLocation) => {
+  const handleLocationSelect = (location: SelectedLocation | null) => {
     setSelectedLocation(location);
   };
 

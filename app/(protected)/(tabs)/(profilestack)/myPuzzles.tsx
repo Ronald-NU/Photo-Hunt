@@ -3,13 +3,15 @@ import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { useFocusEffect, useRouter, Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
+import { getUserData } from "@/Firebase/firebaseHelperUsers";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
-  const {user} = useUser();
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
   const router = useRouter();
 
   const getDifficultyText = (difficulty: number) => {
@@ -21,43 +23,83 @@ export default function MyPuzzlesScreen() {
     }
   };
 
+  const fetchUserPuzzles = useCallback(async () => {
+    if (!user?.uid) return;
+    
+    setIsLoading(true);
+    try {
+      // Get fresh user data from the database
+      const userData = await getUserData(user.uid);
+      if (userData && userData.mypuzzles) {
+        setPuzzles(userData.mypuzzles);
+      } else {
+        setPuzzles([]);
+      }
+    } catch (error) {
+      console.error("Error fetching user puzzles:", error);
+      Alert.alert("Error", "Failed to load your puzzles. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.uid]);
+
   useFocusEffect(
     useCallback(() => {
-      if(user?.mypuzzles){
-        setPuzzles(user.mypuzzles);
-      }
-    }, [user])
+      fetchUserPuzzles();
+    }, [fetchUserPuzzles])
   );
 
   const handlePuzzlePress = async (puzzle: PuzzleMiniData) => {
     try {
       const result = await getPuzzleData(puzzle.id);
-      const puzzleData = result as PuzzleData;
-      
-      if (puzzleData && puzzleData.photoURL) {
-        router.push({
-          pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
-          params: {
-            imageUri: puzzleData.photoURL,
-            difficulty: getDifficultyText(puzzleData.difficulty),
-            locationName: puzzleData.name,
-            latitude: puzzleData.geoLocation.latitude.toString(),
-            longitude: puzzleData.geoLocation.longitude.toString(),
-            isFromMyPuzzles: "true"
-          }
-        });
-      } else {
-        Alert.alert("Error", "Could not load puzzle data.");
+      if (!result) {
+        Alert.alert("Error", "Could not find puzzle data.");
+        return;
       }
+
+      const puzzleData = result as PuzzleData;
+      if (!puzzleData.photoURL) {
+        Alert.alert("Error", "Puzzle image not found.");
+        return;
+      }
+
+      router.push({
+        pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+        params: {
+          imageUri: puzzleData.photoURL,
+          difficulty: getDifficultyText(puzzleData.difficulty),
+          locationName: puzzleData.name,
+          latitude: puzzleData.geoLocation.latitude.toString(),
+          longitude: puzzleData.geoLocation.longitude.toString(),
+          isFromMyPuzzles: "true"
+        }
+      });
     } catch (error) {
       console.error("Error loading puzzle:", error);
       Alert.alert("Error", "Failed to load puzzle. Please try again.");
     }
   };
   
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[GeneralStyle.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#00A9E0" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={GeneralStyle.container}>
-      <Stack.Screen options={{ title: "My Puzzles" }} />
+      <Stack.Screen 
+        options={{ 
+          title: "My Puzzles",
+          headerRight: () => (
+            <TouchableOpacity onPress={fetchUserPuzzles}>
+              <Text style={styles.refreshButton}>Refresh</Text>
+            </TouchableOpacity>
+          )
+        }} 
+      />
       <FlatList
         style={styles.list}
         data={puzzles}
@@ -77,12 +119,18 @@ export default function MyPuzzlesScreen() {
             <Text style={styles.emptySubText}>Create a new puzzle to see it here!</Text>
           </View>
         )}
+        onRefresh={fetchUserPuzzles}
+        refreshing={isLoading}
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   list: {
     width: '100%',
     padding: 15,
@@ -128,5 +176,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  refreshButton: {
+    color: '#00A9E0',
+    fontSize: 16,
+    padding: 10,
   }
 });

@@ -85,8 +85,11 @@ export default function PuzzleScreen() {
     }
 
     try {
+      // Generate a unique ID using timestamp and random string
+      const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       const puzzleData: PuzzleData = {
-        id: Date.now().toString(),
+        id: uniqueId,
         creatorID: user.uid,
         name: locationName as string,
         photoURL: imageUri as string,
@@ -104,7 +107,7 @@ export default function PuzzleScreen() {
         throw new Error("Failed to create puzzle document");
       }
 
-      // Get current user data to ensure we have the latest mypuzzles array
+      // Get fresh user data to ensure we have the latest mypuzzles array
       const currentUserData = await getUserData(user.uid);
       if (!currentUserData) {
         throw new Error("Failed to get user data");
@@ -125,13 +128,20 @@ export default function PuzzleScreen() {
       });
 
       setIsSaved(true);
+
+      // Show success message with options
       Alert.alert(
         "Puzzle Saved",
         "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
         [
           {
             text: "View My Puzzles",
-            onPress: () => router.push("/(protected)/(tabs)/(profilestack)/myPuzzles")
+            onPress: () => {
+              router.push({
+                pathname: "/(protected)/(tabs)/(profilestack)/myPuzzles",
+                params: { refresh: "true" }
+              });
+            }
           },
           {
             text: "Continue Playing",
@@ -141,7 +151,20 @@ export default function PuzzleScreen() {
       );
     } catch (error) {
       console.error('Error saving puzzle:', error);
-      Alert.alert("Error", "Failed to save puzzle. Please try again.");
+      Alert.alert(
+        "Error",
+        "Failed to save puzzle. Please try again.",
+        [
+          {
+            text: "Retry",
+            onPress: handleSave
+          },
+          {
+            text: "Cancel",
+            style: "cancel"
+          }
+        ]
+      );
     }
   };
 
