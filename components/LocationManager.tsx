@@ -7,7 +7,7 @@ import MapView, { Marker } from "react-native-maps";
 import TouchableButton from "./TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
 import { updateUserDocument } from "@/Firebase/firebaseHelperUsers";
-import { getLocalPuzzles } from "@/Firebase/firebaseHelperPuzzles";
+import { getLocalPuzzles, haversineDistance } from "@/Firebase/firebaseHelperPuzzles";
 
 const LocationManager = () => {
     const [response, requestPermission] = useForegroundPermissions();
@@ -18,7 +18,6 @@ const LocationManager = () => {
 
     const lastFetchTimeRef = useRef<number | undefined>(); // Track the last fetch time
     const fetchInterval = 30 * 60 * 1000;
-
 
     useEffect(()=>{
     const trackLocation = async () => {
@@ -93,9 +92,14 @@ const LocationManager = () => {
             // Check if enough time has passed since the last fetch
             if (!lastFetchTimeRef.current || currentTime - lastFetchTimeRef.current >= fetchInterval) {
                 if (mylocation) {
-                    const puzzles = await getLocalPuzzles(mylocation) as PuzzleData[];
-                    setPuzzles(puzzles);
-                    lastFetchTimeRef.current = currentTime; // Update the last fetch time
+                    try {
+                        const puzzles = await getLocalPuzzles(mylocation) as PuzzleData[];
+                        setPuzzles(puzzles);
+                        lastFetchTimeRef.current = currentTime; // Update the last fetch time
+                    } catch (error) {
+                        console.error('Error fetching puzzles:', error);
+                        setPuzzles([]);
+                    }
                 }
             }
         };
@@ -138,14 +142,19 @@ if(response?.granted && mylocation){
         showsUserLocation={true}
         followsUserLocation={true}
         >
-            {
-             puzzles?.map((puzzle)=>{
-                console.log(puzzle);
-                if(haversineDistance(puzzle.geoLocation, mylocation)<= 10){
-                return (<Marker pinColor="red" coordinate={puzzle.geoLocation} />);
+            {puzzles && puzzles.map((puzzle) => {
+                if (haversineDistance(puzzle.geoLocation, mylocation) <= 10) {
+                    return (
+                        <Marker
+                            key={puzzle.id}
+                            pinColor="red"
+                            coordinate={puzzle.geoLocation}
+                            title={puzzle.name}
+                        />
+                    );
                 }
-             })
-            }
+                return null;
+            })}
     </MapView>
   )
 }else{

@@ -2,6 +2,22 @@ import { collection, addDoc, doc, deleteDoc, getDocs } from "firebase/firestore"
 import { db } from "./firebaseSetup";
 import { CollectionPuzzle, PuzzleData, geoLocationData } from "@/Firebase/DataStructures";
 
+// Function to calculate distance between two points on Earth
+export const haversineDistance = (point1: geoLocationData, point2: geoLocationData): number => {
+    const R = 3958.8; // Earth's radius in miles
+    const lat1 = point1.latitude * Math.PI / 180;
+    const lat2 = point2.latitude * Math.PI / 180;
+    const deltaLat = (point2.latitude - point1.latitude) * Math.PI / 180;
+    const deltaLon = (point2.longitude - point1.longitude) * Math.PI / 180;
+
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in miles
+};
+
 //New puzzle Creation
 export const createPuzzleDocument = async (userID: string, data: PuzzleData) => {
     try {
@@ -21,17 +37,22 @@ export const createPuzzleDocument = async (userID: string, data: PuzzleData) => 
 }
 
 //Gets puzzle data from the database puzzle's id
-export const getPuzzleData = async (id: string) => {
+export const getPuzzleData = async (id: string): Promise<PuzzleData | null> => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
+        let foundPuzzle: PuzzleData | null = null;
+        
         querySnapshot.forEach((doc) => {
-            if (doc.data().id === id) {
-                return doc.data();
+            const data = doc.data();
+            if (data.id === id) {
+                foundPuzzle = data as PuzzleData;
             }
         });
-        return null;
+        
+        return foundPuzzle;
     } catch (e) {
-        return e;
+        console.error("Error getting puzzle data:", e);
+        return null;
     }
 }
 
@@ -48,9 +69,10 @@ export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
                 nearbyPuzzles.push(doc.data() as PuzzleData);
             }
         });
-        return nearbyPuzzles.length > 0 ? nearbyPuzzles : null;
+        return nearbyPuzzles;
     } catch (e) {
-        return e;
+        console.error("Error getting local puzzles:", e);
+        return [];
     }
 }
 
