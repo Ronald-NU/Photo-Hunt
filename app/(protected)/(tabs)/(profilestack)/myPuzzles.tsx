@@ -3,7 +3,7 @@ import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { useFocusEffect, useRouter, Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 
@@ -36,19 +36,22 @@ export default function MyPuzzlesScreen() {
       
       if (puzzleData && puzzleData.photoURL) {
         router.push({
-          pathname: "/(protected)/(tabs)/(newgamestack)/puzzle",
+          pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
           params: {
             imageUri: puzzleData.photoURL,
             difficulty: getDifficultyText(puzzleData.difficulty),
             locationName: puzzleData.name,
             latitude: puzzleData.geoLocation.latitude.toString(),
             longitude: puzzleData.geoLocation.longitude.toString(),
-            isViewMode: "true"
+            isFromMyPuzzles: "true"
           }
         });
+      } else {
+        Alert.alert("Error", "Could not load puzzle data.");
       }
     } catch (error) {
       console.error("Error loading puzzle:", error);
+      Alert.alert("Error", "Failed to load puzzle. Please try again.");
     }
   };
   
