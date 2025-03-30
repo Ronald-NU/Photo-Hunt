@@ -3,7 +3,7 @@ import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { useFocusEffect, useRouter, Stack } from "expo-router";
 import { useCallback, useState, useEffect } from "react";
-import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";

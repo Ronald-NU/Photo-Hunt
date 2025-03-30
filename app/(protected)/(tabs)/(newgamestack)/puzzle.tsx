@@ -112,6 +112,7 @@ export default function PuzzleScreen() {
     try {
       // Generate a unique ID using timestamp and random string
       const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      console.log('Generated unique ID:', uniqueId);
       
       const puzzleData: PuzzleData = {
         id: uniqueId,
@@ -124,9 +125,11 @@ export default function PuzzleScreen() {
           longitude: Number(longitude)
         }
       };
+      console.log('Puzzle data to save:', puzzleData);
 
       // Create puzzle in Firebase Puzzles collection
       const puzzleDocId = await createPuzzleDocument(user.uid, puzzleData);
+      console.log('Puzzle document created with ID:', puzzleDocId);
       
       if (!puzzleDocId) {
         throw new Error("Failed to create puzzle document");
@@ -134,6 +137,8 @@ export default function PuzzleScreen() {
 
       // Get fresh user data to ensure we have the latest mypuzzles array
       const currentUserData = await getUserData(user.uid);
+      console.log('Current user data:', currentUserData);
+      
       if (!currentUserData) {
         throw new Error("Failed to get user data");
       }
@@ -146,11 +151,13 @@ export default function PuzzleScreen() {
       };
 
       const updatedMypuzzles = currentUserData.mypuzzles ? [...currentUserData.mypuzzles, newPuzzle] : [newPuzzle];
+      console.log('Updated mypuzzles array:', updatedMypuzzles);
 
       // Update user document with new puzzle
       await updateUserDocument(currentUserData.id, {
         mypuzzles: updatedMypuzzles
       });
+      console.log('User document updated successfully');
 
       setIsSaved(true);
 

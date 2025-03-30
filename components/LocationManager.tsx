@@ -25,6 +25,10 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const router = useRouter();
 
   useEffect(() => {
+    console.log('LocationManager received puzzles:', allPuzzles);
+  }, [allPuzzles]);
+
+  useEffect(() => {
     let isMounted = true;
 
     const initializeLocation = async () => {
@@ -39,6 +43,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
+        console.log('Current location:', location);
 
         if (isMounted) {
           const newRegion = {
@@ -122,24 +127,40 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
             latitude: selectedMarker.latitude,
             longitude: selectedMarker.longitude,
           }}
-          pinColor="red"
+          pinColor="#2196F3"  // 蓝色
           title={selectedMarker.name}
         />
       )}
 
-      {allPuzzles.map((puzzle) => (
-        <Marker
-          key={puzzle.id}
-          coordinate={{
-            latitude: puzzle.geoLocation.latitude,
-            longitude: puzzle.geoLocation.longitude,
-          }}
-          pinColor="blue"
-          title={puzzle.name}
-          description={`Difficulty: ${puzzle.difficulty === 3 ? 'Easy' : puzzle.difficulty === 4 ? 'Medium' : 'Hard'}`}
-          onPress={() => handlePuzzlePress(puzzle)}
-        />
-      ))}
+      {allPuzzles.map((puzzle) => {
+        console.log('Rendering puzzle marker:', puzzle);
+        const getMarkerColor = (difficulty: number) => {
+          switch (difficulty) {
+            case 3: // Easy
+              return '#4CAF50'; // 绿色
+            case 4: // Medium
+              return '#FFC107'; // 黄色
+            case 5: // Hard
+              return '#F44336'; // 红色
+            default:
+              return '#2196F3'; // 默认蓝色
+          }
+        };
+
+        return (
+          <Marker
+            key={puzzle.id}
+            coordinate={{
+              latitude: puzzle.geoLocation.latitude,
+              longitude: puzzle.geoLocation.longitude,
+            }}
+            pinColor={getMarkerColor(puzzle.difficulty)}
+            title={puzzle.name}
+            description={`Difficulty: ${puzzle.difficulty === 3 ? 'Easy' : puzzle.difficulty === 4 ? 'Medium' : 'Hard'}`}
+            onPress={() => handlePuzzlePress(puzzle)}
+          />
+        );
+      })}
     </MapView>
   );
 });
