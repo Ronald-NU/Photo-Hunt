@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, forwardRef } from 'react';
 import MapView, { Marker, Region, MapPressEvent } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { StyleSheet, Alert, View, ActivityIndicator } from 'react-native';
@@ -18,7 +18,7 @@ const DEFAULT_REGION = {
   longitudeDelta: 0.0421,
 };
 
-export default function LocationManager({ onLocationSelect, allPuzzles = [] }: LocationManagerProps) {
+const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationSelect, allPuzzles = [] }, ref) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRegion, setCurrentRegion] = useState<Region>(DEFAULT_REGION);
   const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
@@ -83,7 +83,7 @@ export default function LocationManager({ onLocationSelect, allPuzzles = [] }: L
   }, [onLocationSelect]);
 
   const handlePuzzlePress = useCallback((puzzle: PuzzleData) => {
-    console.log('Puzzle pressed:', puzzle); // Debug log
+    console.log('Puzzle pressed:', puzzle);
     router.push({
       pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
       params: {
@@ -108,6 +108,7 @@ export default function LocationManager({ onLocationSelect, allPuzzles = [] }: L
 
   return (
     <MapView
+      ref={ref}
       style={styles.map}
       initialRegion={currentRegion}
       onPress={handleMapPress}
@@ -141,7 +142,7 @@ export default function LocationManager({ onLocationSelect, allPuzzles = [] }: L
       ))}
     </MapView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   map: {
@@ -154,3 +155,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
 });
+
+export default LocationManager;
