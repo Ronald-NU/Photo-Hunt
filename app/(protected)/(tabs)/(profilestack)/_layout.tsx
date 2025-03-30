@@ -19,6 +19,14 @@ export default function ProfileStackLayout() {
         name="reminder" 
         options={{ title: "Reminders" }} 
       />
+      <Stack.Screen 
+        name="puzzle" 
+        options={{ 
+          title: "Puzzle",
+          headerShown: true,
+          headerBackTitle: "Back to My Puzzles"
+        }} 
+      />
     </Stack>
   );
 }

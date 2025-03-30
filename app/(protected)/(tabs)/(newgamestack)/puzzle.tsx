@@ -78,6 +78,31 @@ export default function PuzzleScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (isViewMode) {
+      // If viewing from MyPuzzles, go back directly
+      router.back();
+    } else if (!isSaved) {
+      // If creating new puzzle and not saved, show confirmation
+      Alert.alert(
+        "Leave without saving?",
+        "Your puzzle hasn't been saved yet. Are you sure you want to leave?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Leave",
+            onPress: () => router.replace("/(protected)/(tabs)/(mapstack)")
+          }
+        ]
+      );
+    } else {
+      router.replace("/(protected)/(tabs)/(mapstack)")
+    }
+  };
+
   const handleSave = async () => {
     if (!user) {
       Alert.alert("Error", "Please log in to save puzzles.");
@@ -132,12 +157,12 @@ export default function PuzzleScreen() {
       // Show success message with options
       Alert.alert(
         "Puzzle Saved",
-        "Your puzzle has been saved successfully! You can view it in Profile > My Puzzles.",
+        "Your puzzle has been saved successfully!",
         [
           {
             text: "View My Puzzles",
             onPress: () => {
-              router.push({
+              router.replace({
                 pathname: "/(protected)/(tabs)/(profilestack)/myPuzzles",
                 params: { refresh: "true" }
               });
@@ -165,31 +190,6 @@ export default function PuzzleScreen() {
           }
         ]
       );
-    }
-  };
-
-  const handleBack = () => {
-    if (isViewMode) {
-      // If viewing from MyPuzzles, go back directly
-      router.back();
-    } else if (!isSaved) {
-      // If creating new puzzle and not saved, show confirmation
-      Alert.alert(
-        "Leave without saving?",
-        "Your puzzle hasn't been saved yet. Are you sure you want to leave?",
-        [
-          {
-            text: "Cancel",
-            style: "cancel"
-          },
-          {
-            text: "Leave",
-            onPress: () => router.back()
-          }
-        ]
-      );
-    } else {
-      router.back();
     }
   };
 

@@ -2,17 +2,19 @@ import { useUser } from "@/components/UserContext";
 import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { useFocusEffect, useRouter, Stack } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";
+import { useLocalSearchParams } from "expo-router";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const router = useRouter();
+  const params = useLocalSearchParams();
 
   const getDifficultyText = (difficulty: number) => {
     switch(difficulty) {
@@ -49,6 +51,13 @@ export default function MyPuzzlesScreen() {
     }, [fetchUserPuzzles])
   );
 
+  // Add effect to handle refresh parameter
+  useEffect(() => {
+    if (params.refresh === "true") {
+      fetchUserPuzzles();
+    }
+  }, [params.refresh, fetchUserPuzzles]);
+
   const handlePuzzlePress = async (puzzle: PuzzleMiniData) => {
     try {
       const result = await getPuzzleData(puzzle.id);
@@ -63,6 +72,7 @@ export default function MyPuzzlesScreen() {
         return;
       }
 
+      // Navigate to puzzle screen in the profilestack
       router.push({
         pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
         params: {

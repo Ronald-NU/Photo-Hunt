@@ -85,7 +85,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const handlePuzzlePress = useCallback((puzzle: PuzzleData) => {
     console.log('Puzzle pressed:', puzzle);
     router.push({
-      pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+      pathname: "/(protected)/(tabs)/(mapstack)/puzzle",
       params: {
         imageUri: puzzle.photoURL,
         difficulty: puzzle.difficulty === 3 ? "Easy" : puzzle.difficulty === 4 ? "Medium" : "Hard",

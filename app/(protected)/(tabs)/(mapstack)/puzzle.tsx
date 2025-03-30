@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 
-export default function ProfilePuzzleScreen() {
+export default function MapPuzzleScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const { imageUri, difficulty, locationName } = params;
