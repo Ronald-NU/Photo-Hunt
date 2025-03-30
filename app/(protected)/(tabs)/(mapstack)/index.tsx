@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import React from 'react';
-import { useRouter } from 'expo-router';
+import React, { useState, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle } from '@/constants/Styles';
 import LocationManager from '@/components/LocationManager';
 import { useSelectedLocation } from '@/components/SelectedLocationContext';
+import { PuzzleData } from '@/Firebase/DataStructures';
+import { getLocalPuzzles } from '@/Firebase/firebaseHelperPuzzles';
 
 export interface SelectedLocation {
   name: string;
@@ -15,6 +17,28 @@ export interface SelectedLocation {
 export default function MapScreen() {
   const router = useRouter();
   const { selectedLocation, setSelectedLocation } = useSelectedLocation();
+  const [allPuzzles, setAllPuzzles] = useState<PuzzleData[]>([]);
+
+  const fetchPuzzles = useCallback(async () => {
+    try {
+      const puzzles = await getLocalPuzzles({
+        latitude: selectedLocation?.latitude || 37.78825,
+        longitude: selectedLocation?.longitude || -122.4324
+      });
+      console.log('Fetched puzzles:', puzzles); // Debug log
+      setAllPuzzles(puzzles);
+    } catch (error) {
+      console.error('Error fetching puzzles:', error);
+    }
+  }, [selectedLocation]);
+
+  // Fetch puzzles when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Map screen focused, fetching puzzles...'); // Debug log
+      fetchPuzzles();
+    }, [fetchPuzzles])
+  );
 
   const navigateToLeaderboard = () => {
     router.push("leaderboard");
@@ -26,7 +50,10 @@ export default function MapScreen() {
 
   return (
     <View style={GeneralStyle.container}>
-      <LocationManager onLocationSelect={handleLocationSelect} />
+      <LocationManager 
+        onLocationSelect={handleLocationSelect}
+        allPuzzles={allPuzzles}
+      />
       
       {selectedLocation && (
         <View style={styles.locationInfo}>

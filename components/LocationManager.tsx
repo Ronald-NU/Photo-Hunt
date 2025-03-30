@@ -4,11 +4,11 @@ import * as Location from 'expo-location';
 import { StyleSheet, Alert, View, ActivityIndicator } from 'react-native';
 import { SelectedLocation } from '@/app/(protected)/(tabs)/(mapstack)';
 import { PuzzleData } from '@/Firebase/DataStructures';
-import { getLocalPuzzles } from '@/Firebase/firebaseHelperPuzzles';
+import { useRouter } from 'expo-router';
 
 interface LocationManagerProps {
   onLocationSelect: (location: SelectedLocation | null) => void;
-  searchResults?: PuzzleData[];
+  allPuzzles?: PuzzleData[];
 }
 
 const DEFAULT_REGION = {
@@ -18,11 +18,11 @@ const DEFAULT_REGION = {
   longitudeDelta: 0.0421,
 };
 
-export default function LocationManager({ onLocationSelect, searchResults = [] }: LocationManagerProps) {
+export default function LocationManager({ onLocationSelect, allPuzzles = [] }: LocationManagerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRegion, setCurrentRegion] = useState<Region>(DEFAULT_REGION);
   const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
-  const [localPuzzles, setLocalPuzzles] = useState<PuzzleData[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -48,12 +48,6 @@ export default function LocationManager({ onLocationSelect, searchResults = [] }
             longitudeDelta: 0.0421,
           };
           setCurrentRegion(newRegion);
-          
-          const puzzles = await getLocalPuzzles({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude
-          });
-          setLocalPuzzles(puzzles);
           setIsLoading(false);
         }
       } catch (error) {
@@ -88,12 +82,21 @@ export default function LocationManager({ onLocationSelect, searchResults = [] }
     }
   }, [onLocationSelect]);
 
-  const allPuzzles = React.useMemo(() => {
-    const puzzleMap = new Map<string, PuzzleData>();
-    localPuzzles.forEach(puzzle => puzzleMap.set(puzzle.id, puzzle));
-    searchResults.forEach(puzzle => puzzleMap.set(puzzle.id, puzzle));
-    return Array.from(puzzleMap.values());
-  }, [localPuzzles, searchResults]);
+  const handlePuzzlePress = useCallback((puzzle: PuzzleData) => {
+    console.log('Puzzle pressed:', puzzle); // Debug log
+    router.push({
+      pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+      params: {
+        imageUri: puzzle.photoURL,
+        difficulty: puzzle.difficulty === 3 ? "Easy" : puzzle.difficulty === 4 ? "Medium" : "Hard",
+        locationName: puzzle.name,
+        latitude: puzzle.geoLocation.latitude.toString(),
+        longitude: puzzle.geoLocation.longitude.toString(),
+        isFromMyPuzzles: "false",
+        isFromMap: "true"
+      }
+    });
+  }, [router]);
 
   if (isLoading) {
     return (
@@ -130,9 +133,10 @@ export default function LocationManager({ onLocationSelect, searchResults = [] }
             latitude: puzzle.geoLocation.latitude,
             longitude: puzzle.geoLocation.longitude,
           }}
-          pinColor="green"
+          pinColor="blue"
           title={puzzle.name}
           description={`Difficulty: ${puzzle.difficulty === 3 ? 'Easy' : puzzle.difficulty === 4 ? 'Medium' : 'Hard'}`}
+          onPress={() => handlePuzzlePress(puzzle)}
         />
       ))}
     </MapView>
