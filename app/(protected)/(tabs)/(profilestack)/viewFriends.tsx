@@ -143,7 +143,10 @@ export default function ViewFriendsScreen() {
         data={requests}
         keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          <FriendAcceptRequestBox onPressAccept={()=>onAcceptRequest(item)} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+          item.friendCode == user?.code?
+        <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>onAcceptRequest(item)} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+        :
+        <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
         )}
       />
       </View>
