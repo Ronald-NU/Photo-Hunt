@@ -28,27 +28,70 @@
 <h3>Sisi You</h3>
 <p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw">CodeWalk Iteration 1</a></p>
 <l>
-<li>Implemented Stack & Tab Navigation under <b>Navigation</b></li>
-<li>Co-developed Firebase setup</li>
-<li>Developed New Game creation functionality:
+
+
+<li>New Game Creation System:
   <ul>
-    <li>Implemented photo capture functionality</li>
-    <li>Created puzzle generation from photos</li>
-    <li>Implemented puzzle storage in user profiles</li>
-    <li>Integrated Google Cloud Vision API for photo validation:
+    <li>Developed comprehensive puzzle creation workflow:
       <ul>
-        <li>Landmark and building detection</li>
-        <li>Face detection for privacy protection</li>
-        <li>Automatic validation of appropriate photo content</li>
+        <li>Dynamic puzzle grid generation</li>
+        <li>Difficulty level implementation</li>
+        <li>Implemented and configured Google Cloud Vision API integration for photo validation</li>
+        <li>Location-based puzzle storage</li>
+      </ul>
+    </li>
+    <li>Enhanced CameraScreen with:
+      <ul>
+        <li>Permission handling and validation</li>
+        <li>Image aspect ratio optimization</li>
+        <li>Real-time location verification</li>
+      </ul>
+    </li>
+    <li>Implemented PuzzleScreen with:
+      <ul>
+        <li>Interactive sliding puzzle gameplay</li>
+        <li>Move tracking and scoring</li>
+
+        <li>Firebase integration for puzzle storage</li>
       </ul>
     </li>
   </ul>
 </li>
-<li>Enhanced Map Screen features:
+
+<li>Map and Location Features:
   <ul>
-    <li>Added interactive location markers for puzzle viewing</li>
-    <li>Implemented search bar functionality</li>
-    <li>Added puzzle difficulty filtering</li>
+    <li>Enhanced MapScreen with:
+      <ul>
+        <li>Real-time difficulty filtering system</li>
+        <li>Puzzle search functionality</li>
+        <li>Color-coded difficulty markers</li>
+      </ul>
+    </li>
+    <li>Enhanced LocationManager with:
+      <ul>
+        <li>Location selection and validation</li>
+        <li>Interactive marker system</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+<li>Profile and Puzzle Management:
+  <ul>
+    <li>Developed MyPuzzlesScreen featuring:
+      <ul>
+        <li>Personal puzzle collection management</li>
+        <li>Difficulty level display</li>
+        <li>Real-time puzzle list updates</li>
+      </ul>
+    </li>
+    <li>Created ViewPuzzleScreen with:
+      <ul>
+        <li>Puzzle preview functionality</li>
+        <li>Dynamic navigation handling</li>
+        <li>Optimized image rendering</li>
+      </ul>
+    </li>
   </ul>
 </li>
 </l>
@@ -124,72 +167,197 @@
 </div>
 
 <h2>Data Model</h2>
-<p>The app uses three main collections in the database:</p>
+<p>The app uses Firebase Firestore with three main collections:</p>
+
 <h3>Collections</h3>
 <ul>
   <li><strong>Users</strong>: Stores user profiles and related information</li>
   <li><strong>Puzzles</strong>: Contains all created puzzles with their properties</li>
   <li><strong>Plays</strong>: Records user gameplay sessions and scores</li>
 </ul>
+
 <h3>Data Structures</h3>
+
 <h4>User Data</h4>
-<ul>
-  <li><strong>Basic Info</strong>: name, email, uid, photoURL, code</li>
-  <li><strong>Stats</strong>: score</li>
-  <li><strong>Relations</strong>:
-    <ul>
-      <li>List of friends (id, name)</li>
-      <li>List of created puzzles (id, name, difficulty)</li>
-    </ul>
-  </li>
-  <li><strong>Location</strong>: Current geographical coordinates</li>
-</ul>
+```typescript
+interface UserData {
+  name: string;
+  email: string;
+  uid: string;
+  photoURL: string;
+  code: string;
+  score: number;
+  friends: FriendData[];
+  mypuzzles: PuzzleMiniData[];
+  geoLocation: geoLocationData;
+  friendRequests?: FriendRequestData[];
+}
+```
+
 <h4>Puzzle Data</h4>
-<ul>
-  <li><strong>Identifiers</strong>: id, creatorID</li>
-  <li><strong>Properties</strong>: name, difficulty</li>
-  <li><strong>Content</strong>: photoURL</li>
-  <li><strong>Location</strong>: Geographic coordinates where the puzzle is located</li>
-</ul>
+```typescript
+interface PuzzleData {
+  id: string;
+  creatorID: string;
+  name: string;
+  photoURL: string;
+  difficulty: number;  // 3: Easy, 4: Medium, 5: Hard
+  geoLocation: geoLocationData;
+}
+```
+
 <h4>Play Data</h4>
-<ul>
-  <li><strong>Session Info</strong>: puzzleId, playerId</li>
-  <li><strong>Details</strong>: name</li>
-  <li><strong>Performance</strong>: score (based on number of moves)</li>
-</ul>
+```typescript
+interface PlayData {
+  puzzleId: string;
+  playerId: string;
+  name: string;
+  score: number;
+}
+```
+
+<h4>Supporting Types</h4>
+```typescript
+interface geoLocationData {
+  latitude: number;
+  longitude: number;
+}
+
+interface PuzzleMiniData {
+  id: string;
+  name: string;
+  difficulty: number;
+}
+
+interface FriendData {
+  id: string;
+  name: string;
+}
+
+interface FriendRequestData {
+  fromId: string;
+  fromName: string;
+  status: 'pending' | 'accepted' | 'rejected';
+}
+```
 
 <h2>CRUD Operations</h2>
-<p>All the implemented CRUD operation within the app.</p>
+<p>Firebase operations implemented in the application:</p>
 
 <h3>Create</h3>
 <l>
-<li><b>createUserDocument:</b> creates the user document within the "Users" collection and generates a unquie friend code for this user.</li>
-<li><b>createPlayDocument:</b> creates the a playdata document within the "Plays" collection.</li>
-<li><b>createPuzzleDocument:</b> creates the Puzzle document within the "Puzzles" collection.</li>
+<li><b>createUserDocument</b>
+  <ul>
+    <li>Creates new user profile in "Users" collection</li>
+    <li>Generates unique friend code</li>
+    <li>Initializes user stats and collections</li>
+  </ul>
+</li>
+<li><b>createPuzzleDocument</b>
+  <ul>
+    <li>Creates new puzzle in "Puzzles" collection</li>
+    <li>Handles image storage and location data</li>
+    <li>Updates creator's mypuzzles array</li>
+  </ul>
+</li>
+<li><b>createPlayDocument</b>
+  <ul>
+    <li>Records new gameplay session</li>
+    <li>Stores player performance data</li>
+  </ul>
+</li>
 </l>
 
 <h3>Read</h3>
 <l>
-<li><b>getPuzzleLeaderBoard:</b> gets the information of all play data from a specific puzzle within the "Plays" collection.</li>
-<li><b> getLocalLeaderBoard:</b> gets the information of all scores for players with 100 miles of a location within the "Users" collection.</li>
-<li><b>getLocalPuzzles:</b> gets the puzzles within 10 miles of a specific location within the "Puzzles" collection.</li>
-<li><b>getPuzzleData:</b> gets the puzzle data of a specific puzzle within the "Puzzles" collection.</li>
-<li><b> getFriend:</b> gets the information a User by their friend code within the "Users" collection.</li>
-<li><b> getUserData:</b> gets the specific information of User by their uid within the "Users" collection.</li>
+<li><b>getUserData</b>
+  <ul>
+    <li>Retrieves user profile by UID</li>
+    <li>Includes friends list and puzzle collection</li>
+  </ul>
+</li>
+<li><b>getPuzzleData</b>
+  <ul>
+    <li>Fetches puzzle details by ID</li>
+    <li>Includes creator and location information</li>
+  </ul>
+</li>
+<li><b>getLocalPuzzles</b>
+  <ul>
+    <li>Retrieves puzzles within specified radius</li>
+    <li>Uses haversine distance calculation</li>
+    <li>Supports difficulty filtering</li>
+  </ul>
+</li>
+<li><b>getPuzzleLeaderBoard</b>
+  <ul>
+    <li>Fetches puzzle completion records</li>
+    <li>Orders by score/completion time</li>
+  </ul>
+</li>
+<li><b>getFriend</b>
+  <ul>
+    <li>Looks up user by friend code</li>
+    <li>Returns basic profile information</li>
+  </ul>
+</li>
 </l>
 
 <h3>Update</h3>
 <l>
-<li><b>updateUserDocument:</b> updates the user document within the "Users" collection.</li>
-<li><b>updatePlayDataDocument:</b> updates a specific playdata document within the "Plays" collection.</li>
+<li><b>updateUserDocument</b>
+  <ul>
+    <li>Updates user profile information</li>
+    <li>Handles friend list modifications</li>
+    <li>Updates puzzle collection</li>
+    <li>Manages friend requests</li>
+  </ul>
+</li>
+<li><b>updatePlayDataDocument</b>
+  <ul>
+    <li>Updates gameplay session data</li>
+    <li>Records completion time and score</li>
+  </ul>
+</li>
 </l>
-
 
 <h3>Delete</h3>
 <l>
-<li><b>deleteUserDocument:</b> deletes a users Document within the "Users" collection.</li>
-<li><b>deletePlayDataDocument:</b> deletes a specific playdata document within the "Plays" collection.</li>
-<li><b>deletePuzzleDocument:</b> deletes a specific puzzle document within the "Puzzles" collection.</li>
+<li><b>deleteUserDocument</b>
+  <ul>
+    <li>Removes user profile</li>
+    <li>Cleans up associated data</li>
+  </ul>
+</li>
+<li><b>deletePuzzleDocument</b>
+  <ul>
+    <li>Removes puzzle from collection</li>
+    <li>Updates creator's puzzle list</li>
+    <li>Removes associated image data</li>
+  </ul>
+</li>
+<li><b>deletePlayDataDocument</b>
+  <ul>
+    <li>Removes specific gameplay record</li>
+  </ul>
+</li>
+</l>
+
+<h3>Special Operations</h3>
+<l>
+<li><b>handleFriendRequest</b>
+  <ul>
+    <li>Processes friend request actions</li>
+    <li>Updates both users' friend lists</li>
+    <li>Manages request status changes</li>
+  </ul>
+</li>
+<li><b>storeImage</b>
+  <ul>
+    <li>Handles image upload to Firebase Storage</li>
+    <li>Returns storage reference path</li>
+  </ul>
+</li>
 </l>
 
 <h2>Citations</h2>
@@ -213,12 +381,12 @@ git clone https://github.com/your-username/Photo-Hunt.git
 cd Photo-Hunt
 ```
 
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Required Configuration Files:
+1. Required Configuration Files:
 
 <h4>Service Account Setup</h4>
 <p>The app requires a Google Cloud Vision API service account for photo validation. Follow these steps:</p>
