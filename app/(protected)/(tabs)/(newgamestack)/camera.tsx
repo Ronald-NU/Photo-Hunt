@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, StyleSheet, Image, Button, TouchableOpacity, Platform, Alert, ActivityIndicator } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
@@ -6,6 +7,7 @@ import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import { validateImage } from '@/utils/imageValidation';
+import * as FileSystem from 'expo-file-system';
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -43,6 +45,7 @@ export default function CameraScreen() {
       const currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
       
+      console.log('Launching camera...');
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [4, 3],
@@ -50,12 +53,30 @@ export default function CameraScreen() {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
       });
       
+      console.log('Camera result:', result);
+      
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        const uri = result.assets[0].uri;
-        console.log('Captured image URI:', uri);
+        const originalUri = result.assets[0].uri;
+        console.log('Original image URI:', originalUri);
+
+        // 生成一个唯一的文件名
+        const fileName = `photo_${Date.now()}.jpg`;
+        const newUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+        // 复制文件到缓存目录
+        await FileSystem.copyAsync({
+          from: originalUri,
+          to: newUri
+        });
+
+        console.log('New image URI:', newUri);
+        
+        // 验证文件是否存在
+        const fileInfo = await FileSystem.getInfoAsync(newUri);
+        console.log('New image exists check:', fileInfo);
         
         // 验证图像
-        const validation = await validateImage(uri);
+        const validation = await validateImage(newUri);
         console.log('Validation result:', validation);
         
         if (!validation.isValid) {
@@ -80,7 +101,7 @@ export default function CameraScreen() {
           return;
         }
         
-        setImageUri(uri);
+        setImageUri(newUri);
       } else {
         Alert.alert("Notice", "No image was selected.");
       }
@@ -121,7 +142,24 @@ export default function CameraScreen() {
               <Text style={styles.loadingText}>Processing image...</Text>
             </View>
           ) : imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.image} />
+            <View style={styles.imageContainer}>
+              <Image 
+                source={{ uri: imageUri }} 
+                style={{ width: 300, height: 300, backgroundColor: 'black' }}
+                resizeMode="cover"
+                onError={(error) => {
+                  console.error('Image loading error:', error.nativeEvent.error);
+                  Alert.alert('Error', 'Failed to load image');
+                }}
+                onLoad={(event) => {
+                  console.log('Image loaded successfully with size:', {
+                    width: event.nativeEvent.source.width,
+                    height: event.nativeEvent.source.height
+                  });
+                }}
+              />
+
+            </View>
           ) : (
             <Text style={styles.label}>No image taken yet.</Text>
           )}
@@ -155,7 +193,7 @@ export default function CameraScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -170,13 +208,19 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 12,
-    overflow: 'hidden',
+
     backgroundColor: '#f5f5f5',
+  },
+  imageContainer: {
+
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   loadingContainer: {
     flex: 1,
