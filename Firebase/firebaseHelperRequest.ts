@@ -51,13 +51,9 @@ export const getFriendRequest = async (code: string, user:UserData) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionRequests));
         const request: FriendRequest[] = []; 
-        const myRequest: FriendRequest[] = [];
         querySnapshot.forEach(async (doc) => {
-            if (doc.data().friendCode === code && doc.data().status === 'PENDING') {
-                request.push(doc.data() as FriendRequest);
-            }
-            if (doc.data().requesterCode === code && doc.data().status === 'PENDING') {
-                myRequest.push(doc.data() as FriendRequest);
+            if ((doc.data().friendCode === code || doc.data().requesterCode === code) && doc.data().status === 'PENDING') {
+                request.push({id: doc.id, ...doc.data() as FriendRequest});
             }
             if (doc.data().requesterCode === code && doc.data().status === 'ACCEPTED') {
                 user.friends = [{
@@ -71,7 +67,7 @@ export const getFriendRequest = async (code: string, user:UserData) => {
                 deleteDoc(doc.ref);
             }
         });
-        return [request, myRequest];
+        return request;
     } catch (e) {
         return e;
     }

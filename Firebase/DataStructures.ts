@@ -61,6 +61,7 @@ export type PlayData = {
 };
 
 export type FriendRequest = {
+    id?: string;
     friendCode: string;
     requesterCode: string;
     name:string;

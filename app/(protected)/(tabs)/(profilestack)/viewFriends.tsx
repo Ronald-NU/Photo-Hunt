@@ -1,35 +1,72 @@
 import ProfileNavSections from "@/components/ProfileNavSections";
 import { useUser } from "@/components/UserContext";
 import { GeneralStyle } from "@/constants/Styles";
-import { FriendMiniData } from "@/Firebase/DataStructures";
+import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import FriendAcceptRequestBox from "@/components/FriendAcceptRequestBox";
+import { onSnapshot } from "firebase/firestore";
+import { acceptDenyFriend, getFriendRequest } from "@/Firebase/firebaseHelperRequest";
 
 
 export default function ViewFriendsScreen() {
   const [friends, setFriends] = useState<FriendMiniData[]>([]);
+  const [requests, setRequsts] = useState<FriendRequest[]>([]);
   const {user} = useUser();
  const [searchQuery, setSearchQuery] = useState('');
- 
+  const [refresh, setRefresh] = useState(false);
   useFocusEffect(
     useCallback(() => {
       if(user){
         setFriends(user.friends);
       }
-    }, [user])
+    }, [user, refresh])
   );
+
+  useEffect(()=>{
+    const request: { requests: FriendRequest[] } = { requests: [] };
+    const getFriends = async () =>{
+    if(user!){
+      const allRequest = await getFriendRequest(user?.code, user) as FriendRequest[]
+      request.requests = allRequest;
+    }
+  }
+  getFriends().then(()=>{
+    setRequsts(request.requests);
+    setRefresh(!refresh);
+  });
+  },[])
 
   function handleSearch(text: string): void {
     setSearchQuery(text);
   }
 
-  const onAcceptRequest = () => {}
+  const onAcceptRequest = (request:FriendRequest) => {
+    const newRequest:FriendRequest = {
+      friendCode: request.friendCode,
+      requesterCode: request.requesterCode,
+      name: request.name,
+      status: "PENDING"
+    }
+    if(request.id && user){
+    acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
+    }
+  }
 
-  const onCancelRequest = () => {}
+  const onCancelRequest = (request:FriendRequest) => {
+    if(request.id && user){
+      const newRequest:FriendRequest = {
+        friendCode: request.friendCode,
+        requesterCode: request.requesterCode,
+        name: request.name,
+        status: "PENDING"
+      }
+    acceptDenyFriend(request.id, newRequest,'REJECTED',user);
+    }
+  }
 
   const onSelectFriend = () => {}
 
@@ -60,10 +97,10 @@ export default function ViewFriendsScreen() {
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Requests</Text>
       <FlatList
         style={{width:'100%'}}
-        data={friends}
-        keyExtractor={(item) => item.id}
+        data={requests}
+        keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          <FriendAcceptRequestBox onPressAccept={()=>onAcceptRequest()} onPressCancel={()=>onCancelRequest()} title={item.name}/>
+          <FriendAcceptRequestBox onPressAccept={()=>onAcceptRequest(item)} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
         )}
       />
       </View>
