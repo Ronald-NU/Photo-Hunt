@@ -1,61 +1,43 @@
-import { View, Text, StyleSheet, Image, Button, TouchableOpacity, Platform } from "react-native";
+import { View, Text, StyleSheet, Image, Button, TouchableOpacity, Platform, Alert, ActivityIndicator } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
-import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
+import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
+import { validateImage } from '@/utils/imageValidation';
 
 export default function CameraScreen() {
   const router = useRouter();
+  const [imageUri, setImageUri] = useState<string>("");
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [loading, setLoading] = useState(false);
   const params = useLocalSearchParams();
   const { locationName, difficulty } = params;
-  
-  const [imageUri, setImageUri] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
-  const [locationPermission, requestLocationPermission] = Location.useForegroundPermissions();
-
-  useEffect(() => {
-    (async () => {
-      if (!locationPermission?.granted) {
-        const permissionResult = await requestLocationPermission();
-        if (!permissionResult.granted) {
-          alert("You need to grant location permissions to create a puzzle");
-          router.back();
-        }
-      }
-    })();
-  }, []);
 
   const verifyPermissions = async () => {
-    // Verify camera permission
-    if (!cameraPermission?.granted) {
-      const cameraResult = await requestCameraPermission();
-      if (!cameraResult.granted) {
-        alert("You need to grant camera permissions to take a photo");
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Insufficient permissions!',
+          'You need to grant camera permissions to use this app.',
+          [{ text: 'Okay' }]
+        );
         return false;
       }
     }
-
-    // Verify location permission
-    if (!locationPermission?.granted) {
-      const locationResult = await requestLocationPermission();
-      if (!locationResult.granted) {
-        alert("You need to grant location permissions to create a puzzle");
-        return false;
-      }
-    }
-
     return true;
   };
-  
+
   const takeImageHandler = async () => {
     setLoading(true);
     try {
       const hasPermissions = await verifyPermissions();
-      if (!hasPermissions) return;
+      if (!hasPermissions) {
+        setLoading(false);
+        return;
+      }
 
       // Get current location
       const currentLocation = await Location.getCurrentPositionAsync({});
@@ -63,19 +45,48 @@ export default function CameraScreen() {
       
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
-        aspect: [1, 1], // Changed to 1:1 for better puzzle creation
-        quality: 0.8,
+        aspect: [4, 3],
+        quality: 1,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
       });
       
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const uri = result.assets[0].uri;
+        console.log('Captured image URI:', uri);
+        
+        // 验证图像
+        const validation = await validateImage(uri);
+        console.log('Validation result:', validation);
+        
+        if (!validation.isValid) {
+          Alert.alert(
+            "Invalid Photo",
+            validation.reason || "Please take a photo of a location or landmark.",
+            [
+              {
+                text: "Try Again",
+                onPress: () => {
+                  setLoading(false);
+                  takeImageHandler();
+                }
+              },
+              {
+                text: "Cancel",
+                style: "cancel",
+                onPress: () => setLoading(false)
+              }
+            ]
+          );
+          return;
+        }
+        
         setImageUri(uri);
       } else {
-        alert("No image was selected.");
+        Alert.alert("Notice", "No image was selected.");
       }
     } catch (err) {
-      console.log('Error taking photo:', err);
-      alert('Failed to take photo: ' + (err as Error).message);
+      console.error('Error taking photo:', err);
+      Alert.alert('Error', 'Failed to take photo: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -83,7 +94,7 @@ export default function CameraScreen() {
 
   const handleCreatePuzzle = () => {
     if (!location) {
-      alert("Location data is not available. Please try again.");
+      Alert.alert("Error", "Location data is not available. Please try again.");
       return;
     }
 
@@ -99,113 +110,117 @@ export default function CameraScreen() {
       }
     });
   };
-  
+
   return (
-    <SafeAreaView style={[GeneralStyle.container, styles.safeArea]}>
-      <View style={styles.imagePreview}>
-        {loading ? (
-          <Text style={TextStyles.mediumText}>Loading image...</Text>
-        ) : imageUri ? (
-          <Image 
-            source={{ uri: imageUri }} 
-            style={styles.image} 
-            resizeMode="contain"
-          />
-        ) : (
-          <Text style={[TextStyles.mediumText, {position:'absolute', top:'40%'}]}>
-            No image taken yet.
-          </Text>
-        )}
-      </View>
-      
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity 
-          style={styles.cameraButton} 
-          onPress={takeImageHandler}
-          disabled={loading}
-        >
-          <View style={[
-            styles.cameraButtonInner, 
-            loading && {backgroundColor: 'darkgray'}
-          ]} />
-        </TouchableOpacity>
-        
-        {imageUri && !loading && (
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Create Puzzle"
+    <SafeAreaView style={GeneralStyle.container}>
+      <View style={styles.container}>
+        <View style={styles.imagePreview}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#00A9E0" />
+              <Text style={styles.loadingText}>Processing image...</Text>
+            </View>
+          ) : imageUri ? (
+            <Image source={{ uri: imageUri }} style={styles.image} />
+          ) : (
+            <Text style={styles.label}>No image taken yet.</Text>
+          )}
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.button, !imageUri && styles.primaryButton]}
+            onPress={takeImageHandler}
+            disabled={loading}
+          >
+            <Text style={[styles.buttonText, !imageUri && styles.primaryButtonText]}>
+              {imageUri ? 'Retake Photo' : 'Take Photo'}
+            </Text>
+          </TouchableOpacity>
+          {imageUri && (
+            <TouchableOpacity
+              style={[styles.button, styles.primaryButton]}
               onPress={handleCreatePuzzle}
-            />
-            <Button
-              title="Take Another"
-              onPress={takeImageHandler}
-            />
-          </View>
-        )}
+              disabled={loading}
+            >
+              <Text style={[styles.buttonText, styles.primaryButtonText]}>
+                Create Puzzle
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    paddingBottom: Platform.OS === 'ios' ? 100 : 80,
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
   },
   imagePreview: {
     width: '100%',
-    height: '70%', // Reduce height to leave space for buttons
+    height: '70%',
+    marginBottom: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -180,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#f5f5f5',
   },
   image: {
-    width: '90%',
-    height: '90%',
-    borderRadius: 8,
-  },
-  bottomContainer: {
     width: '100%',
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 120 : 100,
-    paddingHorizontal: 20,
-    backgroundColor: 'transparent',
+    height: '100%',
+    resizeMode: 'cover',
   },
-  cameraButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: 'white',
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 20,
-    borderWidth: 4,
-    borderColor: 'gray',
+    backgroundColor: '#f5f5f5',
   },
-  cameraButtonInner: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'lightgray',
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
+    fontSize: 16,
+  },
+  label: {
+    color: '#666',
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     width: '100%',
+    gap: 10,
     marginTop: 20,
   },
-  header: {
-    flexDirection: 'row',
+  button: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  backButton: {
-    marginRight: 16,
+  primaryButton: {
+    backgroundColor: '#00A9E0',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  buttonText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+  },
+  primaryButtonText: {
+    color: 'white',
   },
 });
