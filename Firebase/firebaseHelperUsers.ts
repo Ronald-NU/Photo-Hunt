@@ -65,10 +65,13 @@ export const getFriend = async (code: string) => {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
         querySnapshot.forEach((doc) => {
             if (doc.data().code === code) {
-                return doc.data();
+                const userData = doc.data() as UserData;
+                return {
+                    ...userData,
+                    mypuzzles: userData.mypuzzles || []
+                };
             }
         });
-        return null;
     } catch (e) {
         return e;
     }
