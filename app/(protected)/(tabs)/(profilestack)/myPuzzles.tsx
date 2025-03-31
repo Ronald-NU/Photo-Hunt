@@ -99,7 +99,7 @@ export default function MyPuzzlesScreen() {
   }
 
   return (
-    <SafeAreaView style={GeneralStyle.container}>
+    <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
       <Stack.Screen 
         options={{ 
           title: "My Puzzles",
@@ -112,6 +112,10 @@ export default function MyPuzzlesScreen() {
       />
       <FlatList
         style={styles.list}
+        contentContainerStyle={{ 
+          flexGrow: 1,
+          paddingBottom: 100
+        }}
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -119,7 +123,9 @@ export default function MyPuzzlesScreen() {
             style={styles.puzzleItem}
             onPress={() => handlePuzzlePress(item)}
           >
-            <Text style={styles.puzzleName}>{item.name}</Text>
+            <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
             <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
           </TouchableOpacity>
         )}
@@ -131,6 +137,10 @@ export default function MyPuzzlesScreen() {
         )}
         onRefresh={fetchUserPuzzles}
         refreshing={isLoading}
+        showsVerticalScrollIndicator={true}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
       />
     </SafeAreaView>
   );
@@ -142,6 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   list: {
+    flex: 1,
     width: '100%',
     padding: 15,
   },
@@ -165,10 +176,14 @@ const styles = StyleSheet.create({
   puzzleName: {
     fontSize: 18,
     fontWeight: '500',
+    flex: 1,
+    marginRight: 10,
   },
   difficulty: {
     fontSize: 16,
     color: '#666',
+    minWidth: 80,
+    textAlign: 'right',
   },
   emptyContainer: {
     flex: 1,
