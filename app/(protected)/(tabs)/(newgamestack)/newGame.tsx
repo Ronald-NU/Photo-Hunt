@@ -1,19 +1,35 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TouchableButton from "@/components/TouchableButton";
 import { GeneralStyle } from "@/constants/Styles";
 import { Ionicons } from '@expo/vector-icons';
 import { useSelectedLocation } from '@/components/SelectedLocationContext';
+import { useUser } from '@/components/UserContext';
+import CreateAccountModal from '@/components/CreateAccountModal';
+import { auth } from '@/Firebase/firebaseSetup';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
 export default function NewGameScreen() {
+
   const [puzzleName, setPuzzleName] = useState('');
   const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
   const router = useRouter();
   const { selectedLocation } = useSelectedLocation();
+  const {user} = useUser();
+  const [createAccountModal, setCreatAccountModal] = useState(false);
+  
+    useFocusEffect(
+      useCallback(() => {
+        if (user == null) {
+          setCreatAccountModal(true);
+        } else {
+          setCreatAccountModal(false);
+        }
+      }, [user])
+    );
 
   const handleTakePhoto = () => {
     if (!puzzleName.trim()) {
@@ -46,8 +62,18 @@ export default function NewGameScreen() {
     });
   };
 
+  const signUp = () => {
+    auth.signOut();router.replace("signup");setCreatAccountModal(false);
+  }
+
+  const cancel = () => {
+    router.replace("(mapstack)");setCreatAccountModal(false);
+  }
+
+
   return (
     <SafeAreaView style={[GeneralStyle.container, styles.container]}>
+      <CreateAccountModal isOpen={createAccountModal} onClose={cancel} onSignUp={signUp} />
       <View style={styles.titleContainer}>
         <Text style={[GeneralStyle.title, styles.title]}>New Game</Text>
       </View>
