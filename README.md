@@ -11,15 +11,46 @@
 <li>Created and refactored the app into components</li>
 <li>Created the UserContext</li>
 <li>Created the CreateAccountModal</li>
-<li>Implmented User creation process including forgot password and anoynmous sign in found under <b>Authentication/User Creation Proccess</b></li>
-<li>Assisted in app navigation logic/bug fixs</li>
+<li>Implemented User creation process including forgot password and anonymous sign in found under <b>Authentication/User Creation Process</b></li>
+<li>Assisted in app navigation logic/bug fixes</li>
+<li>Implemented friend request system including:
+  <ul>
+    <li>Send friend requests functionality</li>
+    <li>Accept and reject friend requests</li>
+    <li>Friend puzzle screen implementation</li>
+    <li>Modified helper functions for friend information retrieval</li>
+    <li>Updated request status display for outgoing requests</li>
+  </ul>
+</li>
+<li>Enhanced UI/UX with bottom tab bar improvements and navigation flow optimization</li>
 </l>
 
 <h3>Sisi You</h3>
-<p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 1</a></p>
+<p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw">CodeWalk Iteration 1</a></p>
 <l>
 <li>Implemented Stack & Tab Navigation under <b>Navigation</b></li>
 <li>Co-developed Firebase setup</li>
+<li>Developed New Game creation functionality:
+  <ul>
+    <li>Implemented photo capture functionality</li>
+    <li>Created puzzle generation from photos</li>
+    <li>Implemented puzzle storage in user profiles</li>
+    <li>Integrated Google Cloud Vision API for photo validation:
+      <ul>
+        <li>Landmark and building detection</li>
+        <li>Face detection for privacy protection</li>
+        <li>Automatic validation of appropriate photo content</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li>Enhanced Map Screen features:
+  <ul>
+    <li>Added interactive location markers for puzzle viewing</li>
+    <li>Implemented search bar functionality</li>
+    <li>Added puzzle difficulty filtering</li>
+  </ul>
+</li>
 </l>
 
 <h2>Naviagtion</h2>
@@ -57,6 +88,10 @@
   <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 40%;">
     <p><strong>Camera Screen</strong></p>
+  </div>
+    <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/puzzle.PNG" alt="Puzzle Screen" style="width: 40%;">
+    <p><strong>Puzzle Screen</strong></p>
   </div>
 </div>
 
@@ -159,3 +194,135 @@
 
 <h2>Citations</h2>
 <p></p>
+
+<h2>Installation and Setup</h2>
+
+<h3>Prerequisites</h3>
+<ul>
+  <li>Node.js (v18 or higher)</li>
+  <li>npm or yarn</li>
+  <li>Expo CLI (`npm install -g expo-cli`)</li>
+  <li>Expo Go app on your mobile device</li>
+</ul>
+
+<h3>Environment Setup</h3>
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/Photo-Hunt.git
+cd Photo-Hunt
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Required Configuration Files:
+
+<h4>Service Account Setup</h4>
+<p>The app requires a Google Cloud Vision API service account for photo validation. Follow these steps:</p>
+
+1. Create a file named `service-account.json` in the `config` directory
+2. Contact the development team to obtain the service account credentials
+3. The file structure should look like this:
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "your-private-key-id",
+  "private_key": "your-private-key",
+  "client_email": "your-client-email",
+  "client_id": "your-client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "your-cert-url"
+}
+```
+
+<h3>Running the App</h3>
+
+1. Start the development server:
+```bash
+npx expo start
+```
+
+2. Running on a physical device:
+   - Install Expo Go on your mobile device
+   - Scan the QR code shown in the terminal with:
+     - iOS: Camera app
+     - Android: Expo Go app
+
+3. Running on simulators:
+   - iOS (requires macOS):
+     ```bash
+     npx expo start --ios
+     ```
+   - Android:
+     ```bash
+     npx expo start --android
+     ```
+
+<h3>Troubleshooting</h3>
+<ul>
+  <li>If you encounter any issues with dependencies, try:
+    ```bash
+    npm install
+    npx expo install
+    ```
+  </li>
+  <li>For camera permissions issues, ensure you've granted necessary permissions in your device settings</li>
+  <li>If the app fails to connect to Firebase, verify your network connection and Firebase configuration</li>
+</ul>
+
+<h3>Development Notes</h3>
+<ul>
+  <li>The app requires location services to be enabled for full functionality</li>
+  <li>Photo validation requires an active internet connection</li>
+  <li>For testing puzzle creation, ensure you have access to locations with recognizable landmarks or buildings</li>
+</ul>
+
+<h2>State Management</h2>
+<p>The application uses React's Context API for state management, implementing several context providers to handle different aspects of the application state.</p>
+
+<h3>Context Providers</h3>
+
+<h4>1. User Context</h4>
+<p>Manages user authentication and profile state throughout the application.</p>
+<ul>
+  <li><strong>Location:</strong> `components/UserContext`</li>
+  <li><strong>Key Features:</strong>
+    <ul>
+      <li>User authentication state</li>
+      <li>User profile data management</li>
+      <li>Real-time user data updates</li>
+    </ul>
+  </li>
+  <li><strong>Usage Example:</strong>
+    ```typescript
+    const { user } = useUser();
+    ```
+  </li>
+</ul>
+
+<h4>2. Selected Location Context</h4>
+<p>Handles the state of selected locations for puzzle creation and gameplay.</p>
+<ul>
+  <li><strong>Location:</strong> `components/SelectedLocationContext`</li>
+  <li><strong>Key Features:</strong>
+    <ul>
+      <li>Current selected location coordinates</li>
+      <li>Location name and metadata</li>
+      <li>Location selection state for puzzle creation</li>
+    </ul>
+  </li>
+  <li><strong>Usage Example:</strong>
+    ```typescript
+    const { selectedLocation } = useSelectedLocation();
+    ```
+  </li>
+</ul>
+
+<h3>State Flow</h3>
+<p>The application follows a hierarchical state management pattern:</p>
