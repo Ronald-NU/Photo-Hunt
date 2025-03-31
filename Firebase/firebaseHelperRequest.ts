@@ -13,10 +13,7 @@ export const sendFriendRequest = async (code: string,user:UserData) => {
             status: "PENDING"
         };
         const friend = await getFriend(code) as UserData;
-        if(friend == null){
-            return false;
-        }
-        if(friend.code === code){
+        if(friend != null){
             return false;
         }
         await addDoc(collection(db,CollectionRequests),request)
