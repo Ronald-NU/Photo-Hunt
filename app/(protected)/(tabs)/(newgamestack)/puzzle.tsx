@@ -8,7 +8,6 @@ import { useUser } from "@/components/UserContext";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
 const PUZZLE_SIZE = {
@@ -94,7 +93,7 @@ export default function PuzzleScreen() {
           },
           {
             text: "Leave",
-            onPress: () => router.replace("/(protected)/(tabs)/(mapstack)")
+            onPress: () => router.back()
           }
         ]
       );
@@ -205,13 +204,13 @@ export default function PuzzleScreen() {
       <Stack.Screen 
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={handleBack}>
+            <TouchableOpacity onPress={()=>handleBack()}>
               <Text style={styles.headerButton}>Back</Text>
             </TouchableOpacity>
           ),
           headerRight: () => (
             !isViewMode ? (
-              <TouchableOpacity onPress={handleSave}>
+              <TouchableOpacity onPress={()=>handleSave()}>
                 <Text style={styles.headerButton}>Save</Text>
               </TouchableOpacity>
             ) : null

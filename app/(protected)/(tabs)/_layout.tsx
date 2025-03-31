@@ -3,6 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useContext } from "react";
 import { SelectedLocationContext } from "@/components/SelectedLocationContext";
 import { Alert } from "react-native";
+import { NavStyle } from "@/constants/Styles";
+import { colors } from "@/constants/Colors";
 
 export default function TabLayout() {
   const { selectedLocation } = useContext(SelectedLocationContext);
@@ -21,11 +23,11 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#00A9E0",
-      }}
-    >
+      screenOptions={{ headerShown: false, 
+          tabBarActiveTintColor:colors.Primary, 
+          tabBarStyle: NavStyle.tabBar,
+          tabBarInactiveTintColor:colors.Black
+          }}>
       <Tabs.Screen
         name="(newgamestack)"
         options={{

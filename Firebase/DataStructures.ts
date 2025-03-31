@@ -14,7 +14,7 @@ export interface UserData {
     photoURL: string;
     code: string;
     score: number;
-    friends: never[];
+    friends: FriendMiniData[];
     mypuzzles: PuzzleMiniData[];
     geoLocation: geoLocationData;
 }
