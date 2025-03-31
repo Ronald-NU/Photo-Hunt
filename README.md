@@ -51,7 +51,6 @@
       <ul>
         <li>Interactive sliding puzzle gameplay</li>
         <li>Move tracking and scoring</li>
-
         <li>Firebase integration for puzzle storage</li>
       </ul>
     </li>
@@ -169,77 +168,61 @@
 <h2>Data Model</h2>
 <p>The app uses Firebase Firestore with three main collections:</p>
 
-<h3>Collections</h3>
-<ul>
-  <li><strong>Users</strong>: Stores user profiles and related information</li>
-  <li><strong>Puzzles</strong>: Contains all created puzzles with their properties</li>
-  <li><strong>Plays</strong>: Records user gameplay sessions and scores</li>
-</ul>
+### Collections
+- **Users**: Stores user profiles and related information
+- **Puzzles**: Contains all created puzzles with their properties
+- **Plays**: Records user gameplay sessions and scores
 
-<h3>Data Structures</h3>
+### Data Structures
 
-<h4>User Data</h4>
-```typescript
-interface UserData {
-  name: string;
-  email: string;
-  uid: string;
-  photoURL: string;
-  code: string;
-  score: number;
-  friends: FriendData[];
-  mypuzzles: PuzzleMiniData[];
-  geoLocation: geoLocationData;
-  friendRequests?: FriendRequestData[];
-}
-```
+#### User Data
+User documents contain:
+- name (string): User's display name
+- email (string): User's email address
+- uid (string): Unique user identifier
+- photoURL (string): Profile picture URL
+- code (string): Unique friend code
+- score (number): User's total score
+- friends: Array of friend data (id and name)
+- mypuzzles: Array of created puzzles (id, name, difficulty)
+- geoLocation: User's location (latitude and longitude)
+- friendRequests: Array of friend requests (fromId, fromName, status)
 
-<h4>Puzzle Data</h4>
-```typescript
-interface PuzzleData {
-  id: string;
-  creatorID: string;
-  name: string;
-  photoURL: string;
-  difficulty: number;  // 3: Easy, 4: Medium, 5: Hard
-  geoLocation: geoLocationData;
-}
-```
+#### Puzzle Data
+Puzzle documents contain:
+- id (string): Unique puzzle identifier
+- creatorID (string): Creator's user ID
+- name (string): Puzzle name
+- photoURL (string): Puzzle image URL
+- difficulty (number): 3 for Easy, 4 for Medium, 5 for Hard
+- geoLocation: Puzzle location (latitude and longitude)
 
-<h4>Play Data</h4>
-```typescript
-interface PlayData {
-  puzzleId: string;
-  playerId: string;
-  name: string;
-  score: number;
-}
-```
+#### Play Data
+Play records contain:
+- puzzleId (string): ID of the played puzzle
+- playerId (string): ID of the player
+- name (string): Player's name
+- score (number): Score achieved
 
-<h4>Supporting Types</h4>
-```typescript
-interface geoLocationData {
-  latitude: number;
-  longitude: number;
-}
+#### Supporting Types
 
-interface PuzzleMiniData {
-  id: string;
-  name: string;
-  difficulty: number;
-}
+**GeoLocation Data**
+- latitude (number)
+- longitude (number)
 
-interface FriendData {
-  id: string;
-  name: string;
-}
+**Puzzle Mini Data**
+- id (string)
+- name (string)
+- difficulty (number)
 
-interface FriendRequestData {
-  fromId: string;
-  fromName: string;
-  status: 'pending' | 'accepted' | 'rejected';
-}
-```
+**Friend Data**
+- id (string)
+- name (string)
+
+**Friend Request Data**
+- fromId (string): Requester's ID
+- fromName (string): Requester's name
+- status: Can be 'pending', 'accepted', or 'rejected'
 
 <h2>CRUD Operations</h2>
 <p>Firebase operations implemented in the application:</p>
