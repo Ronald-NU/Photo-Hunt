@@ -72,6 +72,7 @@ export const getFriend = async (code: string) => {
                 };
             }
         });
+        return null;
     } catch (e) {
         return e;
     }

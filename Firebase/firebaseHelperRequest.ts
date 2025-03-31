@@ -1,8 +1,9 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { CollectionRequests, FriendRequest, STATUS, UserData } from "./DataStructures";
 import { db } from "./firebaseSetup";
-import { updateUserDocument } from "./firebaseHelperUsers";
+import { getFriend, updateUserDocument } from "./firebaseHelperUsers";
 import { useUser } from "@/components/UserContext";
+import { User } from "firebase/auth";
 const {id} = useUser();
 
 //querys the database by friend code to get the user's uid
@@ -14,7 +15,15 @@ export const sendFriendRequest = async (code: string,user:UserData) => {
             name: user.name,
             status: "PENDING"
         };
+        const friend = await getFriend(code) as UserData;
+        if(friend == null){
+            return false;
+        }
+        if(friend.code === code){
+            return false;
+        }
         await addDoc(collection(db,CollectionRequests),request)
+        return true;
     } catch (e) {
         return e;
     }

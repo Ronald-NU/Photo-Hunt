@@ -4,12 +4,12 @@ import { GeneralStyle } from "@/constants/Styles";
 import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import FriendAcceptRequestBox from "@/components/FriendAcceptRequestBox";
-import { onSnapshot } from "firebase/firestore";
-import { acceptDenyFriend, getFriendRequest } from "@/Firebase/firebaseHelperRequest";
+import { acceptDenyFriend, getFriendRequest, sendFriendRequest } from "@/Firebase/firebaseHelperRequest";
+import TouchableButton from "@/components/TouchableButton";
 
 
 export default function ViewFriendsScreen() {
@@ -68,6 +68,36 @@ export default function ViewFriendsScreen() {
     }
   }
 
+  const sendRequest = async () => {
+    var exist = false;
+    requests.forEach((request)=>{
+      if(request.friendCode === searchQuery){
+        Alert.alert("No Request Sent", "Already Sent Request")
+        exist = true;
+        return;
+      }
+    })
+    user?.friends.forEach((friend)=>{
+      if(friend.id === searchQuery){
+        Alert.alert("No Request Sent", "Already Friends")
+        exist = true;
+        return;
+      }
+    })
+    if(exist){
+      return;
+    }
+    if(user){
+     const requestStatus = await sendFriendRequest(searchQuery, user);
+     if(!requestStatus){
+      Alert.alert("No Request Sent", "Incorrect Friend Code")
+     } else {
+      Alert.alert("Friend Request Sent")
+      setSearchQuery("");
+     }
+    }
+  }
+
   const onSelectFriend = () => {}
 
   return (
@@ -92,6 +122,7 @@ export default function ViewFriendsScreen() {
                 ) : null
                 }
               </View>
+              <TouchableButton title="Add Friend" onPress={sendRequest}/>
             </View>
       <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Requests</Text>
