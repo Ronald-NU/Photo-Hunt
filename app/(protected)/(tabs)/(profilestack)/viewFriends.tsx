@@ -9,13 +9,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import FriendAcceptRequestBox from "@/components/FriendAcceptRequestBox";
 import { acceptDenyFriend, getFriendRequest, sendFriendRequest } from "@/Firebase/firebaseHelperRequest";
-import TouchableButton from "@/components/TouchableButton";
+import { colors } from "@/constants/Colors";
 
 
 export default function ViewFriendsScreen() {
   const [friends, setFriends] = useState<FriendMiniData[]>([]);
   const [requests, setRequsts] = useState<FriendRequest[]>([]);
-  const {user} = useUser();
+  const {user, id} = useUser();
  const [searchQuery, setSearchQuery] = useState('');
   const [refresh, setRefresh] = useState(false);
   useFocusEffect(
@@ -30,7 +30,7 @@ export default function ViewFriendsScreen() {
     const request: { requests: FriendRequest[] } = { requests: [] };
     const getFriends = async () =>{
     if(user!){
-      const allRequest = await getFriendRequest(user?.code, user) as FriendRequest[]
+      const allRequest = await getFriendRequest(id, user?.code, user) as FriendRequest[]
       request.requests = allRequest;
     }
   }
@@ -70,6 +70,10 @@ export default function ViewFriendsScreen() {
 
   const sendRequest = async () => {
     var exist = false;
+    if(searchQuery.length < 6){
+      Alert.alert("No Request Sent", "Invalid Friend Code")
+      return;
+    }
     requests.forEach((request)=>{
       if(request.friendCode === searchQuery){
         Alert.alert("No Request Sent", "Already Sent Request")
@@ -102,8 +106,10 @@ export default function ViewFriendsScreen() {
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
-      <View style={{height:40, width:'90%', marginBottom: 10}}>
-       <View style={styles.searchContainer}>
+      <View style={{height:40, width:'90%', marginBottom: 10, flexDirection:'row', 
+        justifyContent:'space-evenly',
+        alignContent:'space-between'}}>
+       <View style={[styles.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
                 <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
                 <TextInput
                   style={styles.searchInput}
@@ -122,8 +128,14 @@ export default function ViewFriendsScreen() {
                 ) : null
                 }
               </View>
-              <TouchableButton title="Add Friend" onPress={sendRequest}/>
-            </View>
+              <TouchableOpacity 
+                    style={{backgroundColor:colors.Primary, padding:8, borderRadius:8}}
+                    onPress={sendRequest}
+                  >
+                    <Ionicons name="add-circle-outline" size={24} color={colors.White} />
+                  </TouchableOpacity>
+              </View>
+            
       <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Requests</Text>
       <FlatList

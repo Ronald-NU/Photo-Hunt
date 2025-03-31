@@ -2,9 +2,6 @@ import { addDoc, collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "
 import { CollectionRequests, FriendRequest, STATUS, UserData } from "./DataStructures";
 import { db } from "./firebaseSetup";
 import { getFriend, updateUserDocument } from "./firebaseHelperUsers";
-import { useUser } from "@/components/UserContext";
-import { User } from "firebase/auth";
-const {id} = useUser();
 
 //querys the database by friend code to get the user's uid
 export const sendFriendRequest = async (code: string,user:UserData) => {
@@ -56,7 +53,7 @@ export const acceptDenyFriend = async (id:string, request:FriendRequest, status:
 }
 
 //querys the database by myfriend code to get all pending requests
-export const getFriendRequest = async (code: string, user:UserData) => {
+export const getFriendRequest = async (id:string, code: string, user:UserData) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionRequests));
         const request: FriendRequest[] = []; 

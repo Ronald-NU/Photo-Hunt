@@ -52,5 +52,5 @@ interface UserContextType {
       );
     };
     
-    export const useUser = () => useContext(UserContext);
+  export const useUser = () => useContext(UserContext);
     
