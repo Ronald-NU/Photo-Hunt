@@ -353,6 +353,40 @@ Play records contain:
 </li>
 </l>
 
+<h2>Firestore Security Rules</h2>
+  <p>This document defines the security rules for accessing Firestore documents. Additionally as most aspects of our app require users to be able to view eachothers information and created documents thuswe allow reading for all data for signed in users but limit updating and writing to users with correct ownership.</p>
+  <pre><code>service cloud.firestore {
+  match /databases/{database}/documents {
+    // General rule for all documents (should be more restrictive)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Rules for puzzles: Only creator can write, all authenticated users can read
+    match /puzzles/{puzzle} {
+      allow write: if request.auth != null && request.auth.uid == resource.data.creatorID;
+      allow read: if request.auth != null;
+    }
+    
+    // Rules for play data: Only creator can write & update, all authenticated users can read
+    match /playdata/{play} {
+      allow write, update: if request.auth != null && request.auth.uid == resource.data.playerID;
+      allow read: if request.auth != null;
+    }
+
+    // Rules for requests
+    match /requests/{request} {
+      allow read, update, write: if request.auth != null;
+    }
+
+    // Rules for users: Each user can only modify their own data
+    match /users/{user} {
+      allow update, write: if request.auth != null && request.auth.uid == user;
+      allow read: if request.auth != null;
+    }
+  }
+}</code></pre>
+
 <h2>Citations</h2>
 <p></p>
 
