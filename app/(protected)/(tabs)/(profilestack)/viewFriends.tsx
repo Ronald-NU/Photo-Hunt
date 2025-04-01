@@ -48,9 +48,11 @@ export default function ViewFriendsScreen() {
     const newRequest:FriendRequest = {
       friendCode: request.friendCode,
       requesterCode: request.requesterCode,
+      friendName: request.friendName,
       name: request.name,
       status: "PENDING"
     }
+    console.log(newRequest)
     if(request.id && user){
     acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
     }
@@ -61,6 +63,7 @@ export default function ViewFriendsScreen() {
       const newRequest:FriendRequest = {
         friendCode: request.friendCode,
         requesterCode: request.requesterCode,
+        friendName: request.friendName,
         name: request.name,
         status: "PENDING"
       }
@@ -136,20 +139,23 @@ export default function ViewFriendsScreen() {
                   </TouchableOpacity>
               </View>
             
-      <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
+      {
+        requests.length > 0?
+        <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Requests</Text>
       <FlatList
         style={{width:'100%'}}
         data={requests}
         keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          item.friendCode == user?.code?
-        <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>onAcceptRequest(item)} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+          item.requesterCode == user?.code?
+        <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.friendName}/>
         :
-        <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+        <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{onAcceptRequest(item)}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
         )}
       />
-      </View>
+      </View>:null
+      }
       <View style={{marginBottom: 10, width:'100%', flex:1}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Friends</Text>
       <FlatList

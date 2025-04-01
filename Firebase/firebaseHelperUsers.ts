@@ -63,16 +63,19 @@ export const getUserData = async (uid: string) => {
 export const getFriend = async (code: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var friend;
         querySnapshot.forEach((doc) => {
+            console.log(doc.data().code === code);
             if (doc.data().code === code) {
-                const userData = doc.data() as UserData;
-                return {
+                const userData = doc.data();
+                console.log(userData);
+                friend = {
                     ...userData,
                     mypuzzles: userData.mypuzzles || []
                 };
             }
         });
-        return null;
+        return friend;
     } catch (e) {
         return e;
     }

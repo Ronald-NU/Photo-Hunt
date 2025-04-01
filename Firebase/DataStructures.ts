@@ -65,6 +65,7 @@ export type FriendRequest = {
     friendCode: string;
     requesterCode: string;
     name:string;
+    friendName: string;
     status: STATUS;
 }
 export type STATUS = 'PENDING'|'ACCEPTED'|'REJECTED';

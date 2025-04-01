@@ -4,18 +4,20 @@ import { db } from "./firebaseSetup";
 import { getFriend, updateUserDocument } from "./firebaseHelperUsers";
 
 //querys the database by friend code to get the user's uid
-export const sendFriendRequest = async (code: string,user:UserData) => {
+export const sendFriendRequest = async (code: string, user:UserData) => {
     try {
+        const friend = await getFriend(code);
+        console.log(friend);
+        if(friend == undefined){
+            return false;
+        }
         const request:FriendRequest = {
             friendCode: code,
             requesterCode: user.code,
+            friendName: (friend as UserData).name,
             name: user.name,
             status: "PENDING"
         };
-        const friend = await getFriend(code) as UserData;
-        if(friend != null){
-            return false;
-        }
         await addDoc(collection(db,CollectionRequests),request)
         return true;
     } catch (e) {
