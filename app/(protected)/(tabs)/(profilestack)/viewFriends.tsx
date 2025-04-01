@@ -2,7 +2,7 @@ import ProfileNavSections from "@/components/ProfileNavSections";
 import { useUser } from "@/components/UserContext";
 import { GeneralStyle } from "@/constants/Styles";
 import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -110,7 +110,15 @@ export default function ViewFriendsScreen() {
     setRefresh(!refresh);
   }
 
-  const onSelectFriend = () => {}
+  const onSelectFriend = (code: string, name:string) => {
+    console.log(code);
+    router.navigate({
+        pathname: "friendPuzzles",
+        params: { code: code,
+          name: name
+         },
+    });
+};
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
@@ -168,7 +176,7 @@ export default function ViewFriendsScreen() {
         data={friends}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ProfileNavSections onPress={()=>onSelectFriend()} title={item.name}/>
+          <ProfileNavSections onPress={()=>onSelectFriend(item.id, item.name)} title={item.name}/>
         )}
       />
       </View>
