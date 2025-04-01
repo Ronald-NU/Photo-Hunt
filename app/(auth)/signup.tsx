@@ -153,8 +153,8 @@ export default function signup() {
         onChangeText={enterconfirmPassword}/>
         <View style={{width:'80%',paddingVertical:2}}>
         {
-            errors.map((error)=>{
-               return <Text style={{width:'100%', color: colors.Primary}}>* {error}</Text>
+            errors.map((error, i)=>{
+               return <Text key={i} style={{width:'100%', color: colors.Primary}}>* {error}</Text>
             })
         }
         </View>

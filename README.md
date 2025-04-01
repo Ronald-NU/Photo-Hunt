@@ -160,8 +160,16 @@
     <p><strong>Profile Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/passworderrorsignup.png" alt="Sign Up Password error Screen" style="width: 40%;">
+    <p><strong>Create Password Errors Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/anoynmousProfile.png" alt="Anoynmous Profile Screen" style="width: 40%;">
     <p><strong>Profile Anoynmous Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/anoynmousNewgame.png" alt="Anoynmous New Game Screen" style="width: 40%;">
+    <p><strong>New Game Anoynmous Screen</strong></p>
   </div>
 </div>
 
@@ -220,8 +228,10 @@ Play records contain:
 - name (string)
 
 **Friend Request Data**
-- fromId (string): Requester's ID
-- fromName (string): Requester's name
+- name (string): Requester's name
+- friendCode (string): Friend's unquie code
+- requesterCode (string): Requester's unquie code
+- friendName (string): Friend's Name
 - status: Can be 'pending', 'accepted', or 'rejected'
 
 <h2>CRUD Operations</h2>
