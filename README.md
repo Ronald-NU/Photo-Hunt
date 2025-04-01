@@ -485,5 +485,3 @@ npx expo start
   </li>
 </ul>
 
-<h3>State Flow</h3>
-<p>The application follows a hierarchical state management pattern:</p>
