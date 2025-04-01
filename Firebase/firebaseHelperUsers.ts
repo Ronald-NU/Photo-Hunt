@@ -42,17 +42,19 @@ const generateFriendCode = async () => {
 export const getUserData = async (uid: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var user;
         for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
                 const userData = doc.data() as UserData;
-                return {
+                user ={
                     ...userData,
                     id: doc.id,
                     mypuzzles: userData.mypuzzles || []
                 };
+
             }
         }
-        return null;
+        return user;
     } catch (e) {
         console.error("Error getting user data:", e);
         return null;

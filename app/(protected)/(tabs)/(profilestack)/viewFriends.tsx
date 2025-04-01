@@ -23,7 +23,7 @@ export default function ViewFriendsScreen() {
       if(user){
         setFriends(user.friends);
       }
-    }, [user, refresh])
+    }, [refresh, user])
   );
 
   useEffect(()=>{
@@ -36,15 +36,14 @@ export default function ViewFriendsScreen() {
   }
   getFriends().then(()=>{
     setRequsts(request.requests);
-    setRefresh(!refresh);
   });
-  },[])
+  },[refresh])
 
   function handleSearch(text: string): void {
     setSearchQuery(text);
   }
 
-  const onAcceptRequest = (request:FriendRequest) => {
+  const onAcceptRequest = async (request:FriendRequest) => {
     const newRequest:FriendRequest = {
       friendCode: request.friendCode,
       requesterCode: request.requesterCode,
@@ -52,13 +51,13 @@ export default function ViewFriendsScreen() {
       name: request.name,
       status: "PENDING"
     }
-    console.log(newRequest)
     if(request.id && user){
-    acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
+    await acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
+    setRefresh(!refresh);
     }
   }
 
-  const onCancelRequest = (request:FriendRequest) => {
+  const onCancelRequest = async (request:FriendRequest) => {
     if(request.id && user){
       const newRequest:FriendRequest = {
         friendCode: request.friendCode,
@@ -67,7 +66,8 @@ export default function ViewFriendsScreen() {
         name: request.name,
         status: "PENDING"
       }
-    acceptDenyFriend(request.id, newRequest,'REJECTED',user);
+    await acceptDenyFriend(request.id, newRequest,'REJECTED',user);
+    setRefresh(!refresh);
     }
   }
 
@@ -75,6 +75,10 @@ export default function ViewFriendsScreen() {
     var exist = false;
     if(searchQuery.length < 6){
       Alert.alert("No Request Sent", "Invalid Friend Code")
+      return;
+    }
+    if(searchQuery == user?.code){
+      Alert.alert("No Request Sent", "You can't add yourself as a friend")
       return;
     }
     requests.forEach((request)=>{
@@ -103,6 +107,7 @@ export default function ViewFriendsScreen() {
       setSearchQuery("");
      }
     }
+    setRefresh(!refresh);
   }
 
   const onSelectFriend = () => {}

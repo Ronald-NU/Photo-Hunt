@@ -16,7 +16,7 @@ interface UserContextType {
   
   export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<UserData | null>(null);
-    const [id,setID] = useState<string>("");
+    const [id, setID] = useState<string>("");
    
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
