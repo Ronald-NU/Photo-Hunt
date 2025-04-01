@@ -46,19 +46,19 @@ export default function MapScreen() {
 
   const fetchPuzzles = useCallback(async () => {
     try {
-      console.log('Fetching puzzles...');
+      //console.log('Fetching puzzles...');
       const currentLocation = await getCurrentLocation();
-      console.log('Current location:', currentLocation);
+     // console.log('Current location:', currentLocation);
       
       const latitude = currentLocation?.coords.latitude || selectedLocation?.latitude || 37.78825;
       const longitude = currentLocation?.coords.longitude || selectedLocation?.longitude || -122.4324;
-      console.log('Using coordinates:', { latitude, longitude });
+      //console.log('Using coordinates:', { latitude, longitude });
 
       const puzzles = await getLocalPuzzles({
         latitude,
         longitude
       });
-      console.log('Fetched puzzles:', puzzles);
+     // console.log('Fetched puzzles:', puzzles);
       setAllPuzzles(puzzles);
       
       // Reset map to current location
@@ -69,7 +69,7 @@ export default function MapScreen() {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         };
-        console.log('Animating map to region:', region);
+        //console.log('Animating map to region:', region);
         mapRef.current.animateToRegion(region, 1000);
       }
     } catch (error) {
@@ -79,7 +79,7 @@ export default function MapScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('Map screen focused, fetching puzzles...');
+      //console.log('Map screen focused, fetching puzzles...');
       fetchPuzzles();
     }, [fetchPuzzles])
   );
@@ -107,7 +107,7 @@ export default function MapScreen() {
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       };
-      console.log('Found puzzle, animating to:', region);
+     // console.log('Found puzzle, animating to:', region);
       mapRef.current?.animateToRegion(region, 1000);
     }
   };
