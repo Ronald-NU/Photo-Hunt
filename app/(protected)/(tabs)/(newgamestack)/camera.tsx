@@ -265,6 +265,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryButtonText: {
-    color: 'white',
+    color: colors.White,
   },
 });

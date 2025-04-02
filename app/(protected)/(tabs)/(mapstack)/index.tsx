@@ -145,7 +145,7 @@ export default function MapScreen() {
           style={styles.leaderboardButton} 
           onPress={navigateToLeaderboard}
         >
-          <Ionicons name="trophy-outline" size={24} color="black" />
+          <Ionicons name="trophy-outline" size={24} color={colors.Black} />
         </TouchableOpacity>
 
         <View style={GeneralStyle.searchContainer}>

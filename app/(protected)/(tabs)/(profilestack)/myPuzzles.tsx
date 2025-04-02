@@ -9,6 +9,7 @@ import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";
 import { useLocalSearchParams } from "expo-router";
 import { colors } from "@/constants/Colors";
+import PuzzleSection from "@/components/PuzzleSection";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -120,15 +121,7 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.puzzleItem}
-            onPress={() => handlePuzzlePress(item)}
-          >
-            <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
-              {item.name}
-            </Text>
-            <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
-          </TouchableOpacity>
+          <PuzzleSection onPress={handlePuzzlePress} item={item} />
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -151,35 +144,6 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  puzzleItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    marginVertical: 5,
-    backgroundColor: colors.White,
-    borderRadius: 10,
-    shadowColor: colors.Black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  puzzleName: {
-    fontSize: 18,
-    fontWeight: '500',
-    flex: 1,
-    marginRight: 10,
-  },
-  difficulty: {
-    fontSize: 16,
-    color: colors.Grey,
-    minWidth: 80,
-    textAlign: 'right',
   },
   emptyContainer: {
     flex: 1,
