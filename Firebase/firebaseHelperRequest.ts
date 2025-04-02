@@ -25,18 +25,15 @@ export const sendFriendRequest = async (code: string, user:UserData) => {
 }
 
 //querys the database by friend code to get the user's uid
-export const acceptDenyFriend = async (id:string, request:FriendRequest, status:STATUS, user:UserData) => {
+export const acceptDenyFriend = async (id:string, idUser:string, request:FriendRequest, status:STATUS, user:UserData) => {
     try {
         if(status === 'ACCEPTED'){
             user.friends = [{
                 id:request.friendCode,
                 name:request.name}
                 , ...user.friends]
-           await updateUserDocument(id, user);
+           await updateUserDocument(idUser, user);
             request.status = status;
-            if(user?.name){
-            request.name = user?.name;
-            }
             updateDoc(doc(collection(db,CollectionRequests),id),request);    
         } 
         if(status === 'REJECTED'){
@@ -62,7 +59,7 @@ export const getFriendRequest = async (id:string, code: string, user:UserData) =
             if (doc.data().requesterCode === code && doc.data().status === 'ACCEPTED') {
                 user.friends = [{
                     id:doc.data().friendCode as string,
-                    name:doc.data().name}
+                    name:doc.data().friendName}
                     , ...user.friends]
                await updateUserDocument(id, user);
                 deleteDoc(doc.ref);

@@ -24,16 +24,15 @@ export default function ViewFriendsScreen() {
         setFriends(user.friends);
       }
     }, [user]));
-
-  useEffect(()=>{
-    const getFriends = async () =>{
-    if(user!){
+  const getFriends = async () =>{
+      if(user!){
       const allRequest = await getFriendRequest(id, user?.code, user) as FriendRequest[]
       setRequsts(allRequest);
     }
   }
+  useEffect(()=>{
   getFriends();
-  },[refresh])
+  },[getFriends])
 
   function handleSearch(text: string): void {
     setSearchQuery(text);
@@ -48,7 +47,8 @@ export default function ViewFriendsScreen() {
       status: "PENDING"
     }
     if(request.id && user){
-    await acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
+    await acceptDenyFriend(request.id, id, newRequest, 'ACCEPTED', user);
+    await getFriends();
     setRefresh(!refresh);
     }
   }
@@ -62,7 +62,8 @@ export default function ViewFriendsScreen() {
         name: request.name,
         status: "PENDING"
       }
-    await acceptDenyFriend(request.id, newRequest, 'REJECTED', user);
+    await acceptDenyFriend(request.id, id, newRequest, 'REJECTED', user);
+    await getFriends();
     setRefresh(!refresh);
     }
   }
@@ -156,11 +157,12 @@ export default function ViewFriendsScreen() {
         data={requests}
         keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          item.requesterCode == user?.code&&item.status=="PENDING"?
+        item.status=="PENDING"?
+          item.requesterCode == user?.code?
         <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.friendName}/>
         :
         <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{onAcceptRequest(item)}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
-        )}
+        :null)}
       />
       </View>:null
       }
