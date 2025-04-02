@@ -6,6 +6,7 @@ import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleData, PuzzleMiniData, UserData } from '@/Firebase/DataStructures';
 import { getPuzzleData } from '@/Firebase/firebaseHelperPuzzles';
 import { getFriend } from '@/Firebase/firebaseHelperUsers';
+import { colors } from '@/constants/Colors';
 
 export default function FriendPuzzleScreen() {
 const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     minWidth: 80,
     textAlign: 'right',
   },
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   },
   emptySubText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     textAlign: 'center',
   },
   refreshButton: {

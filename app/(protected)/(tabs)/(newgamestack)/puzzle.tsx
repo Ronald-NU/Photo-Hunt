@@ -9,6 +9,7 @@ import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/constants/Colors';
 
 const PUZZLE_SIZE = {
   Easy: 3, // 3x3 grid
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   },
   moves: {
     fontSize: 14,
-    color: '#666',
+    color: colors.Grey,
   },
   puzzleContainer: {
     flex: 1,
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
   },
   completeSubText: {
     fontSize: 18,
-    color: '#666',
+    color: colors.Grey,
     marginBottom: 20,
   },
   button: {

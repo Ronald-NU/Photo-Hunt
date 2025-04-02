@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";
 import { useLocalSearchParams } from "expo-router";
+import { colors } from "@/constants/Colors";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     minWidth: 80,
     textAlign: 'right',
   },
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   },
   emptySubText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     textAlign: 'center',
   },
   refreshButton: {

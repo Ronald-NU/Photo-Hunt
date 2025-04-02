@@ -9,6 +9,7 @@ import { PuzzleData } from '@/Firebase/DataStructures';
 import { getLocalPuzzles } from '@/Firebase/firebaseHelperPuzzles';
 import type { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { colors } from '@/constants/Colors';
 
 export interface SelectedLocation {
   name: string;
@@ -148,27 +149,27 @@ export default function MapScreen() {
         </TouchableOpacity>
 
         <View style={GeneralStyle.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={GeneralStyle.searchIcon} />
+          <Ionicons name="search" size={20} color={colors.Grey} style={GeneralStyle.searchIcon} />
           <TextInput
             style={GeneralStyle.searchInput}
             placeholder="Search puzzle by name..."
             value={searchQuery}
             onChangeText={handleSearch}
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.Grey}
           />
           {searchQuery ? (
             <TouchableOpacity 
               style={GeneralStyle.clearButton}
               onPress={() => setSearchQuery('')}
             >
-              <Ionicons name="close-circle" size={20} color="#666" />
+              <Ionicons name="close-circle" size={20} color={colors.Grey} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity 
               style={GeneralStyle.refreshButton}
               onPress={handleRefresh}
             >
-              <Ionicons name="refresh" size={20} color="#666" />
+              <Ionicons name="refresh" size={20} color={colors.Grey} />
             </TouchableOpacity>
           )}
         </View>
@@ -318,7 +319,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   filterText: {
-    color: '#666',
+    color: colors.Grey,
     fontSize: 13,
     fontWeight: '500',
   },

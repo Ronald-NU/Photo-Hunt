@@ -9,6 +9,7 @@ import { useSelectedLocation } from '@/components/SelectedLocationContext';
 import { useUser } from '@/components/UserContext';
 import CreateAccountModal from '@/components/CreateAccountModal';
 import { auth } from '@/Firebase/firebaseSetup';
+import { colors } from '@/constants/Colors';
 
 type Difficulty = 'Easy' | 'Medium' | 'Hard';
 
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 16,
     marginLeft: 10,
-    color: '#666',
+    color: colors.Grey,
   },
   difficultyContainer: {
     flexDirection: 'row',
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: 'center',
-    color: '#666',
+    color: colors.Grey,
     marginVertical: 20,
   },
 });

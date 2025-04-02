@@ -126,20 +126,20 @@ export default function ViewFriendsScreen() {
         justifyContent:'space-evenly',
         alignContent:'space-between'}}>
        <View style={[GeneralStyle.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
-                <Ionicons name="search" size={20} color="#666" style={GeneralStyle.searchIcon} />
+                <Ionicons name="search" size={20} color={colors.Grey} style={GeneralStyle.searchIcon} />
                 <TextInput
                   style={GeneralStyle.searchInput}
                   placeholder="Add friends by code #AAA111"
                   value={searchQuery}
                   onChangeText={handleSearch}
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.Grey}
                 />
                 {searchQuery ? (
                   <TouchableOpacity 
                     style={GeneralStyle.clearButton}
                     onPress={() => setSearchQuery('')}
                   >
-                    <Ionicons name="close-circle" size={20} color="#666" />
+                    <Ionicons name="close-circle" size={20} color={colors.Grey} />
                   </TouchableOpacity>
                 ) : null
                 }
