@@ -4,7 +4,7 @@ import { GeneralStyle } from "@/constants/Styles";
 import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import FriendAcceptRequestBox from "@/components/FriendAcceptRequestBox";
@@ -125,10 +125,10 @@ export default function ViewFriendsScreen() {
       <View style={{height:40, width:'90%', marginBottom: 10, flexDirection:'row', 
         justifyContent:'space-evenly',
         alignContent:'space-between'}}>
-       <View style={[styles.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
-                <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+       <View style={[GeneralStyle.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
+                <Ionicons name="search" size={20} color="#666" style={GeneralStyle.searchIcon} />
                 <TextInput
-                  style={styles.searchInput}
+                  style={GeneralStyle.searchInput}
                   placeholder="Add friends by code #AAA111"
                   value={searchQuery}
                   onChangeText={handleSearch}
@@ -136,7 +136,7 @@ export default function ViewFriendsScreen() {
                 />
                 {searchQuery ? (
                   <TouchableOpacity 
-                    style={styles.clearButton}
+                    style={GeneralStyle.clearButton}
                     onPress={() => setSearchQuery('')}
                   >
                     <Ionicons name="close-circle" size={20} color="#666" />
@@ -183,35 +183,3 @@ export default function ViewFriendsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 16,
-    color: '#333',
-  },
-  clearButton: {
-    padding: 5,
-    marginLeft: 5,
-  },
-});

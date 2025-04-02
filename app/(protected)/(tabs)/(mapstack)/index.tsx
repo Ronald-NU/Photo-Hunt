@@ -147,10 +147,10 @@ export default function MapScreen() {
           <Ionicons name="trophy-outline" size={24} color="black" />
         </TouchableOpacity>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+        <View style={GeneralStyle.searchContainer}>
+          <Ionicons name="search" size={20} color="#666" style={GeneralStyle.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={GeneralStyle.searchInput}
             placeholder="Search puzzle by name..."
             value={searchQuery}
             onChangeText={handleSearch}
@@ -158,14 +158,14 @@ export default function MapScreen() {
           />
           {searchQuery ? (
             <TouchableOpacity 
-              style={styles.clearButton}
+              style={GeneralStyle.clearButton}
               onPress={() => setSearchQuery('')}
             >
               <Ionicons name="close-circle" size={20} color="#666" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity 
-              style={styles.refreshButton}
+              style={GeneralStyle.refreshButton}
               onPress={handleRefresh}
             >
               <Ionicons name="refresh" size={20} color="#666" />
@@ -247,39 +247,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 16,
-    color: '#333',
-  },
-  refreshButton: {
-    padding: 5,
-    marginLeft: 5,
-  },
-  clearButton: {
-    padding: 5,
-    marginLeft: 5,
   },
   locationInfo: {
     position: 'absolute',

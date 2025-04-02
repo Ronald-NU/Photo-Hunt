@@ -101,7 +101,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
         }} 
       />
       <FlatList
-        style={styles.list}
+        style={GeneralStyle.list}
         contentContainerStyle={{ 
           flexGrow: 1,
           paddingBottom: 100
@@ -140,11 +140,6 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  list: {
-    flex: 1,
-    width: '100%',
-    padding: 15,
   },
   puzzleItem: {
     flexDirection: 'row',
