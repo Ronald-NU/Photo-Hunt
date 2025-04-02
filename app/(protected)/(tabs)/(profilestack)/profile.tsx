@@ -5,14 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import ProfileNavSections from "@/components/ProfileNavSections";
 import { useUser } from "@/components/UserContext";
 import { useCallback, useState } from "react";
-import { GeneralStyle, TextStyles } from "@/constants/Styles";
+import {  TextStyles } from "@/constants/Styles";
 import CreateAccountModal from "@/components/CreateAccountModal";
 import { auth } from "@/Firebase/firebaseSetup";
 import { colors } from "@/constants/Colors";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const {user, loading} = useUser();
+  const {user} = useUser();
   const [createAccountModal, setCreatAccountModal] = useState(false);
 
   useFocusEffect(
@@ -24,14 +24,6 @@ export default function ProfileScreen() {
       }
     }, [user])
   );
-
-  if(loading){
-    return (
-    <SafeAreaView style={GeneralStyle.container}>
-      <ActivityIndicator/>
-    </SafeAreaView>
-    )
-  }
 
   const logout = () => {
     Alert.alert(
@@ -66,8 +58,7 @@ export default function ProfileScreen() {
     onClose={()=>{cancel()}} />
             <TouchableOpacity 
             style={styles.logoutButton} 
-            onPress={logout}  
-          >  
+            onPress={logout} >  
           <Ionicons name="exit-outline" size={30} color={colors.Black} />
           </TouchableOpacity>
 <View style={styles.profileContainer}>

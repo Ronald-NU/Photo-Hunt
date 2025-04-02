@@ -10,56 +10,115 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createUserDocument } from '@/Firebase/firebaseHelperUsers';
 import { colors } from '@/constants/Colors';
 import TouchableButton from '@/components/TouchableButton';
+import * as Location from 'expo-location';
+import { UserCreateData } from '@/Firebase/DataStructures';
 
 export default function signup() {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
+    const [errors, setErrors] = useState<string[]>([])
 
     const createUser = async () => {
-        if (password === confirmpassword) {
-            try {
-                if(name =="" || email=="" || password=="" || confirmpassword==""){
-                    Alert.alert("Please fill out all fields");
-                    return;
+        try {
+            if(email === '' || password === '' || name === ''){
+                Alert.alert('Could not Register',
+                 "Make sure to input a valid email and password!");
+                return;
+            } 
+            if(password.length < 8){
+                Alert.alert('Could not Register',
+                 "Password must be at least 8 characters long!");
+                return;
+            }
+            if(!email.includes('@')){
+                Alert.alert('Could not Register',
+                 "Please enter a valid email address!");
+                return;
+            }
+            if(password !== confirmpassword){
+                Alert.alert('Could not Register',
+                 "Passwords do not match!");
+                return;
+            }
+
+            // Create Firebase auth user
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            
+            // Get current location for initial user data
+            let location = await Location.getCurrentPositionAsync({});
+            
+            // Create user document in Firestore
+            const userData: UserCreateData = {
+                name: name,
+                email: email,
+                uid: userCredential.user.uid,
+                geoLocation: {
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude
                 }
-                if(password != confirmpassword){
-                    Alert.alert("Passwords do not match");
-                    return;
+            };
+            
+            await createUserDocument(userData);
+            
+            // Navigate to protected area
+            router.replace("/(protected)/");
+        } catch (error) {
+            if(error instanceof FirebaseError && "code" in error && "message" in error){
+                if(error.code === 'auth/email-already-in-use'){
+                    Alert.alert('Could not Register',
+                 "Email already in use!");
+                 return;
                 }
-                if(!email.includes("@") || !email.includes(".")){
-                    Alert.alert("Invalid Email");
-                    return;
+                if(error.code === 'auth/invalid-email'){
+                    Alert.alert('Could not Register',
+                 "Invalid email address!");
+                 return;
                 }
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                if(user){
-                    const id = await createUserDocument({
-                        name: name, 
-                        email: email, 
-                        uid: user.uid, 
-                        geoLocation: {latitude: 0, longitude: 0}
-                    });
+                if(error.code === 'auth/operation-not-allowed'){
+                    Alert.alert('Could not Register',
+                 "Email/password accounts are not enabled!");
+                 return;
                 }
-            } catch (error: any) {
-                if(error.code == "auth/password-does-not-meet-requirements"){
-                    Alert.alert('Could not Register', 
-                    "Make sure to input a valid email and password with "+ 
-                    "at least 8 characters and 1 captial letter!");
+                if(error.code === 'auth/weak-password'){
+                    Alert.alert('Could not Register',
+                 "Password is too weak!");
+                 return;
                 }
             }
+            console.error('Error creating user:', error);
+            Alert.alert('Could not Register',
+                 "An error occurred during registration. Please try again.");
         }
-        else {
-            Alert.alert('Could Not Register', 
-                "Make sure the passwords match and have at least 8 characters and 1 captial letter!");
-        }
-    }
+    };
 
     const anonymousSignIn =  async () => {
        signInAnonymously(auth);
     }
     
+    const enterPassword = (text:string) =>{
+        setPassword(text);
+        passwordError(text);
+        if(confirmpassword.length > 0 && text != confirmpassword){
+            setErrors((error)=>["Passwords do not match!",...error])
+        }
+    }
+
+    const passwordError = (text:string) => {
+        if(text){
+            setErrors(["Password must be at least 8 characters long!"]);
+        }
+    }
+
+    const enterconfirmPassword = (text:string) =>{
+        setConfirmPassword(text);
+        passwordError(text);
+        if(text.length > 0 && password != text){
+            setErrors((error)=>["Passwords do not match!",...error])
+        }
+    }
+
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
@@ -84,14 +143,21 @@ export default function signup() {
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={password}
-        onChangeText={text => {setPassword(text)}}/>
+        onChangeText={enterPassword}/>
          <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Confirm Password</Text>
          <TextInput 
         placeholder='Password' 
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={confirmpassword}
-        onChangeText={text => {setConfirmPassword(text)}}/>
+        onChangeText={enterconfirmPassword}/>
+        <View style={{width:'80%',paddingVertical:2}}>
+        {
+            errors.map((error, i)=>{
+               return <Text key={i} style={{width:'100%', color: colors.Primary}}>* {error}</Text>
+            })
+        }
+        </View>
         <TouchableButton onPress={createUser} title="Register" widthBut={'80%'} />
         <PressableTextLink onPress={anonymousSignIn} title="Don't want to make an account? Sign in Anonymously with limited features"/>
         <PressableTextLink onPress={() => router.replace('./login')} title="Already Registered? Login"/>

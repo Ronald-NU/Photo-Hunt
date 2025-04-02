@@ -1,20 +1,19 @@
+import { UserProvider, useUser } from "@/components/UserContext";
 import { auth } from "@/Firebase/firebaseSetup";
 import { router, Stack, useSegments } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { SelectedLocationProvider } from "@/components/SelectedLocationContext";
 
-export default function Layout() {
+export default function RootLayout() {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
     const segments = useSegments();
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
-          if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
+          if (user) {        
             setUserLoggedIn(true);
           } else {
-          // User is signed out
             setUserLoggedIn(false);
           }
         })
@@ -32,10 +31,14 @@ export default function Layout() {
    }, [userLoggedIn]);
    
     return   (
-    <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
-        <Stack.Screen
-				 name="(auth)" options={{ animation: "slide_from_left" }} />     
-	<Stack.Screen 
-				name="(protected)" options={{ animation: "slide_from_right" }} />
-    </Stack>)
+    <UserProvider>
+      <SelectedLocationProvider>
+        <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+            <Stack.Screen
+					 name="(auth)" options={{ animation: "slide_from_left" }} />     
+			<Stack.Screen 
+				 name="(protected)" options={{ animation: "slide_from_right" }} />
+        </Stack>
+      </SelectedLocationProvider>
+    </UserProvider>)
 }

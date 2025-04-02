@@ -11,15 +11,88 @@
 <li>Created and refactored the app into components</li>
 <li>Created the UserContext</li>
 <li>Created the CreateAccountModal</li>
-<li>Implmented User creation process including forgot password and anoynmous sign in found under <b>Authentication/User Creation Proccess</b></li>
-<li>Assisted in app navigation logic/bug fixs</li>
+<li>Implemented User creation process including forgot password and anonymous sign in found under <b>Authentication/User Creation Process</b></li>
+<li>Assisted in app navigation logic/bug fixes</li>
+<li>Implemented friend request system including:
+  <ul>
+    <li>Send friend requests functionality</li>
+    <li>Accept and reject friend requests</li>
+    <li>Friend puzzle screen implementation</li>
+    <li>Modified helper functions for friend information retrieval</li>
+    <li>Updated request status display for outgoing requests</li>
+  </ul>
+</li>
+<li>Enhanced UI/UX with bottom tab bar improvements and navigation flow optimization</li>
 </l>
 
 <h3>Sisi You</h3>
-<p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 1</a></p>
+<p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw">CodeWalk Iteration 1</a></p>
 <l>
-<li>Implemented Stack & Tab Navigation under <b>Navigation</b></li>
-<li>Co-developed Firebase setup</li>
+
+
+<li>New Game Creation System:
+  <ul>
+    <li>Developed comprehensive puzzle creation workflow:
+      <ul>
+        <li>Dynamic puzzle grid generation</li>
+        <li>Difficulty level implementation</li>
+        <li>Implemented and configured Google Cloud Vision API integration for photo validation</li>
+        <li>Location-based puzzle storage</li>
+      </ul>
+    </li>
+    <li>Enhanced CameraScreen with:
+      <ul>
+        <li>Permission handling and validation</li>
+        <li>Image aspect ratio optimization</li>
+        <li>Real-time location verification</li>
+      </ul>
+    </li>
+    <li>Implemented PuzzleScreen with:
+      <ul>
+        <li>Interactive sliding puzzle gameplay</li>
+        <li>Move tracking and scoring</li>
+        <li>Firebase integration for puzzle storage</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+<li>Map and Location Features:
+  <ul>
+    <li>Enhanced MapScreen with:
+      <ul>
+        <li>Real-time difficulty filtering system</li>
+        <li>Puzzle search functionality</li>
+        <li>Color-coded difficulty markers</li>
+      </ul>
+    </li>
+    <li>Enhanced LocationManager with:
+      <ul>
+        <li>Location selection and validation</li>
+        <li>Interactive marker system</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+<li>Profile and Puzzle Management:
+  <ul>
+    <li>Developed MyPuzzlesScreen featuring:
+      <ul>
+        <li>Personal puzzle collection management</li>
+        <li>Difficulty level display</li>
+        <li>Real-time puzzle list updates</li>
+      </ul>
+    </li>
+    <li>Created ViewPuzzleScreen with:
+      <ul>
+        <li>Puzzle preview functionality</li>
+        <li>Dynamic navigation handling</li>
+        <li>Optimized image rendering</li>
+      </ul>
+    </li>
+  </ul>
+</li>
 </l>
 
 <h2>Naviagtion</h2>
@@ -58,6 +131,10 @@
     <img src="screenshots/camera.PNG" alt="Camera Screen" style="width: 40%;">
     <p><strong>Camera Screen</strong></p>
   </div>
+    <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/puzzle.PNG" alt="Puzzle Screen" style="width: 40%;">
+    <p><strong>Puzzle Screen</strong></p>
+  </div>
 </div>
 
 <h2>Authentication/User Creation Proccess</h2>
@@ -83,79 +160,362 @@
     <p><strong>Profile Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/passworderrorsignup.png" alt="Sign Up Password error Screen" style="width: 40%;">
+    <p><strong>Create Password Errors Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/anoynmousProfile.png" alt="Anoynmous Profile Screen" style="width: 40%;">
     <p><strong>Profile Anoynmous Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/anoynmousNewgame.png" alt="Anoynmous New Game Screen" style="width: 40%;">
+    <p><strong>New Game Anoynmous Screen</strong></p>
   </div>
 </div>
 
 <h2>Data Model</h2>
-<p>The app uses three main collections in the database:</p>
-<h3>Collections</h3>
-<ul>
-  <li><strong>Users</strong>: Stores user profiles and related information</li>
-  <li><strong>Puzzles</strong>: Contains all created puzzles with their properties</li>
-  <li><strong>Plays</strong>: Records user gameplay sessions and scores</li>
-</ul>
-<h3>Data Structures</h3>
-<h4>User Data</h4>
-<ul>
-  <li><strong>Basic Info</strong>: name, email, uid, photoURL, code</li>
-  <li><strong>Stats</strong>: score</li>
-  <li><strong>Relations</strong>:
-    <ul>
-      <li>List of friends (id, name)</li>
-      <li>List of created puzzles (id, name, difficulty)</li>
-    </ul>
-  </li>
-  <li><strong>Location</strong>: Current geographical coordinates</li>
-</ul>
-<h4>Puzzle Data</h4>
-<ul>
-  <li><strong>Identifiers</strong>: id, creatorID</li>
-  <li><strong>Properties</strong>: name, difficulty</li>
-  <li><strong>Content</strong>: photoURL</li>
-  <li><strong>Location</strong>: Geographic coordinates where the puzzle is located</li>
-</ul>
-<h4>Play Data</h4>
-<ul>
-  <li><strong>Session Info</strong>: puzzleId, playerId</li>
-  <li><strong>Details</strong>: name</li>
-  <li><strong>Performance</strong>: score (based on number of moves)</li>
-</ul>
+<p>The app uses Firebase Firestore with three main collections:</p>
+
+### Collections
+- **Users**: Stores user profiles and related information
+- **Puzzles**: Contains all created puzzles with their properties
+- **Plays**: Records user gameplay sessions and scores
+
+### Data Structures
+
+#### User Data
+User documents contain:
+- name (string): User's display name
+- email (string): User's email address
+- uid (string): Unique user identifier
+- photoURL (string): Profile picture URL
+- code (string): Unique friend code
+- score (number): User's total score
+- friends: Array of friend data (id and name)
+- mypuzzles: Array of created puzzles (id, name, difficulty)
+- geoLocation: User's location (latitude and longitude)
+- friendRequests: Array of friend requests (fromId, fromName, status)
+
+#### Puzzle Data
+Puzzle documents contain:
+- id (string): Unique puzzle identifier
+- creatorID (string): Creator's user ID
+- name (string): Puzzle name
+- photoURL (string): Puzzle image URL
+- difficulty (number): 3 for Easy, 4 for Medium, 5 for Hard
+- geoLocation: Puzzle location (latitude and longitude)
+
+#### Play Data
+Play records contain:
+- puzzleId (string): ID of the played puzzle
+- playerId (string): ID of the player
+- name (string): Player's name
+- score (number): Score achieved
+
+#### Supporting Types
+
+**GeoLocation Data**
+- latitude (number)
+- longitude (number)
+
+**Puzzle Mini Data**
+- id (string)
+- name (string)
+- difficulty (number)
+
+**Friend Data**
+- id (string)
+- name (string)
+
+**Friend Request Data**
+- name (string): Requester's name
+- friendCode (string): Friend's unquie code
+- requesterCode (string): Requester's unquie code
+- friendName (string): Friend's Name
+- status: Can be 'pending', 'accepted', or 'rejected'
 
 <h2>CRUD Operations</h2>
-<p>All the implemented CRUD operation within the app.</p>
+<p>Firebase operations implemented in the application:</p>
 
 <h3>Create</h3>
 <l>
-<li><b>createUserDocument:</b> creates the user document within the "Users" collection and generates a unquie friend code for this user.</li>
-<li><b>createPlayDocument:</b> creates the a playdata document within the "Plays" collection.</li>
-<li><b>createPuzzleDocument:</b> creates the Puzzle document within the "Puzzles" collection.</li>
+<li><b>createUserDocument</b>
+  <ul>
+    <li>Creates new user profile in "Users" collection</li>
+    <li>Generates unique friend code</li>
+    <li>Initializes user stats and collections</li>
+  </ul>
+</li>
+<li><b>createPuzzleDocument</b>
+  <ul>
+    <li>Creates new puzzle in "Puzzles" collection</li>
+    <li>Handles image storage and location data</li>
+    <li>Updates creator's mypuzzles array</li>
+  </ul>
+</li>
+<li><b>createPlayDocument</b>
+  <ul>
+    <li>Records new gameplay session</li>
+    <li>Stores player performance data</li>
+  </ul>
+</li>
 </l>
 
 <h3>Read</h3>
 <l>
-<li><b>getPuzzleLeaderBoard:</b> gets the information of all play data from a specific puzzle within the "Plays" collection.</li>
-<li><b> getLocalLeaderBoard:</b> gets the information of all scores for players with 100 miles of a location within the "Users" collection.</li>
-<li><b>getLocalPuzzles:</b> gets the puzzles within 10 miles of a specific location within the "Puzzles" collection.</li>
-<li><b>getPuzzleData:</b> gets the puzzle data of a specific puzzle within the "Puzzles" collection.</li>
-<li><b> getFriend:</b> gets the information a User by their friend code within the "Users" collection.</li>
-<li><b> getUserData:</b> gets the specific information of User by their uid within the "Users" collection.</li>
+<li><b>getUserData</b>
+  <ul>
+    <li>Retrieves user profile by UID</li>
+    <li>Includes friends list and puzzle collection</li>
+  </ul>
+</li>
+<li><b>getPuzzleData</b>
+  <ul>
+    <li>Fetches puzzle details by ID</li>
+    <li>Includes creator and location information</li>
+  </ul>
+</li>
+<li><b>getLocalPuzzles</b>
+  <ul>
+    <li>Retrieves puzzles within specified radius</li>
+    <li>Uses haversine distance calculation</li>
+    <li>Supports difficulty filtering</li>
+  </ul>
+</li>
+<li><b>getPuzzleLeaderBoard</b>
+  <ul>
+    <li>Fetches puzzle completion records</li>
+    <li>Orders by score/completion time</li>
+  </ul>
+</li>
+<li><b>getFriend</b>
+  <ul>
+    <li>Looks up user by friend code</li>
+    <li>Returns basic profile information</li>
+  </ul>
+</li>
 </l>
 
 <h3>Update</h3>
 <l>
-<li><b>updateUserDocument:</b> updates the user document within the "Users" collection.</li>
-<li><b>updatePlayDataDocument:</b> updates a specific playdata document within the "Plays" collection.</li>
+<li><b>updateUserDocument</b>
+  <ul>
+    <li>Updates user profile information</li>
+    <li>Handles friend list modifications</li>
+    <li>Updates puzzle collection</li>
+    <li>Manages friend requests</li>
+  </ul>
+</li>
+<li><b>updatePlayDataDocument</b>
+  <ul>
+    <li>Updates gameplay session data</li>
+    <li>Records completion time and score</li>
+  </ul>
+</li>
 </l>
-
 
 <h3>Delete</h3>
 <l>
-<li><b>deleteUserDocument:</b> deletes a users Document within the "Users" collection.</li>
-<li><b>deletePlayDataDocument:</b> deletes a specific playdata document within the "Plays" collection.</li>
-<li><b>deletePuzzleDocument:</b> deletes a specific puzzle document within the "Puzzles" collection.</li>
+<li><b>deleteUserDocument</b>
+  <ul>
+    <li>Removes user profile</li>
+    <li>Cleans up associated data</li>
+  </ul>
+</li>
+<li><b>deletePuzzleDocument</b>
+  <ul>
+    <li>Removes puzzle from collection</li>
+    <li>Updates creator's puzzle list</li>
+    <li>Removes associated image data</li>
+  </ul>
+</li>
+<li><b>deletePlayDataDocument</b>
+  <ul>
+    <li>Removes specific gameplay record</li>
+  </ul>
+</li>
 </l>
+
+<h3>Special Operations</h3>
+<l>
+<li><b>handleFriendRequest</b>
+  <ul>
+    <li>Processes friend request actions</li>
+    <li>Updates both users' friend lists</li>
+    <li>Manages request status changes</li>
+  </ul>
+</li>
+<li><b>storeImage</b>
+  <ul>
+    <li>Handles image upload to Firebase Storage</li>
+    <li>Returns storage reference path</li>
+  </ul>
+</li>
+</l>
+
+<h2>Firestore Security Rules</h2>
+  <p>This document defines the security rules for accessing Firestore documents. Additionally as most aspects of our app require users to be able to view eachothers information and created documents thuswe allow reading for all data for signed in users but limit updating and writing to users with correct ownership.</p>
+  <pre><code>service cloud.firestore {
+  match /databases/{database}/documents {
+    // General rule for all documents (should be more restrictive)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Rules for puzzles: Only creator can write, all authenticated users can read
+    match /puzzles/{puzzle} {
+      allow write: if request.auth != null && request.auth.uid == resource.data.creatorID;
+      allow read: if request.auth != null;
+    }
+    
+    // Rules for play data: Only creator can write & update, all authenticated users can read
+    match /playdata/{play} {
+      allow write, update: if request.auth != null && request.auth.uid == resource.data.playerID;
+      allow read: if request.auth != null;
+    }
+
+    // Rules for requests
+    match /requests/{request} {
+      allow read, update, write: if request.auth != null;
+    }
+
+    // Rules for users: Each user can only modify their own data
+    match /users/{user} {
+      allow update, write: if request.auth != null && request.auth.uid == user;
+      allow read: if request.auth != null;
+    }
+  }
+}</code></pre>
 
 <h2>Citations</h2>
 <p></p>
+
+<h2>Installation and Setup</h2>
+
+<h3>Prerequisites</h3>
+<ul>
+  <li>Node.js (v18 or higher)</li>
+  <li>npm or yarn</li>
+  <li>Expo CLI (`npm install -g expo-cli`)</li>
+  <li>Expo Go app on your mobile device</li>
+</ul>
+
+<h3>Environment Setup</h3>
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/Photo-Hunt.git
+cd Photo-Hunt
+```
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+1. Required Configuration Files:
+
+<h4>Service Account Setup</h4>
+<p>The app requires a Google Cloud Vision API service account for photo validation. Follow these steps:</p>
+
+1. Create a file named `service-account.json` in the `config` directory
+2. Contact the development team to obtain the service account credentials
+3. The file structure should look like this:
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "your-private-key-id",
+  "private_key": "your-private-key",
+  "client_email": "your-client-email",
+  "client_id": "your-client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "your-cert-url"
+}
+```
+
+<h3>Running the App</h3>
+
+1. Start the development server:
+```bash
+npx expo start
+```
+
+2. Running on a physical device:
+   - Install Expo Go on your mobile device
+   - Scan the QR code shown in the terminal with:
+     - iOS: Camera app
+     - Android: Expo Go app
+
+3. Running on simulators:
+   - iOS (requires macOS):
+     ```bash
+     npx expo start --ios
+     ```
+   - Android:
+     ```bash
+     npx expo start --android
+     ```
+
+<h3>Troubleshooting</h3>
+<ul>
+  <li>If you encounter any issues with dependencies, try:
+    ```bash
+    npm install
+    npx expo install
+    ```
+  </li>
+  <li>For camera permissions issues, ensure you've granted necessary permissions in your device settings</li>
+  <li>If the app fails to connect to Firebase, verify your network connection and Firebase configuration</li>
+</ul>
+
+<h3>Development Notes</h3>
+<ul>
+  <li>The app requires location services to be enabled for full functionality</li>
+  <li>Photo validation requires an active internet connection</li>
+  <li>For testing puzzle creation, ensure you have access to locations with recognizable landmarks or buildings</li>
+</ul>
+
+<h2>State Management</h2>
+<p>The application uses React's Context API for state management, implementing several context providers to handle different aspects of the application state.</p>
+
+<h3>Context Providers</h3>
+
+<h4>1. User Context</h4>
+<p>Manages user authentication and profile state throughout the application.</p>
+<ul>
+  <li><strong>Location:</strong> `components/UserContext`</li>
+  <li><strong>Key Features:</strong>
+    <ul>
+      <li>User authentication state</li>
+      <li>User profile data management</li>
+      <li>Real-time user data updates</li>
+    </ul>
+  </li>
+  <li><strong>Usage Example:</strong>
+    ```typescript
+    const { user } = useUser();
+    ```
+  </li>
+</ul>
+
+<h4>2. Selected Location Context</h4>
+<p>Handles the state of selected locations for puzzle creation and gameplay.</p>
+<ul>
+  <li><strong>Location:</strong> `components/SelectedLocationContext`</li>
+  <li><strong>Key Features:</strong>
+    <ul>
+      <li>Current selected location coordinates</li>
+      <li>Location name and metadata</li>
+      <li>Location selection state for puzzle creation</li>
+    </ul>
+  </li>
+  <li><strong>Usage Example:</strong>
+    ```typescript
+    const { selectedLocation } = useSelectedLocation();
+    ```
+  </li>
+</ul>
+

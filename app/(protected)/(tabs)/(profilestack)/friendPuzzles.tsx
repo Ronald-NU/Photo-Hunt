@@ -1,20 +1,17 @@
-import { useUser } from "@/components/UserContext";
-import { GeneralStyle } from "@/constants/Styles";
-import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
-import { useFocusEffect, useRouter, Stack } from "expo-router";
-import { useCallback, useState, useEffect } from "react";
-import { FlatList, Text, View, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Image } from "react-native";
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
-import { getUserData } from "@/Firebase/firebaseHelperUsers";
-import { useLocalSearchParams } from "expo-router";
+import { GeneralStyle } from "@/constants/Styles";
+import { PuzzleData, PuzzleMiniData, UserData } from '@/Firebase/DataStructures';
+import { getPuzzleData } from '@/Firebase/firebaseHelperPuzzles';
+import { getFriend } from '@/Firebase/firebaseHelperUsers';
 
-export default function MyPuzzlesScreen() {
-  const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
+export default function FriendPuzzleScreen() {
+const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
+ const params = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useUser();
   const router = useRouter();
-  const params = useLocalSearchParams();
 
   const getDifficultyText = (difficulty: number) => {
     switch(difficulty) {
@@ -26,12 +23,12 @@ export default function MyPuzzlesScreen() {
   };
 
   const fetchUserPuzzles = useCallback(async () => {
-    if (!user?.uid) return;
+    if (!params.code) return;
     
     setIsLoading(true);
     try {
       // Get fresh user data from the database
-      const userData = await getUserData(user.uid);
+      const userData = await getFriend(Array.isArray(params.code) ? params.code[0] : params.code) as UserData;
       if (userData && userData.mypuzzles) {
         setPuzzles(userData.mypuzzles);
       } else {
@@ -43,20 +40,13 @@ export default function MyPuzzlesScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.uid]);
+  }, [params.code]);
 
   useFocusEffect(
     useCallback(() => {
       fetchUserPuzzles();
     }, [fetchUserPuzzles])
   );
-
-  // Add effect to handle refresh parameter
-  useEffect(() => {
-    if (params.refresh === "true") {
-      fetchUserPuzzles();
-    }
-  }, [params.refresh, fetchUserPuzzles]);
 
   const handlePuzzlePress = async (puzzle: PuzzleMiniData) => {
     try {
@@ -102,7 +92,7 @@ export default function MyPuzzlesScreen() {
     <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
       <Stack.Screen 
         options={{ 
-          title: "My Puzzles",
+          title: `${params.name} Puzzles`,
           headerRight: () => (
             <TouchableOpacity onPress={fetchUserPuzzles}>
               <Text style={styles.refreshButton}>Refresh</Text>
@@ -132,7 +122,7 @@ export default function MyPuzzlesScreen() {
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No puzzles created yet</Text>
-            <Text style={styles.emptySubText}>Create a new puzzle to see it here!</Text>
+            <Text style={styles.emptySubText}>Wait for your friend to create a new puzzle to see it here!</Text>
           </View>
         )}
         onRefresh={fetchUserPuzzles}

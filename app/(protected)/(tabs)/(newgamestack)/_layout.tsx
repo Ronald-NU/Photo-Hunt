@@ -18,6 +18,14 @@ export default function NewGameStackLayout() {
           headerBackTitle: "Back"
         }} 
       />
+      <Stack.Screen 
+        name="puzzle" 
+        options={{ 
+          title: "Puzzle",
+          headerShown: true,
+          headerBackTitle: "Back"
+        }} 
+      />
     </Stack>
   );
 }

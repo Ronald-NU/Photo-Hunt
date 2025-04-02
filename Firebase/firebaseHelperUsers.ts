@@ -39,16 +39,24 @@ const generateFriendCode = async () => {
     return code;
 }
 //Gets user data from the database based on the user's uid
-export const getUserData = async (uid: string)=> {
+export const getUserData = async (uid: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var user;
         for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
-                return doc.data();
+                const userData = doc.data() as UserData;
+                user ={
+                    ...userData,
+                    id: doc.id,
+                    mypuzzles: userData.mypuzzles || []
+                };
+
             }
         }
-        return null;
+        return user;
     } catch (e) {
+        console.error("Error getting user data:", e);
         return null;
     }
 }
@@ -57,12 +65,19 @@ export const getUserData = async (uid: string)=> {
 export const getFriend = async (code: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var friend;
         querySnapshot.forEach((doc) => {
+            console.log(doc.data().code === code);
             if (doc.data().code === code) {
-                return doc.data();
+                const userData = doc.data();
+                console.log(userData);
+                friend = {
+                    ...userData,
+                    mypuzzles: userData.mypuzzles || []
+                };
             }
         });
-        return null;
+        return friend;
     } catch (e) {
         return e;
     }

@@ -1,47 +1,62 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { UserData } from '@/Firebase/DataStructures';
-import { auth } from '@/Firebase/firebaseSetup';
-import { getUserData } from '@/Firebase/firebaseHelperUsers';
+import { CollectionUser, UserData } from '@/Firebase/DataStructures';
+import { auth, db } from '@/Firebase/firebaseSetup';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 interface UserContextType {
     user: UserData | null;
-    loading: boolean;
-    setLoading:(value:boolean)=>void
+    id: string;
   }
   
   const UserContext = createContext<UserContextType>({
     user: null,
-    loading: true,
-    setLoading:(value:boolean)=>{}
+    id: "",
   });
   
   export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<UserData | null>(null);
-    const [loading, setLoading] = useState(true);
-  
+    const [id, setID] = useState<string>("");
+   
     useEffect(() => {
-    const firebaseUser = auth.currentUser;
-    const setUserData =  async () => {
-        if (firebaseUser) {
-            if(auth.currentUser?.isAnonymous){
-                setUser(null);
-                setLoading(false);
+      const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser?.uid && !firebaseUser.isAnonymous) {
+          const usersRef = collection(db, CollectionUser);
+          const q = query(usersRef, where("uid", "==", firebaseUser.uid));
+          const firestoreUnsubscribe = onSnapshot(q, (querySnapshot) => {
+            if (!querySnapshot.empty) {
+              const doc = querySnapshot.docs[0];
+              const userData = doc.data() as UserData;
+    
+              setUser({
+                ...userData,
+                mypuzzles: userData.mypuzzles || [],
+              });
+              setID(doc.id);
             } else {
-                const data = await getUserData(firebaseUser.uid);
-                setUser(data as UserData | null)
-                setLoading(false);
+              console.log("No user data found for uid:", firebaseUser.uid);
+              setUser(null);
+              setID("");
             }
+          });
+    
+          return () => firestoreUnsubscribe();
+        } else {
+          setUser(null);
+          setID("");
         }
-       }
-      setUserData();
-      },[auth]);
+      });
+    
+      return () => authUnsubscribe(); // Cleanup Auth listener
+    }, []);
+    
     
       return (
-        <UserContext.Provider value={{ user, loading, setLoading }}>
+        <UserContext.Provider value={{ user, id }}>
           {children}
         </UserContext.Provider>
       );
     };
     
-    export const useUser = () => useContext(UserContext);
+  export const useUser = () => useContext(UserContext);
     
