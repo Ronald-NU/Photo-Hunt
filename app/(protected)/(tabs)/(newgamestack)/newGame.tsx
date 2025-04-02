@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   selectedDifficultyText: {
-    color: '#fff',
+    color: colors.White,
   },
   description: {
     textAlign: 'center',

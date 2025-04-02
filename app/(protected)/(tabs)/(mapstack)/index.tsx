@@ -237,10 +237,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   leaderboardButton: {
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     padding: 10,
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -254,10 +254,10 @@ const styles = StyleSheet.create({
     bottom: 120,
     left: 20,
     right: 20,
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     padding: 15,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -295,10 +295,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     zIndex: 10,
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     borderRadius: 8,
     padding: 8,
-    shadowColor: '#000',
+    shadowColor: colors.White,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -324,6 +324,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterTextActive: {
-    color: 'white',
+    color:  colors.White,
   },
 });

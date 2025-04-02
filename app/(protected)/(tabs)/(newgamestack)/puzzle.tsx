@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: colors.White,
     fontSize: 16,
     fontWeight: '500',
   },

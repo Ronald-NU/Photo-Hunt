@@ -194,11 +194,10 @@ export default function CameraScreen() {
 
 const styles = StyleSheet.create({
   container: {
-
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: colors.White,
   },
   imagePreview: {
     width: '100%',

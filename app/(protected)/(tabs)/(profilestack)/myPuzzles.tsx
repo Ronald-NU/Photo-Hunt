@@ -158,9 +158,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     marginVertical: 5,
-    backgroundColor: '#fff',
+    backgroundColor: colors.White,
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
