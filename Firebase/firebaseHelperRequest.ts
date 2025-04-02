@@ -29,7 +29,7 @@ export const acceptDenyFriend = async (id:string, idUser:string, request:FriendR
     try {
         if(status === 'ACCEPTED'){
             user.friends = [{
-                id:request.friendCode,
+                id:request.requesterCode,
                 name:request.name}
                 , ...user.friends]
            await updateUserDocument(idUser, user);
@@ -57,12 +57,20 @@ export const getFriendRequest = async (id:string, code: string, user:UserData) =
                 request.push({id: doc.id, ...doc.data() as FriendRequest});
             }
             if (doc.data().requesterCode === code && doc.data().status === 'ACCEPTED') {
+                var exist = false;
+                user.friends.forEach((friend)=>{
+                    if(friend.id == doc.data().friendCode){
+                        exist = true;
+                    }
+                })
+                if(!exist){
                 user.friends = [{
                     id:doc.data().friendCode as string,
                     name:doc.data().friendName}
                     , ...user.friends]
                await updateUserDocument(id, user);
-                deleteDoc(doc.ref);
+                }
+               await deleteDoc(doc.ref);
             }
             if (doc.data().requesterCode === code && doc.data().status === 'REJECTED') {
                 deleteDoc(doc.ref);
