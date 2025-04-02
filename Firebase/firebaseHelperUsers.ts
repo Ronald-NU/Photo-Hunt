@@ -16,7 +16,6 @@ export const createUserDocument = async (data: UserCreateData) => {
             mypuzzles: [],
             geoLocation: data.geoLocation,
         }
-       console.log("hi");
         const docRef = await addDoc(collection(db, CollectionUser), NewUserData);
         return docRef.id;
     } catch (e) {

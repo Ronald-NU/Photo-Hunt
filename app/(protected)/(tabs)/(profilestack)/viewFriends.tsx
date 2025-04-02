@@ -23,20 +23,16 @@ export default function ViewFriendsScreen() {
       if(user){
         setFriends(user.friends);
       }
-    }, [refresh, user])
-  );
+    }, [user]));
 
   useEffect(()=>{
-    const request: { requests: FriendRequest[] } = { requests: [] };
     const getFriends = async () =>{
     if(user!){
       const allRequest = await getFriendRequest(id, user?.code, user) as FriendRequest[]
-      request.requests = allRequest;
+      setRequsts(allRequest);
     }
   }
-  getFriends().then(()=>{
-    setRequsts(request.requests);
-  });
+  getFriends();
   },[refresh])
 
   function handleSearch(text: string): void {
@@ -66,7 +62,7 @@ export default function ViewFriendsScreen() {
         name: request.name,
         status: "PENDING"
       }
-    await acceptDenyFriend(request.id, newRequest,'REJECTED',user);
+    await acceptDenyFriend(request.id, newRequest, 'REJECTED', user);
     setRefresh(!refresh);
     }
   }
@@ -160,7 +156,7 @@ export default function ViewFriendsScreen() {
         data={requests}
         keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          item.requesterCode == user?.code?
+          item.requesterCode == user?.code&&item.status=="PENDING"?
         <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.friendName}/>
         :
         <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{onAcceptRequest(item)}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
