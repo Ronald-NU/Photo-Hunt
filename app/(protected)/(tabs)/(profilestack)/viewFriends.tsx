@@ -111,7 +111,6 @@ export default function ViewFriendsScreen() {
   }
 
   const onSelectFriend = (code: string, name:string) => {
-    console.log(code);
     router.navigate({
         pathname: "friendPuzzles",
         params: { code: code,

@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
+import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc, setDoc } from "firebase/firestore"; 
 import { db } from "./firebaseSetup";
 import { UserCreateData, UserData, CollectionUser, geoLocationData } from "@/Firebase/DataStructures";
 
@@ -16,6 +16,7 @@ export const createUserDocument = async (data: UserCreateData) => {
             mypuzzles: [],
             geoLocation: data.geoLocation,
         }
+       console.log("hi");
         const docRef = await addDoc(collection(db, CollectionUser), NewUserData);
         return docRef.id;
     } catch (e) {
@@ -65,12 +66,10 @@ export const getUserData = async (uid: string) => {
 export const getFriend = async (code: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
-        var friend;
+        var friend = null;
         querySnapshot.forEach((doc) => {
-            console.log(doc.data().code === code);
             if (doc.data().code === code) {
                 const userData = doc.data();
-                console.log(userData);
                 friend = {
                     ...userData,
                     mypuzzles: userData.mypuzzles || []

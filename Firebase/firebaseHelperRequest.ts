@@ -7,7 +7,6 @@ import { getFriend, updateUserDocument } from "./firebaseHelperUsers";
 export const sendFriendRequest = async (code: string, user:UserData) => {
     try {
         const friend = await getFriend(code);
-        console.log(friend);
         if(friend == undefined){
             return false;
         }

@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
+import { colors } from "@/constants/Colors";
 
 export default function LeaderboardScreen() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
   },
   header: {
     flexDirection: 'row',

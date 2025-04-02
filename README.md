@@ -386,9 +386,10 @@ Play records contain:
       allow read, update, write: if request.auth != null;
     }
 
-    // Rules for users: Each user can only modify their own data
+     // Rules for users: Each user can only modify their own data
     match /users/{user} {
-      allow update, write: if request.auth != null && request.auth.uid == user;
+    	allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update, write: if request.auth != null && request.auth.uid == resource.data.uid;
       allow read: if request.auth != null;
     }
   }

@@ -22,7 +22,8 @@ interface UserContextType {
       const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         if (firebaseUser?.uid && !firebaseUser.isAnonymous) {
           const usersRef = collection(db, CollectionUser);
-          const q = query(usersRef, where("uid", "==", firebaseUser.uid));
+          try {
+          const q = query(usersRef, where("uid", "==", firebaseUser?.uid));
           const firestoreUnsubscribe = onSnapshot(q, (querySnapshot) => {
             if (!querySnapshot.empty) {
               const doc = querySnapshot.docs[0];
@@ -39,8 +40,11 @@ interface UserContextType {
               setID("");
             }
           });
-    
+        
           return () => firestoreUnsubscribe();
+        } catch (error) {
+          console.log("Error")
+        }
         } else {
           setUser(null);
           setID("");

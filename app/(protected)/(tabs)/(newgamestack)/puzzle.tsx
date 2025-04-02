@@ -8,7 +8,6 @@ import { useUser } from "@/components/UserContext";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
-import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/Colors';
 
 const PUZZLE_SIZE = {
@@ -32,7 +31,6 @@ export default function PuzzleScreen() {
   const isViewMode = isFromMyPuzzles === "true";
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
   const totalPieces = gridSize * gridSize;
-
   useEffect(() => {
     // Initialize puzzle pieces
     const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);

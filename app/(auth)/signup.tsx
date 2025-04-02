@@ -19,7 +19,6 @@ export default function signup() {
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState<string[]>([])
-
     const createUser = async () => {
         try {
             if(email === '' || password === '' || name === ''){
@@ -45,10 +44,8 @@ export default function signup() {
 
             // Create Firebase auth user
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            
             // Get current location for initial user data
             let location = await Location.getCurrentPositionAsync({});
-            
             // Create user document in Firestore
             const userData: UserCreateData = {
                 name: name,
@@ -59,11 +56,8 @@ export default function signup() {
                     longitude: location.coords.longitude
                 }
             };
-            
+            console.log(userData);
             await createUserDocument(userData);
-            
-            // Navigate to protected area
-            router.replace("/(protected)/");
         } catch (error) {
             if(error instanceof FirebaseError && "code" in error && "message" in error){
                 if(error.code === 'auth/email-already-in-use'){
@@ -106,14 +100,16 @@ export default function signup() {
     }
 
     const passwordError = (text:string) => {
-        if(text){
+        if(text.length < 8){
             setErrors(["Password must be at least 8 characters long!"]);
+        } else {
+            setErrors([]);
         }
     }
 
     const enterconfirmPassword = (text:string) =>{
         setConfirmPassword(text);
-        passwordError(text);
+        passwordError(password);
         if(text.length > 0 && password != text){
             setErrors((error)=>["Passwords do not match!",...error])
         }
