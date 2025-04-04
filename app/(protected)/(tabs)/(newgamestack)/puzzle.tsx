@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert, Image, TextInput, Vibration, ViewStyle } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
@@ -261,7 +261,13 @@ const findPath = (
   const closedSet = new Set<string>();
   openSet.set(stateToString(initialState), initialState);
 
-  while (openSet.size > 0) {
+  // 添加最大迭代次数限制，防止死循环
+  let iterations = 0;
+  const MAX_ITERATIONS = 1000;
+  
+  while (openSet.size > 0 && iterations < MAX_ITERATIONS) {
+    iterations++;
+    
     // 找到 f 值最小的状态
     let currentState = Array.from(openSet.values()).reduce((a, b) => 
       a.f < b.f ? a : b
@@ -304,6 +310,29 @@ const findPath = (
     }
   }
 
+  // 如果达到最大迭代次数但仍未找到解决方案，返回最接近解决方案的一步
+  if (iterations >= MAX_ITERATIONS && openSet.size > 0) {
+    // 找到启发式值最小的状态
+    const bestState = Array.from(openSet.values()).reduce((a, b) => 
+      a.h < b.h ? a : b
+    );
+    
+    // 回溯找到第一步
+    let currentState = bestState;
+    let firstMove = null;
+    
+    while (currentState.parent) {
+      if (!currentState.parent.parent) {
+        firstMove = currentState.lastMove;
+      }
+      currentState = currentState.parent;
+    }
+    
+    if (firstMove) {
+      return [firstMove];
+    }
+  }
+
   return null; // 没有找到解决方案
 };
 
@@ -319,6 +348,9 @@ export default function PuzzleScreen() {
   const [isSaved, setIsSaved] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [nextMove, setNextMove] = useState<Move | null>(null);
+  const [isProcessingHint, setIsProcessingHint] = useState(false);
+  const hintTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hintAfterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { imageUri, difficulty, locationName, latitude, longitude, isFromMyPuzzles } = params;
   const isViewMode = isFromMyPuzzles === "true";
@@ -443,9 +475,16 @@ export default function PuzzleScreen() {
   const handleChange = useCallback((nextPieces: readonly number[], nextHidden: number | null) => {
     if (isViewMode) return;
     
+    // 在处理提示的过程中，只允许提示触发的移动
+    if (isProcessingHint && !showHint) {
+      console.log('Ignoring manual move during hint processing');
+      return;
+    }
+    
     console.log('Puzzle State Before Move:', {
       currentPieces: pieces,
-      currentHidden: hidden
+      currentHidden: hidden,
+      isFromHint: isProcessingHint && showHint
     });
     
     // 使用函数式更新来确保状态同步
@@ -463,10 +502,23 @@ export default function PuzzleScreen() {
     
     const isCorrect = nextPieces.every((piece, index) => piece === index);
     if (isCorrect) {
+      // 清除所有计时器
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+        hintTimeoutRef.current = null;
+      }
+      if (hintAfterTimeoutRef.current) {
+        clearTimeout(hintAfterTimeoutRef.current);
+        hintAfterTimeoutRef.current = null;
+      }
+      
       setIsComplete(true);
+      setShowHint(false);
+      setNextMove(null);
+      setIsProcessingHint(false);
       handleSave();
     }
-  }, [isViewMode, handleSave]);
+  }, [isViewMode, handleSave, pieces, hidden, isProcessingHint, showHint, hintTimeoutRef, hintAfterTimeoutRef]);
 
   const handleBack = useCallback(() => {
     if (isViewMode) {
@@ -522,34 +574,75 @@ export default function PuzzleScreen() {
     console.log('Handle Hint Called - Current State:', {
       pieces,
       hidden,
-      gridSize
+      gridSize,
+      isProcessingHint,
+      showHint
     });
     
-    const move = calculateNextMove();
-    console.log('Calculated Next Move:', move);
-    
-    if (move) {
-      setNextMove(move);
-      setShowHint(true);
-      Vibration.vibrate(50);
-
-      // 计算移动的拼图块的索引
-      const fromIndex = posToIndex(move.from, gridSize);
-      const toIndex = posToIndex(move.to, gridSize);
-
-      // 创建新的拼图状态
-      const nextPieces = [...pieces];
-      [nextPieces[fromIndex], nextPieces[toIndex]] = [nextPieces[toIndex], nextPieces[fromIndex]];
-
-      // 延迟执行移动，让用户先看到提示箭头
-      setTimeout(() => {
-        // 执行移动
-        handleChange(nextPieces, fromIndex);
-        setShowHint(false);
-        setNextMove(null);
-      }, 1000); // 1秒后执行移动
+    // 防止重复点击或在提示显示时点击
+    if (showHint || isProcessingHint) {
+      console.log('Hint already active or processing, ignoring click');
+      return;
     }
-  }, [calculateNextMove, pieces, hidden, gridSize, handleChange]);
+    
+    // 标记正在处理提示
+    setIsProcessingHint(true);
+    
+    try {
+      const move = calculateNextMove();
+      console.log('Calculated Next Move:', move);
+      
+      if (move) {
+        setNextMove(move);
+        setShowHint(true);
+        Vibration.vibrate(50);
+  
+        // 计算移动的拼图块的索引
+        const fromIndex = posToIndex(move.from, gridSize);
+        const toIndex = posToIndex(move.to, gridSize);
+  
+        // 创建新的拼图状态
+        const nextPieces = [...pieces];
+        [nextPieces[fromIndex], nextPieces[toIndex]] = [nextPieces[toIndex], nextPieces[fromIndex]];
+  
+        // 清除之前的计时器
+        if (hintTimeoutRef.current) {
+          clearTimeout(hintTimeoutRef.current);
+          hintTimeoutRef.current = null;
+        }
+        
+        // 延迟执行移动，让用户先看到提示箭头
+        hintTimeoutRef.current = setTimeout(() => {
+          // 执行移动
+          handleChange(nextPieces, fromIndex);
+          
+          // 清除之前的后续计时器
+          if (hintAfterTimeoutRef.current) {
+            clearTimeout(hintAfterTimeoutRef.current);
+            hintAfterTimeoutRef.current = null;
+          }
+          
+          // 确保UI更新完成后再重置状态
+          hintAfterTimeoutRef.current = setTimeout(() => {
+            setShowHint(false);
+            setNextMove(null);
+            setIsProcessingHint(false);
+            hintTimeoutRef.current = null;
+            hintAfterTimeoutRef.current = null;
+          }, 300);
+        }, 1000); // 1秒后执行移动
+      } else {
+        // 如果没有找到有效移动，也要重置状态
+        setIsProcessingHint(false);
+      }
+    } catch (error) {
+      console.error('Error in handleHint:', error);
+      // 发生错误时重置状态
+      setShowHint(false);
+      setNextMove(null);
+      setIsProcessingHint(false);
+    }
+  }, [calculateNextMove, pieces, hidden, gridSize, handleChange, showHint, isProcessingHint]);
 
   const handleComplete = useCallback(() => {
     if (!isViewMode) {
@@ -557,6 +650,18 @@ export default function PuzzleScreen() {
       handleSave();
     }
   }, [isViewMode, handleSave]);
+
+  // 在组件卸载时清除所有计时器
+  useEffect(() => {
+    return () => {
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+      }
+      if (hintAfterTimeoutRef.current) {
+        clearTimeout(hintAfterTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
@@ -606,21 +711,30 @@ export default function PuzzleScreen() {
             <>
               <Text style={styles.hintText}>Tap to move pieces</Text>
               <View style={styles.puzzleWrapper}>
-                <PicturePuzzle
-                  size={puzzleSize}
-                  pieces={pieces}
-                  hidden={hidden}
-                  onChange={handleChange}
-                  source={{ uri: imageUri as string }}
-                />
-                <GridLines size={puzzleSize} gridSize={gridSize} />
-                {showHint && nextMove && (
-                  <HintArrow
-                    from={nextMove.from}
-                    to={nextMove.to}
-                    gridSize={gridSize}
-                    pieceSize={puzzleSize / gridSize}
-                  />
+                {/* 添加错误边界和防护措施 */}
+                {pieces && pieces.length > 0 && hidden !== undefined ? (
+                  <>
+                    <PicturePuzzle
+                      size={puzzleSize}
+                      pieces={[...pieces]} // 确保传递新数组，防止引用问题
+                      hidden={hidden}
+                      onChange={handleChange}
+                      source={{ uri: imageUri as string }}
+                    />
+                    <GridLines size={puzzleSize} gridSize={gridSize} />
+                    {showHint && nextMove && (
+                      <HintArrow
+                        from={nextMove.from}
+                        to={nextMove.to}
+                        gridSize={gridSize}
+                        pieceSize={puzzleSize / gridSize}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <View style={styles.loadingContainer}>
+                    <Text>加载拼图中...</Text>
+                  </View>
                 )}
               </View>
             </>
