@@ -37,6 +37,7 @@
     "@types/jsrsasign": "^10.5.15",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.72.8",
+    "@types/uuid": "^10.0.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "react-native-dotenv": "^3.4.11",
     "typescript": "^5.3.3"

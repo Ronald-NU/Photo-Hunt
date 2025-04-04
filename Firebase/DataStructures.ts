@@ -31,6 +31,8 @@ export type PuzzleMiniData = {
     id: string;
     name: string;
     difficulty: number;
+    isCompleted?: boolean; // 是否完成
+    moves?: number; // 完成所需的移动次数
 };
 
 // A friend mini structure which stores the name and code of the friend

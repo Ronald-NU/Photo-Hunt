@@ -72,16 +72,22 @@ export default function MyPuzzlesScreen() {
         return;
       }
 
-      // Navigate to puzzle screen in the profilestack
+      // 根据拼图完成状态决定跳转到哪个页面
+      const pathname = puzzle.isCompleted 
+        ? "/(protected)/(tabs)/(profilestack)/puzzle"  // 已完成 - 跳转到查看页面
+        : "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
+      
       router.push({
-        pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+        pathname,
         params: {
           imageUri: puzzleData.photoURL,
           difficulty: getDifficultyText(puzzleData.difficulty),
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
-          isFromMyPuzzles: "true"
+          isFromMyPuzzles: "true",
+          isCompleted: puzzle.isCompleted ? "true" : "false",
+          currentMoves: puzzle.moves?.toString() || "0"
         }
       });
     } catch (error) {
@@ -123,10 +129,24 @@ export default function MyPuzzlesScreen() {
             style={styles.puzzleItem}
             onPress={() => handlePuzzlePress(item)}
           >
-            <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
-              {item.name}
-            </Text>
-            <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
+            <View style={styles.puzzleInfo}>
+              <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
+                {item.name}
+              </Text>
+              {item.isCompleted && (
+                <View style={styles.completedBadge}>
+                  <Text style={styles.completedText}>Completed</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.rightContent}>
+              {item.isCompleted ? (
+                <Text style={styles.movesText}>{item.moves || 0} steps</Text>
+              ) : (
+                <Text style={styles.incompleteText}>Incomplete</Text>
+              )}
+              <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
+            </View>
           </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
@@ -173,6 +193,14 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  puzzleInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rightContent: {
+    alignItems: 'flex-end',
+  },
   puzzleName: {
     fontSize: 18,
     fontWeight: '500',
@@ -206,5 +234,28 @@ const styles = StyleSheet.create({
     color: '#00A9E0',
     fontSize: 16,
     padding: 10,
-  }
+  },
+  completedBadge: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 8,
+  },
+  completedText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  movesText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  incompleteText: {
+    fontSize: 14,
+    color: '#FF9800',
+    marginBottom: 4,
+    fontWeight: '500',
+  },
 });

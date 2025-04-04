@@ -352,14 +352,32 @@ export default function PuzzleScreen() {
   const hintTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hintAfterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { imageUri, difficulty, locationName, latitude, longitude, isFromMyPuzzles } = params;
-  const isViewMode = isFromMyPuzzles === "true";
+  const { 
+    imageUri, 
+    difficulty, 
+    locationName, 
+    latitude, 
+    longitude, 
+    isFromMyPuzzles, 
+    isCompleted, 
+    currentMoves 
+  } = params;
+  
+  // 只有在满足下列条件时才进入查看模式：
+  // 1. 从我的拼图进入 AND
+  // 2. 拼图已经完成
+  const isViewMode = isFromMyPuzzles === "true" && isCompleted === "true";
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
   const totalPieces = gridSize * gridSize;
   const puzzleSize = Dimensions.get('window').width - 30;
 
-  // 初始化拼图碎片
+  // 初始化拼图碎片和移动次数
   useEffect(() => {
+    // 如果有当前移动次数，初始化它
+    if (currentMoves) {
+      setMoves(parseInt(currentMoves as string) || 0);
+    }
+    
     const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
     if (!isViewMode) {
       for (let i = initialPieces.length - 1; i > 0; i--) {
@@ -371,7 +389,7 @@ export default function PuzzleScreen() {
       setHidden(null);
     }
     setPieces(initialPieces);
-  }, [isViewMode, totalPieces]);
+  }, [isViewMode, totalPieces, currentMoves]);
 
   // 获取用户文档ID
   useEffect(() => {
@@ -421,13 +439,37 @@ export default function PuzzleScreen() {
         throw new Error("Failed to get user data");
       }
 
-      const newPuzzle: PuzzleMiniData = {
-        id: puzzleData.id,
-        name: puzzleData.name,
-        difficulty: puzzleData.difficulty
-      };
+      // 检查用户的 mypuzzles 中是否已存在此拼图
+      let existingPuzzleIndex = -1;
+      if (currentUserData.mypuzzles) {
+        existingPuzzleIndex = currentUserData.mypuzzles.findIndex(
+          p => p.name === puzzleData.name && 
+              Math.abs(Number(latitude) - puzzleData.geoLocation.latitude) < 0.0001 &&
+              Math.abs(Number(longitude) - puzzleData.geoLocation.longitude) < 0.0001
+        );
+      }
 
-      const updatedMypuzzles = currentUserData.mypuzzles ? [...currentUserData.mypuzzles, newPuzzle] : [newPuzzle];
+      let updatedMypuzzles;
+      
+      if (existingPuzzleIndex >= 0) {
+        // 如果拼图已存在，更新其状态
+        updatedMypuzzles = [...currentUserData.mypuzzles];
+        updatedMypuzzles[existingPuzzleIndex] = {
+          ...updatedMypuzzles[existingPuzzleIndex],
+          isCompleted: isComplete,
+          moves: moves
+        };
+      } else {
+        // 如果是新拼图，添加到列表
+        const newPuzzle: PuzzleMiniData = {
+          id: puzzleData.id,
+          name: puzzleData.name,
+          difficulty: puzzleData.difficulty,
+          isCompleted: isComplete,
+          moves: moves
+        };
+        updatedMypuzzles = currentUserData.mypuzzles ? [...currentUserData.mypuzzles, newPuzzle] : [newPuzzle];
+      }
 
       await updateUserDocument(currentUserData.id, {
         mypuzzles: updatedMypuzzles
@@ -470,7 +512,7 @@ export default function PuzzleScreen() {
         ]
       );
     }
-  }, [user, locationName, imageUri, gridSize, latitude, longitude, router]);
+  }, [user, locationName, imageUri, gridSize, latitude, longitude, router, isComplete, moves]);
 
   const handleChange = useCallback((nextPieces: readonly number[], nextHidden: number | null) => {
     if (isViewMode) return;
@@ -733,7 +775,7 @@ export default function PuzzleScreen() {
                   </>
                 ) : (
                   <View style={styles.loadingContainer}>
-                    <Text>加载拼图中...</Text>
+                    <Text>Loading puzzle...</Text>
                   </View>
                 )}
               </View>
