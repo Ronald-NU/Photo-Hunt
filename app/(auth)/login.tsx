@@ -47,7 +47,6 @@ export default function login(){
             }
             Alert.alert('Could not Login',
                  "Make sure to input a valid email and password!");           
-            console.log(error);
         }
     }
     

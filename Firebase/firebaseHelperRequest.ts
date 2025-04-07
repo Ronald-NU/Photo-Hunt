@@ -4,18 +4,19 @@ import { db } from "./firebaseSetup";
 import { getFriend, updateUserDocument } from "./firebaseHelperUsers";
 
 //querys the database by friend code to get the user's uid
-export const sendFriendRequest = async (code: string,user:UserData) => {
+export const sendFriendRequest = async (code: string, user:UserData) => {
     try {
+        const friend = await getFriend(code);
+        if(friend == undefined){
+            return false;
+        }
         const request:FriendRequest = {
             friendCode: code,
             requesterCode: user.code,
+            friendName: (friend as UserData).name,
             name: user.name,
             status: "PENDING"
         };
-        const friend = await getFriend(code) as UserData;
-        if(friend != null){
-            return false;
-        }
         await addDoc(collection(db,CollectionRequests),request)
         return true;
     } catch (e) {
@@ -24,18 +25,15 @@ export const sendFriendRequest = async (code: string,user:UserData) => {
 }
 
 //querys the database by friend code to get the user's uid
-export const acceptDenyFriend = async (id:string, request:FriendRequest, status:STATUS, user:UserData) => {
+export const acceptDenyFriend = async (id:string, idUser:string, request:FriendRequest, status:STATUS, user:UserData) => {
     try {
         if(status === 'ACCEPTED'){
             user.friends = [{
-                id:request.friendCode,
+                id:request.requesterCode,
                 name:request.name}
                 , ...user.friends]
-           await updateUserDocument(id, user);
+           await updateUserDocument(idUser, user);
             request.status = status;
-            if(user?.name){
-            request.name = user?.name;
-            }
             updateDoc(doc(collection(db,CollectionRequests),id),request);    
         } 
         if(status === 'REJECTED'){
@@ -59,12 +57,20 @@ export const getFriendRequest = async (id:string, code: string, user:UserData) =
                 request.push({id: doc.id, ...doc.data() as FriendRequest});
             }
             if (doc.data().requesterCode === code && doc.data().status === 'ACCEPTED') {
+                var exist = false;
+                user.friends.forEach((friend)=>{
+                    if(friend.id == doc.data().friendCode){
+                        exist = true;
+                    }
+                })
+                if(!exist){
                 user.friends = [{
                     id:doc.data().friendCode as string,
-                    name:doc.data().name}
+                    name:doc.data().friendName}
                     , ...user.friends]
                await updateUserDocument(id, user);
-                deleteDoc(doc.ref);
+                }
+               await deleteDoc(doc.ref);
             }
             if (doc.data().requesterCode === code && doc.data().status === 'REJECTED') {
                 deleteDoc(doc.ref);

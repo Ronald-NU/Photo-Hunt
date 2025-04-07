@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image } from 'rea
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
+import { colors } from '@/constants/Colors';
 
 export default function ProfilePuzzleScreen() {
   const params = useLocalSearchParams();
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   },
   difficulty: {
     fontSize: 14,
-    color: '#666',
+    color: colors.Grey,
   },
   puzzleContainer: {
     flex: 1,

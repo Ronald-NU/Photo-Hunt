@@ -8,6 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";
 import { useLocalSearchParams } from "expo-router";
+import { colors } from "@/constants/Colors";
+import PuzzleSection from "@/components/PuzzleSection";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -117,7 +119,7 @@ export default function MyPuzzlesScreen() {
         }} 
       />
       <FlatList
-        style={styles.list}
+        style={GeneralStyle.list}
         contentContainerStyle={{ 
           flexGrow: 1,
           paddingBottom: 100
@@ -125,6 +127,7 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
+<<<<<<< HEAD
           <TouchableOpacity 
             style={styles.puzzleItem}
             onPress={() => handlePuzzlePress(item)}
@@ -148,6 +151,9 @@ export default function MyPuzzlesScreen() {
               <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
             </View>
           </TouchableOpacity>
+=======
+          <PuzzleSection onPress={handlePuzzlePress} item={item} />
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -171,6 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+<<<<<<< HEAD
   list: {
     flex: 1,
     width: '100%',
@@ -213,6 +220,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
     textAlign: 'right',
   },
+=======
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -227,7 +236,7 @@ const styles = StyleSheet.create({
   },
   emptySubText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     textAlign: 'center',
   },
   refreshButton: {

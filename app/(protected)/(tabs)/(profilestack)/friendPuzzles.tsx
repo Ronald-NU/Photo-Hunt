@@ -6,6 +6,8 @@ import { GeneralStyle } from "@/constants/Styles";
 import { PuzzleData, PuzzleMiniData, UserData } from '@/Firebase/DataStructures';
 import { getPuzzleData } from '@/Firebase/firebaseHelperPuzzles';
 import { getFriend } from '@/Firebase/firebaseHelperUsers';
+import { colors } from '@/constants/Colors';
+import PuzzleSection from '@/components/PuzzleSection';
 
 export default function FriendPuzzleScreen() {
 const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -94,7 +96,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
     <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
       <Stack.Screen 
         options={{ 
-          title: "Puzzles",
+          title: "My Puzzles",
           headerRight: () => (
             <TouchableOpacity onPress={fetchUserPuzzles}>
               <Text style={styles.refreshButton}>Refresh</Text>
@@ -103,7 +105,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
         }} 
       />
       <FlatList
-        style={styles.list}
+        style={GeneralStyle.list}
         contentContainerStyle={{ 
           flexGrow: 1,
           paddingBottom: 100
@@ -111,15 +113,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.puzzleItem}
-            onPress={() => handlePuzzlePress(item)}
-          >
-            <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
-              {item.name}
-            </Text>
-            <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
-          </TouchableOpacity>
+          <PuzzleSection onPress={handlePuzzlePress} item={item} />
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -143,40 +137,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  list: {
-    flex: 1,
-    width: '100%',
-    padding: 15,
-  },
-  puzzleItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    marginVertical: 5,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  puzzleName: {
-    fontSize: 18,
-    fontWeight: '500',
-    flex: 1,
-    marginRight: 10,
-  },
-  difficulty: {
-    fontSize: 16,
-    color: '#666',
-    minWidth: 80,
-    textAlign: 'right',
-  },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -191,7 +151,7 @@ const styles = StyleSheet.create({
   },
   emptySubText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     textAlign: 'center',
   },
   refreshButton: {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert, Image, TextInput, Vibration, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,7 +9,7 @@ import { useUser } from "@/components/UserContext";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
-import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/constants/Colors';
 
 const PUZZLE_SIZE = {
   Easy: 3, // 3x3 grid (9 pieces)
@@ -369,9 +370,13 @@ export default function PuzzleScreen() {
   const isViewMode = isFromMyPuzzles === "true" && isCompleted === "true";
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
   const totalPieces = gridSize * gridSize;
+
   const puzzleSize = Dimensions.get('window').width - 30;
 
+<<<<<<< HEAD
   // 初始化拼图碎片和移动次数
+=======
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
   useEffect(() => {
     // 如果有当前移动次数，初始化它
     if (currentMoves) {
@@ -821,7 +826,7 @@ const styles = StyleSheet.create({
   },
   movesText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.Grey,
   },
   puzzleContainer: {
     flex: 1,
@@ -893,7 +898,7 @@ const styles = StyleSheet.create({
   },
   completeSubText: {
     fontSize: 18,
-    color: '#666',
+    color: colors.Grey,
     marginBottom: 20,
   },
   button: {
@@ -904,7 +909,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: colors.White,
     fontSize: 16,
     fontWeight: '500',
   },

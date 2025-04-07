@@ -106,6 +106,44 @@ export const GeneralStyle = StyleSheet.create({
                 width: '90%',
                 alignItems: "center",
               },
+              searchContainer: {
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: 'white',
+                borderRadius: 8,
+                paddingHorizontal: 10,
+                shadowColor: '#000',
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              },
+              searchIcon: {
+                marginRight: 8,
+              },
+              searchInput: {
+                flex: 1,
+                height: 44,
+                fontSize: 16,
+                color: '#333',
+              },
+              refreshButton: {
+                padding: 5,
+                marginLeft: 5,
+              },
+              clearButton: {
+                padding: 5,
+                marginLeft: 5,
+              },
+              list: {
+                flex: 1,
+                width: '100%',
+                padding: 15,
+              },
 });
 
 export const TextStyles = StyleSheet.create({

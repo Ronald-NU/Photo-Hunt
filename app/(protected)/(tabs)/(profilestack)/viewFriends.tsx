@@ -2,9 +2,13 @@ import ProfileNavSections from "@/components/ProfileNavSections";
 import { useUser } from "@/components/UserContext";
 import { GeneralStyle } from "@/constants/Styles";
 import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
+<<<<<<< HEAD
 import { useFocusEffect, useRouter } from "expo-router";
+=======
+import { router, useFocusEffect } from "expo-router";
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import FriendAcceptRequestBox from "@/components/FriendAcceptRequestBox";
@@ -24,48 +28,48 @@ export default function ViewFriendsScreen() {
       if(user){
         setFriends(user.friends);
       }
-    }, [user, refresh])
-  );
-
-  useEffect(()=>{
-    const request: { requests: FriendRequest[] } = { requests: [] };
-    const getFriends = async () =>{
-    if(user!){
+    }, [user]));
+  const getFriends = async () =>{
+      if(user!){
       const allRequest = await getFriendRequest(id, user?.code, user) as FriendRequest[]
-      request.requests = allRequest;
+      setRequsts(allRequest);
     }
   }
-  getFriends().then(()=>{
-    setRequsts(request.requests);
-    setRefresh(!refresh);
-  });
-  },[])
+  useEffect(()=>{
+  getFriends();
+  },[getFriends])
 
   function handleSearch(text: string): void {
     setSearchQuery(text);
   }
 
-  const onAcceptRequest = (request:FriendRequest) => {
+  const onAcceptRequest = async (request:FriendRequest) => {
     const newRequest:FriendRequest = {
       friendCode: request.friendCode,
       requesterCode: request.requesterCode,
+      friendName: request.friendName,
       name: request.name,
       status: "PENDING"
     }
     if(request.id && user){
-    acceptDenyFriend(request.id, newRequest,'ACCEPTED',user);
+    await acceptDenyFriend(request.id, id, newRequest, 'ACCEPTED', user);
+    await getFriends();
+    setRefresh(!refresh);
     }
   }
 
-  const onCancelRequest = (request:FriendRequest) => {
+  const onCancelRequest = async (request:FriendRequest) => {
     if(request.id && user){
       const newRequest:FriendRequest = {
         friendCode: request.friendCode,
         requesterCode: request.requesterCode,
+        friendName: request.friendName,
         name: request.name,
         status: "PENDING"
       }
-    acceptDenyFriend(request.id, newRequest,'REJECTED',user);
+    await acceptDenyFriend(request.id, id, newRequest, 'REJECTED', user);
+    await getFriends();
+    setRefresh(!refresh);
     }
   }
 
@@ -73,6 +77,10 @@ export default function ViewFriendsScreen() {
     var exist = false;
     if(searchQuery.length < 6){
       Alert.alert("No Request Sent", "Invalid Friend Code")
+      return;
+    }
+    if(searchQuery == user?.code){
+      Alert.alert("No Request Sent", "You can't add yourself as a friend")
       return;
     }
     requests.forEach((request)=>{
@@ -101,33 +109,45 @@ export default function ViewFriendsScreen() {
       setSearchQuery("");
      }
     }
+    setRefresh(!refresh);
   }
 
+<<<<<<< HEAD
   const onSelectFriend = (id:string) => { router.push({
     pathname: '/friendPuzzles',
     params: { code: id },
   }) }
+=======
+  const onSelectFriend = (code: string, name:string) => {
+    router.navigate({
+        pathname: "friendPuzzles",
+        params: { code: code,
+          name: name
+         },
+    });
+};
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <View style={{height:40, width:'90%', marginBottom: 10, flexDirection:'row', 
         justifyContent:'space-evenly',
         alignContent:'space-between'}}>
-       <View style={[styles.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
-                <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+       <View style={[GeneralStyle.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
+                <Ionicons name="search" size={20} color={colors.Grey} style={GeneralStyle.searchIcon} />
                 <TextInput
-                  style={styles.searchInput}
+                  style={GeneralStyle.searchInput}
                   placeholder="Add friends by code #AAA111"
                   value={searchQuery}
                   onChangeText={handleSearch}
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.Grey}
                 />
                 {searchQuery ? (
                   <TouchableOpacity 
-                    style={styles.clearButton}
+                    style={GeneralStyle.clearButton}
                     onPress={() => setSearchQuery('')}
                   >
-                    <Ionicons name="close-circle" size={20} color="#666" />
+                    <Ionicons name="close-circle" size={20} color={colors.Grey} />
                   </TouchableOpacity>
                 ) : null
                 }
@@ -140,20 +160,24 @@ export default function ViewFriendsScreen() {
                   </TouchableOpacity>
               </View>
             
-      <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
+      {
+        requests.length > 0?
+        <View style={{marginBottom: 10, width:'100%', height:'25%'}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Requests</Text>
       <FlatList
         style={{width:'100%'}}
         data={requests}
         keyExtractor={(item) => (item.friendCode+item.requesterCode)}
         renderItem={({ item }) => (
-          item.friendCode == user?.code?
-        <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>onAcceptRequest(item)} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+        item.status=="PENDING"?
+          item.requesterCode == user?.code?
+        <FriendAcceptRequestBox pendingFriend={false} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.friendName}/>
         :
-        <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
-        )}
+        <FriendAcceptRequestBox pendingFriend={true} onPressAccept={()=>{onAcceptRequest(item)}} onPressCancel={()=>onCancelRequest(item)} title={item.name}/>
+        :null)}
       />
-      </View>
+      </View>:null
+      }
       <View style={{marginBottom: 10, width:'100%', flex:1}}>
         <Text style={[GeneralStyle.BoldInputLabelText,{fontSize:18,paddingHorizontal:'5%',paddingBottom:10}]}>Friends</Text>
       <FlatList
@@ -161,42 +185,14 @@ export default function ViewFriendsScreen() {
         data={friends}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
+<<<<<<< HEAD
           <ProfileNavSections onPress={()=>onSelectFriend(item.id)} title={item.name}/>
+=======
+          <ProfileNavSections onPress={()=>onSelectFriend(item.id, item.name)} title={item.name}/>
+>>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
         )}
       />
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 16,
-    color: '#333',
-  },
-  clearButton: {
-    padding: 5,
-    marginLeft: 5,
-  },
-});

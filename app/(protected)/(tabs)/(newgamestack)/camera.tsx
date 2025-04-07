@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import { validateImage } from '@/utils/imageValidation';
 import * as FileSystem from 'expo-file-system';
+import { colors } from '@/constants/Colors';
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -192,11 +193,10 @@ export default function CameraScreen() {
 
 const styles = StyleSheet.create({
   container: {
-
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: colors.White,
   },
   imagePreview: {
     width: '100%',
@@ -229,11 +229,11 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 10,
-    color: '#666',
+    color: colors.Grey,
     fontSize: 16,
   },
   label: {
-    color: '#666',
+    color: colors.Grey,
     fontSize: 16,
   },
   buttonContainer: {
@@ -260,10 +260,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    color: '#666',
+    color: colors.Grey,
     fontWeight: '600',
   },
   primaryButtonText: {
-    color: 'white',
+    color: colors.White,
   },
 });

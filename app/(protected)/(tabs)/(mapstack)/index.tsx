@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle } from '@/constants/Styles';
@@ -9,6 +9,10 @@ import { PuzzleData } from '@/Firebase/DataStructures';
 import { getLocalPuzzles } from '@/Firebase/firebaseHelperPuzzles';
 import type { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { colors } from '@/constants/Colors';
+import * as Notifications from 'expo-notifications';
+import { verifyPermissions } from '@/components/NotificationManager';
+import Constants from 'expo-constants';
 
 export interface SelectedLocation {
   name: string;
@@ -18,6 +22,7 @@ export interface SelectedLocation {
 
 type DifficultyFilter = 'all' | 'easy' | 'medium' | 'hard';
 
+
 export default function MapScreen() {
   const router = useRouter();
   const { selectedLocation, setSelectedLocation } = useSelectedLocation();
@@ -26,6 +31,23 @@ export default function MapScreen() {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const mapRef = useRef<any>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+
+  useEffect(()=>{
+    const NotificationSetup = async () => {
+      if(await verifyPermissions()){
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+    });
+  }
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: true })
+  });
+    }
+    }
+  NotificationSetup()
+  },[])
 
   const getCurrentLocation = async () => {
     try {
@@ -46,19 +68,19 @@ export default function MapScreen() {
 
   const fetchPuzzles = useCallback(async () => {
     try {
-      console.log('Fetching puzzles...');
+      //console.log('Fetching puzzles...');
       const currentLocation = await getCurrentLocation();
-      console.log('Current location:', currentLocation);
+     // console.log('Current location:', currentLocation);
       
       const latitude = currentLocation?.coords.latitude || selectedLocation?.latitude || 37.78825;
       const longitude = currentLocation?.coords.longitude || selectedLocation?.longitude || -122.4324;
-      console.log('Using coordinates:', { latitude, longitude });
+      //console.log('Using coordinates:', { latitude, longitude });
 
       const puzzles = await getLocalPuzzles({
         latitude,
         longitude
       });
-      console.log('Fetched puzzles:', puzzles);
+     // console.log('Fetched puzzles:', puzzles);
       setAllPuzzles(puzzles);
       
       // Reset map to current location
@@ -69,7 +91,7 @@ export default function MapScreen() {
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         };
-        console.log('Animating map to region:', region);
+        //console.log('Animating map to region:', region);
         mapRef.current.animateToRegion(region, 1000);
       }
     } catch (error) {
@@ -79,7 +101,7 @@ export default function MapScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('Map screen focused, fetching puzzles...');
+      //console.log('Map screen focused, fetching puzzles...');
       fetchPuzzles();
     }, [fetchPuzzles])
   );
@@ -107,7 +129,7 @@ export default function MapScreen() {
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       };
-      console.log('Found puzzle, animating to:', region);
+     // console.log('Found puzzle, animating to:', region);
       mapRef.current?.animateToRegion(region, 1000);
     }
   };
@@ -144,31 +166,31 @@ export default function MapScreen() {
           style={styles.leaderboardButton} 
           onPress={navigateToLeaderboard}
         >
-          <Ionicons name="trophy-outline" size={24} color="black" />
+          <Ionicons name="trophy-outline" size={24} color={colors.Black} />
         </TouchableOpacity>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+        <View style={GeneralStyle.searchContainer}>
+          <Ionicons name="search" size={20} color={colors.Grey} style={GeneralStyle.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={GeneralStyle.searchInput}
             placeholder="Search puzzle by name..."
             value={searchQuery}
             onChangeText={handleSearch}
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.Grey}
           />
           {searchQuery ? (
             <TouchableOpacity 
-              style={styles.clearButton}
+              style={GeneralStyle.clearButton}
               onPress={() => setSearchQuery('')}
             >
-              <Ionicons name="close-circle" size={20} color="#666" />
+              <Ionicons name="close-circle" size={20} color={colors.Grey} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity 
-              style={styles.refreshButton}
+              style={GeneralStyle.refreshButton}
               onPress={handleRefresh}
             >
-              <Ionicons name="refresh" size={20} color="#666" />
+              <Ionicons name="refresh" size={20} color={colors.Grey} />
             </TouchableOpacity>
           )}
         </View>
@@ -236,10 +258,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   leaderboardButton: {
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     padding: 10,
     borderRadius: 8,
-    shadowColor: '#000',
+    shadowColor: colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -247,49 +269,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: 44,
-    fontSize: 16,
-    color: '#333',
-  },
-  refreshButton: {
-    padding: 5,
-    marginLeft: 5,
-  },
-  clearButton: {
-    padding: 5,
-    marginLeft: 5,
   },
   locationInfo: {
     position: 'absolute',
     bottom: 120,
     left: 20,
     right: 20,
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     padding: 15,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: colors.Black,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -327,10 +316,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     zIndex: 10,
-    backgroundColor: 'white',
+    backgroundColor: colors.White,
     borderRadius: 8,
     padding: 8,
-    shadowColor: '#000',
+    shadowColor: colors.White,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -351,11 +340,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
   },
   filterText: {
-    color: '#666',
+    color: colors.Grey,
     fontSize: 13,
     fontWeight: '500',
   },
   filterTextActive: {
-    color: 'white',
+    color:  colors.White,
   },
 });
