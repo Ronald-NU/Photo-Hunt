@@ -73,9 +73,9 @@ export default function MyPuzzlesScreen() {
       }
 
       // 根据拼图完成状态决定跳转到哪个页面
-      const pathname = puzzle.isCompleted 
-        ? "/(protected)/(tabs)/(profilestack)/puzzle"  // 已完成 - 跳转到查看页面
-        : "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
+      const pathname = //puzzle.isCompleted 
+         "/(protected)/(tabs)/(profilestack)/puzzle";  // 已完成 - 跳转到查看页面
+        //: "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
       
       router.push({
         pathname,
