@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Alert, Image, TextInput, Vibration, ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { SafeAreaView } from "react-native-safe-area-context";

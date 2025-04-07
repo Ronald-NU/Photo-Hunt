@@ -32,7 +32,7 @@ return (
                     <View style={GeneralStyle.modalContainer}>
             <Text style={[GeneralStyle.title,{color:colors.Black}]}>{title}</Text>
             <Text style={[TextStyles.mediumText, {color:colors.Black, textAlign:'center', paddingVertical:16}]}>
-                Schedule a daily notification for {title} at a specific time to continue your Photo Hunt!
+                Schedule a daily notification for {title} at the time below to continue your Photo Hunt!
             </Text>
             <DateTimePicker
                 mode="time"
@@ -66,7 +66,7 @@ export const scheduleNotificationHandler = async (title:string, time:string) => 
       await Notifications.scheduleNotificationAsync({
         content: {
           title: title,
-          body: `Remember to attempt Photo Hunt ${title}!`,
+          body: `Come back to your ${title} Photo Hunt!`,
         },
         trigger: {type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: parseInt(time.split(':')[0]), minute: parseInt(time.split(':')[1])},
       });
