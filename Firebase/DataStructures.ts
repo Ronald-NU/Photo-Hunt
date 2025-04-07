@@ -54,8 +54,8 @@ export type geoLocationData = {
 };
 
 export type PlayData = {
-    puzzleId: string;
-    playerId: string;
+    puzzleID: string;
+    playerID: string;
     name: string;
     score: number;
 };
@@ -65,6 +65,7 @@ export type FriendRequest = {
     friendCode: string;
     requesterCode: string;
     name:string;
+    friendName: string;
     status: STATUS;
 }
 export type STATUS = 'PENDING'|'ACCEPTED'|'REJECTED';

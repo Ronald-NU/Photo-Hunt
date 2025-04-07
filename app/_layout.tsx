@@ -1,4 +1,4 @@
-import { UserProvider, useUser } from "@/components/UserContext";
+import { UserProvider } from "@/components/UserContext";
 import { auth } from "@/Firebase/firebaseSetup";
 import { router, Stack, useSegments } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";

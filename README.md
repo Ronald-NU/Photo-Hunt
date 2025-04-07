@@ -5,9 +5,12 @@
 <p>All the contributions to the project currently!</p>
 <h3>Ronald Mundell</h3>
 <p><a href="https://northeastern-my.sharepoint.com/:v:/g/personal/mundell_r_northeastern_edu/EZr8R2x1DWxGr4flVdmqEoUBCb0oMJN_SYaRO2ERJ7RP5A?e=yJxoDd">CodeWalk Iteration 1</a></p>
+<p><a href="https://northeastern-my.sharepoint.com/:v:/r/personal/mundell_r_northeastern_edu/Documents/Iteration2-CodeWalk.webm?csf=1&web=1&e=HAjOdX">CodeWalk Iteration 2</a></p>
+<p><a href="">CodeWalk Iteration 3</a></p>
 <l>
 <li>Setup of app and github</li>
 <li>Created CRUD operations for the collections found under <b>CRUD Operations</b></li>
+<li>Setup Firebase Rules</li>
 <li>Created and refactored the app into components</li>
 <li>Created the UserContext</li>
 <li>Created the CreateAccountModal</li>
@@ -27,6 +30,8 @@
 
 <h3>Sisi You</h3>
 <p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw">CodeWalk Iteration 1</a></p>
+
+<p><a hre32WZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 2</a></p>
 <l>
 
 
@@ -160,8 +165,16 @@
     <p><strong>Profile Screen</strong></p>
   </div>
   <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/passworderrorsignup.png" alt="Sign Up Password error Screen" style="width: 40%;">
+    <p><strong>Create Password Errors Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/anoynmousProfile.png" alt="Anoynmous Profile Screen" style="width: 40%;">
     <p><strong>Profile Anoynmous Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/anoynmousNewgame.png" alt="Anoynmous New Game Screen" style="width: 40%;">
+    <p><strong>New Game Anoynmous Screen</strong></p>
   </div>
 </div>
 
@@ -220,8 +233,10 @@ Play records contain:
 - name (string)
 
 **Friend Request Data**
-- fromId (string): Requester's ID
-- fromName (string): Requester's name
+- name (string): Requester's name
+- friendCode (string): Friend's unquie code
+- requesterCode (string): Requester's unquie code
+- friendName (string): Friend's Name
 - status: Can be 'pending', 'accepted', or 'rejected'
 
 <h2>CRUD Operations</h2>
@@ -247,6 +262,12 @@ Play records contain:
   <ul>
     <li>Records new gameplay session</li>
     <li>Stores player performance data</li>
+  </ul>
+</li>
+<li><b>sendFriendRequest</b>
+  <ul>
+    <li>sends a friend request to another user</li>
+    <li>creates a request</li>
   </ul>
 </li>
 </l>
@@ -302,6 +323,12 @@ Play records contain:
     <li>Records completion time and score</li>
   </ul>
 </li>
+<li><b>acceptDenyRequest</b>
+  <ul>
+    <li>accepts or denys a friend request</li>
+    <li>updates the friend request document with the new status</li>
+  </ul>
+</li>
 </l>
 
 <h3>Delete</h3>
@@ -328,13 +355,6 @@ Play records contain:
 
 <h3>Special Operations</h3>
 <l>
-<li><b>handleFriendRequest</b>
-  <ul>
-    <li>Processes friend request actions</li>
-    <li>Updates both users' friend lists</li>
-    <li>Manages request status changes</li>
-  </ul>
-</li>
 <li><b>storeImage</b>
   <ul>
     <li>Handles image upload to Firebase Storage</li>
@@ -342,6 +362,41 @@ Play records contain:
   </ul>
 </li>
 </l>
+
+<h2>Firestore Security Rules</h2>
+  <p>This document defines the security rules for accessing Firestore documents. Additionally as most aspects of our app require users to be able to view eachothers information and created documents thuswe allow reading for all data for signed in users but limit updating and writing to users with correct ownership.</p>
+  <pre><code>service cloud.firestore {
+  match /databases/{database}/documents {
+    // General rule for all documents (should be more restrictive)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Rules for puzzles: Only creator can write, all authenticated users can read
+    match /puzzles/{puzzle} {
+      allow write: if request.auth != null && request.auth.uid == resource.data.creatorID;
+      allow read: if request.auth != null;
+    }
+    
+    // Rules for play data: Only creator can write & update, all authenticated users can read
+    match /playdata/{play} {
+      allow write, update: if request.auth != null && request.auth.uid == resource.data.playerID;
+      allow read: if request.auth != null;
+    }
+
+    // Rules for requests
+    match /requests/{request} {
+      allow read, update, write: if request.auth != null;
+    }
+
+     // Rules for users: Each user can only modify their own data
+    match /users/{user} {
+    	allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update, write: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow read: if request.auth != null;
+    }
+  }
+}</code></pre>
 
 <h2>Citations</h2>
 <p></p>
@@ -475,5 +530,3 @@ npx expo start
   </li>
 </ul>
 
-<h3>State Flow</h3>
-<p>The application follows a hierarchical state management pattern:</p>

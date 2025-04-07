@@ -1,4 +1,4 @@
-import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc, query, where } from "firebase/firestore"; 
+import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc, setDoc } from "firebase/firestore"; 
 import { db } from "./firebaseSetup";
 import { UserCreateData, UserData, CollectionUser, geoLocationData } from "@/Firebase/DataStructures";
 
@@ -42,17 +42,19 @@ const generateFriendCode = async () => {
 export const getUserData = async (uid: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var user;
         for (const doc of querySnapshot.docs) {
             if (doc.data().uid === uid) {
                 const userData = doc.data() as UserData;
-                return {
+                user ={
                     ...userData,
                     id: doc.id,
                     mypuzzles: userData.mypuzzles || []
                 };
+
             }
         }
-        return null;
+        return user;
     } catch (e) {
         console.error("Error getting user data:", e);
         return null;
@@ -63,16 +65,17 @@ export const getUserData = async (uid: string) => {
 export const getFriend = async (code: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser));
+        var friend = null;
         querySnapshot.forEach((doc) => {
             if (doc.data().code === code) {
-                const userData = doc.data() as UserData;
-                return {
+                const userData = doc.data();
+                friend = {
                     ...userData,
                     mypuzzles: userData.mypuzzles || []
                 };
             }
         });
-        return null;
+        return friend;
     } catch (e) {
         return e;
     }

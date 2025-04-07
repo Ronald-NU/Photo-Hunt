@@ -18,7 +18,7 @@ export default function signup() {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
-
+    const [errors, setErrors] = useState<string[]>([])
     const createUser = async () => {
         try {
             if(email === '' || password === '' || name === ''){
@@ -44,10 +44,8 @@ export default function signup() {
 
             // Create Firebase auth user
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            
             // Get current location for initial user data
             let location = await Location.getCurrentPositionAsync({});
-            
             // Create user document in Firestore
             const userData: UserCreateData = {
                 name: name,
@@ -58,11 +56,8 @@ export default function signup() {
                     longitude: location.coords.longitude
                 }
             };
-            
+            console.log(userData);
             await createUserDocument(userData);
-            
-            // Navigate to protected area
-            router.replace("/(protected)/");
         } catch (error) {
             if(error instanceof FirebaseError && "code" in error && "message" in error){
                 if(error.code === 'auth/email-already-in-use'){
@@ -96,6 +91,30 @@ export default function signup() {
        signInAnonymously(auth);
     }
     
+    const enterPassword = (text:string) =>{
+        setPassword(text);
+        passwordError(text);
+        if(confirmpassword.length > 0 && text != confirmpassword){
+            setErrors((error)=>["Passwords do not match!",...error])
+        }
+    }
+
+    const passwordError = (text:string) => {
+        if(text.length < 8){
+            setErrors(["Password must be at least 8 characters long!"]);
+        } else {
+            setErrors([]);
+        }
+    }
+
+    const enterconfirmPassword = (text:string) =>{
+        setConfirmPassword(text);
+        passwordError(password);
+        if(text.length > 0 && password != text){
+            setErrors((error)=>["Passwords do not match!",...error])
+        }
+    }
+
     return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={[GeneralStyle.container, {backgroundColor: colors.Primary}]}>
@@ -120,14 +139,21 @@ export default function signup() {
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={password}
-        onChangeText={text => {setPassword(text)}}/>
+        onChangeText={enterPassword}/>
          <Text style={[GeneralStyle.BoldInputLabelText,{ width:'80%', textAlign:'left'}]}>Confirm Password</Text>
          <TextInput 
         placeholder='Password' 
         style={GeneralStyle.textInput}
         secureTextEntry={true}
         value={confirmpassword}
-        onChangeText={text => {setConfirmPassword(text)}}/>
+        onChangeText={enterconfirmPassword}/>
+        <View style={{width:'80%',paddingVertical:2}}>
+        {
+            errors.map((error, i)=>{
+               return <Text key={i} style={{width:'100%', color: colors.Primary}}>* {error}</Text>
+            })
+        }
+        </View>
         <TouchableButton onPress={createUser} title="Register" widthBut={'80%'} />
         <PressableTextLink onPress={anonymousSignIn} title="Don't want to make an account? Sign in Anonymously with limited features"/>
         <PressableTextLink onPress={() => router.replace('./login')} title="Already Registered? Login"/>

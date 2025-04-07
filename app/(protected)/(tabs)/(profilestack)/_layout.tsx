@@ -30,6 +30,12 @@ export default function ProfileStackLayout() {
           headerBackTitle: "Back to My Puzzles"
         }} 
       />
+      <Stack.Screen 
+        name="friendPuzzles" 
+        options={{ 
+          title: "Friend Puzzles",
+        }} 
+      />
     </Stack>
   );
 }

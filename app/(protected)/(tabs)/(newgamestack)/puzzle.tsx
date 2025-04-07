@@ -8,7 +8,7 @@ import { useUser } from "@/components/UserContext";
 import { PuzzleMiniData, PuzzleData } from "@/Firebase/DataStructures";
 import { createPuzzleDocument } from "@/Firebase/firebaseHelperPuzzles";
 import { updateUserDocument, getUserData } from "@/Firebase/firebaseHelperUsers";
-import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@/constants/Colors';
 
 const PUZZLE_SIZE = {
   Easy: 3, // 3x3 grid (9 pieces)
@@ -324,9 +324,9 @@ export default function PuzzleScreen() {
   const isViewMode = isFromMyPuzzles === "true";
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
   const totalPieces = gridSize * gridSize;
+
   const puzzleSize = Dimensions.get('window').width - 30;
 
-  // 初始化拼图碎片
   useEffect(() => {
     const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
     if (!isViewMode) {
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   },
   movesText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.Grey,
   },
   puzzleContainer: {
     flex: 1,
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
   },
   completeSubText: {
     fontSize: 18,
-    color: '#666',
+    color: colors.Grey,
     marginBottom: 20,
   },
   button: {
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: '#fff',
+    color: colors.White,
     fontSize: 16,
     fontWeight: '500',
   },
