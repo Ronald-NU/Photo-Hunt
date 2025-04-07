@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import React, { useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle } from '@/constants/Styles';
@@ -10,6 +10,9 @@ import { getLocalPuzzles } from '@/Firebase/firebaseHelperPuzzles';
 import type { Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { colors } from '@/constants/Colors';
+import * as Notifications from 'expo-notifications';
+import { verifyPermissions } from '@/components/NotificationManager';
+import Constants from 'expo-constants';
 
 export interface SelectedLocation {
   name: string;
@@ -19,6 +22,7 @@ export interface SelectedLocation {
 
 type DifficultyFilter = 'all' | 'easy' | 'medium' | 'hard';
 
+
 export default function MapScreen() {
   const router = useRouter();
   const { selectedLocation, setSelectedLocation } = useSelectedLocation();
@@ -27,6 +31,23 @@ export default function MapScreen() {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const mapRef = useRef<any>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+
+  useEffect(()=>{
+    const NotificationSetup = async () => {
+      if(await verifyPermissions()){
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+    });
+  }
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: true })
+  });
+    }
+    }
+  NotificationSetup()
+  },[])
 
   const getCurrentLocation = async () => {
     try {
