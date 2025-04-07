@@ -9,7 +9,10 @@ export default function ProfileStackLayout() {
       />
       <Stack.Screen 
         name="myPuzzles" 
-        options={{ title: "My Puzzles" }} 
+        options={{ 
+          title: "My Puzzles",
+          headerBackTitle: "Back to Profile"
+        }} 
       />
       <Stack.Screen 
         name="viewFriends" 

@@ -51,7 +51,6 @@ export default function CameraScreen() {
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
       });
       
       console.log('Camera result:', result);
@@ -64,7 +63,7 @@ export default function CameraScreen() {
         const fileName = `photo_${Date.now()}.jpg`;
         const newUri = `${FileSystem.cacheDirectory}${fileName}`;
 
-        // 复制文件到缓存目录
+
         await FileSystem.copyAsync({
           from: originalUri,
           to: newUri
@@ -72,11 +71,11 @@ export default function CameraScreen() {
 
         console.log('New image URI:', newUri);
         
-        // 验证文件是否存在
+
         const fileInfo = await FileSystem.getInfoAsync(newUri);
         console.log('New image exists check:', fileInfo);
         
-        // 验证图像
+
         const validation = await validateImage(newUri);
         console.log('Validation result:', validation);
         
