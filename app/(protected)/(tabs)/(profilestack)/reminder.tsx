@@ -4,8 +4,9 @@ import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { GeneralStyle } from "@/constants/Styles";
-import NotificationManager, { cancelNotificationByIdentifier, getAllScheduledNotifications } from "@/components/NotificationManager";
+import NotificationManager, { cancelAllNotifications, cancelNotificationByIdentifier, getAllScheduledNotifications } from "@/components/NotificationManager";
 import { NotificationRequest } from "expo-notifications";
+import TouchableButton from "@/components/TouchableButton";
 
 export default function ReminderScreen() {
   const [reminders, setReminders] = useState<NotificationRequest[]>([]);
@@ -60,6 +61,26 @@ export default function ReminderScreen() {
           </View>
         )}
       />
+      <TouchableButton title="Delete all Notifications" onPress={async () => {
+        Alert.alert(
+          "Delete All Reminders",
+          "Are you sure you want to delete all reminders?",
+          [
+            {
+              text: "Cancel",
+              onPress: () => {},
+              style: "cancel",
+            },
+            {
+              text: "OK",
+              onPress: async () => {
+                await cancelAllNotifications();
+                setRefresh(!refresh);
+              },
+              style: "destructive",
+            },
+          ])
+      }}/>
     </SafeAreaView>
   );
 }

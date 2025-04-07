@@ -85,10 +85,14 @@ export const scheduleNotificationHandler = async (title:string, time:string) => 
     return scheduled;
   }
 
-  export async function cancelNotificationById(notificationId: string) {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
-    console.log(`Notification with ID ${notificationId} cancelled`);
+  export async function cancelAllNotifications() {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    for (const notification of scheduled) {
+      await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+    }
+    console.log('All notifications cancelled');
   }
+
   export async function cancelNotificationByIdentifier(identifier: string) {
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
     const notification = scheduled.find((n) => n.identifier === identifier);
