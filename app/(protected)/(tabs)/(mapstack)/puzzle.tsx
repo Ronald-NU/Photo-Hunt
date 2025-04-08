@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 import { colors } from '@/constants/Colors';
+import NotificationManager from '@/components/NotificationManager';
 
 export default function MapPuzzleScreen() {
   const params = useLocalSearchParams();
@@ -29,7 +30,10 @@ export default function MapPuzzleScreen() {
               <Text style={styles.title}>{locationName as string}</Text>
               <Text style={styles.difficulty}>Difficulty: {difficulty}</Text>
             </View>
-          )
+          ),
+          headerRight: () => (
+            <NotificationManager title={(params.locationName as string)}/>
+          ),
         }}
       />
 

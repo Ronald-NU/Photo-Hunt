@@ -1,9 +1,10 @@
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import * as Notifications from "expo-notifications";
 import React, { useState } from "react";
-import { Alert, Button, Modal, View, Text } from "react-native";
+import { Alert, Button, Modal, View, Text, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import TouchableButton from "./TouchableButton";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/Colors";
 
 export  const verifyPermissions = async () => {
@@ -54,7 +55,9 @@ return (
             </View>
         </Modal>
      {
-        <TouchableButton title='Set a Reminder' onPress={() => setVisible(true)}/>
+        <TouchableOpacity onPress={() => setVisible(true)}>
+          <Ionicons name="notifications-outline" size={24} color="gold"/>
+        </TouchableOpacity>
      } 
     </View>
   )
