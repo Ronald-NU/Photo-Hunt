@@ -21,11 +21,10 @@ export default function LeaderboardScreen() {
       try {
         // Get fresh user data from the database
         const TopOneHunderedData = await getLocalLeaderBoard() as PlayData[];
-        console.log(TopOneHunderedData);
         if (TopOneHunderedData) {
-        //  setPlayData(TopOneHunderedData);
+          setPlayData(TopOneHunderedData);
         } else {
-        //  setPlayData([]);
+          setPlayData([]);
         }
       } catch (error) {
         console.error("Error fetching user puzzles:", error);
