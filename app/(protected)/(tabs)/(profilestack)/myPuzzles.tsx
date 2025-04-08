@@ -74,11 +74,7 @@ export default function MyPuzzlesScreen() {
         return;
       }
 
-      // 根据拼图完成状态决定跳转到哪个页面
-      const pathname = //puzzle.isCompleted 
-         "/(protected)/(tabs)/(profilestack)/puzzle";  // 已完成 - 跳转到查看页面
-        //: "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
-      
+      const pathname = "/(protected)/(tabs)/(profilestack)/puzzle";
       router.push({
         pathname,
         params: {
@@ -87,9 +83,6 @@ export default function MyPuzzlesScreen() {
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
-          isFromMyPuzzles: "true",
-          isCompleted: puzzle.isCompleted ? "true" : "false",
-          currentMoves: puzzle.moves?.toString() || "0"
         }
       });
     } catch (error) {
@@ -127,7 +120,7 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <PuzzleSection onPress={handlePuzzlePress} item={item} />
+          <PuzzleSection onPress={()=>handlePuzzlePress(item)} item={item} />
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>

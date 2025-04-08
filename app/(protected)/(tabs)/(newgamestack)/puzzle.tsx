@@ -458,8 +458,6 @@ export default function PuzzleScreen() {
         updatedMypuzzles = [...currentUserData.mypuzzles];
         updatedMypuzzles[existingPuzzleIndex] = {
           ...updatedMypuzzles[existingPuzzleIndex],
-          isCompleted: isComplete,
-          moves: moves
         };
       } else {
         // 如果是新拼图，添加到列表
@@ -467,8 +465,6 @@ export default function PuzzleScreen() {
           id: puzzleData.id,
           name: puzzleData.name,
           difficulty: puzzleData.difficulty,
-          isCompleted: isComplete,
-          moves: moves
         };
         updatedMypuzzles = currentUserData.mypuzzles ? [...currentUserData.mypuzzles, newPuzzle] : [newPuzzle];
       }
