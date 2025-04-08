@@ -20,7 +20,7 @@ export const getPuzzleLeaderBoard = async (puzzleID: string) => {
         var leaderboard:PlayData[] = []; 
         querySnapshot.forEach((doc) => {
             var docData = doc.data() as PlayData;
-            if (puzzleID === docData.puzzleId) {
+            if (puzzleID === docData.puzzleID) {
                 leaderboard.push(doc.data() as PlayData);
             }
         });

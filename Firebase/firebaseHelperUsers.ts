@@ -94,16 +94,17 @@ export const updateUserDocument = async (docId: string, data: any) => {
 }
 
 //querys the puzzle leaderboard data by querying the playdata collection
-export const getLocalLeaderBoard = async (location: geoLocationData) => {
+export const getLocalLeaderBoard = async () => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser)); 
         var leaderboard : UserData[] = [];
         querySnapshot.forEach((doc) => {
             var docData = doc.data() as UserData
             //within 100 miles of a location add to the leaderboard array
-            if (Math.abs(docData.geoLocation.latitude - location.latitude) < 1 && Math.abs(docData.geoLocation.longitude - location.longitude) < 1) {
+            leaderboard.push(docData as UserData);
+            /*if (Math.abs(docData.geoLocation.latitude - location.latitude) < 1 && Math.abs(docData.geoLocation.longitude - location.longitude) < 1) {
                 leaderboard.push(docData as UserData);
-            }
+            }*/
         });
         return leaderboard;
     } catch (e) {
