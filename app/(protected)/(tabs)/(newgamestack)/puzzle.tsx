@@ -373,10 +373,7 @@ export default function PuzzleScreen() {
 
   const puzzleSize = Dimensions.get('window').width - 30;
 
-<<<<<<< HEAD
   // 初始化拼图碎片和移动次数
-=======
->>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
   useEffect(() => {
     // 如果有当前移动次数，初始化它
     if (currentMoves) {

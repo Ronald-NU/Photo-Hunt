@@ -127,33 +127,7 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-<<<<<<< HEAD
-          <TouchableOpacity 
-            style={styles.puzzleItem}
-            onPress={() => handlePuzzlePress(item)}
-          >
-            <View style={styles.puzzleInfo}>
-              <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
-                {item.name}
-              </Text>
-              {item.isCompleted && (
-                <View style={styles.completedBadge}>
-                  <Text style={styles.completedText}>Completed</Text>
-                </View>
-              )}
-            </View>
-            <View style={styles.rightContent}>
-              {item.isCompleted ? (
-                <Text style={styles.movesText}>{item.moves || 0} steps</Text>
-              ) : (
-                <Text style={styles.incompleteText}>Incomplete</Text>
-              )}
-              <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
-            </View>
-          </TouchableOpacity>
-=======
           <PuzzleSection onPress={handlePuzzlePress} item={item} />
->>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -177,51 +151,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-<<<<<<< HEAD
-  list: {
-    flex: 1,
-    width: '100%',
-    padding: 15,
-  },
-  puzzleItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    marginVertical: 5,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  puzzleInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rightContent: {
-    alignItems: 'flex-end',
-  },
-  puzzleName: {
-    fontSize: 18,
-    fontWeight: '500',
-    flex: 1,
-    marginRight: 10,
-  },
-  difficulty: {
-    fontSize: 16,
-    color: '#666',
-    minWidth: 80,
-    textAlign: 'right',
-  },
-=======
->>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
   emptyContainer: {
     flex: 1,
     alignItems: 'center',

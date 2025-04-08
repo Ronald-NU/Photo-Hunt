@@ -96,7 +96,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
     <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
       <Stack.Screen 
         options={{ 
-          title: "My Puzzles",
+          title: `${params.name}'s Puzzles`,
           headerRight: () => (
             <TouchableOpacity onPress={fetchUserPuzzles}>
               <Text style={styles.refreshButton}>Refresh</Text>

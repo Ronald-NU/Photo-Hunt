@@ -107,7 +107,6 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
     }
   }, [onLocationSelect]);
 
-<<<<<<< HEAD
   const handlePuzzlePress = useCallback(async (puzzle: PuzzleData) => {
     console.log('Puzzle pressed:', puzzle);
     
@@ -116,7 +115,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
     let currentMoves = 0;
     
     if (userData && userData.mypuzzles) {
-      const userPuzzle = userData.mypuzzles.find(p => 
+      const userPuzzle = userData.mypuzzles.find((p:PuzzleData)  => 
         p.name === puzzle.name && 
         Math.abs(p.difficulty - puzzle.difficulty) < 0.1
       );
@@ -132,10 +131,6 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       ? "/(protected)/(tabs)/(mapstack)/puzzle"   // 已完成 - 跳转到查看页面
       : "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
     
-=======
-  const handlePuzzlePress = useCallback((puzzle: PuzzleData) => {
-    //console.log('Puzzle pressed:', puzzle);
->>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
     router.push({
       pathname,
       params: {
@@ -182,19 +177,15 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       )}
 
       {allPuzzles.map((puzzle) => {
-<<<<<<< HEAD
         console.log('Rendering puzzle marker:', puzzle);
         
         // 检查用户是否已完成此拼图
-        const isPuzzleCompleted = userData?.mypuzzles?.some(p => 
+        const isPuzzleCompleted = userData?.mypuzzles?.some((p:PuzzleData) => 
           p.name === puzzle.name && 
-          Math.abs(p.difficulty - puzzle.difficulty) < 0.1 &&
-          p.isCompleted
+          Math.abs(p.difficulty - puzzle.difficulty) < 0.1 
+          //&& p.isCompleted
         );
         
-=======
-        //console.log('Rendering puzzle marker:', puzzle);
->>>>>>> 65575879e7f69484157cdb8af62c2036474ca446
         const getMarkerColor = (difficulty: number) => {
           // 如果拼图已完成，使用不同颜色
           if (isPuzzleCompleted) {
