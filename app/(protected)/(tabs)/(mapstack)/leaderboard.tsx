@@ -1,18 +1,18 @@
-// app/(protected)/(tabs)/leaderboard.tsx
-import { useFocusEffect, useRouter } from "expo-router";
-
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, Alert } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import { colors } from "@/constants/Colors";
-import PuzzleSection from "@/components/PuzzleSection";
 import { useCallback, useState } from "react";
 import { PlayData } from "@/Firebase/DataStructures";
 import { getLocalLeaderBoard } from "@/Firebase/firebaseHelperUsers";
 
 export default function LeaderboardScreen() {
-  const router = useRouter();
-  const [playData, setPlayData] = useState<PlayData[]>([]);
+  const [playData, setPlayData] = useState<PlayData[]>([
+    {playerID: '4123123', puzzleID: '412123', name: 'Ronald', score: 4000},
+    {playerID: '412', puzzleID: '412123', name: 'Ronald', score: 4000},
+    {playerID: '41', puzzleID: '412123', name: 'Ronald', score: 4000},
+    {playerID: '4123123', puzzleID: '5', name: 'Ronald', score: 4000}]);
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -23,9 +23,9 @@ export default function LeaderboardScreen() {
         const TopOneHunderedData = await getLocalLeaderBoard() as PlayData[];
         console.log(TopOneHunderedData);
         if (TopOneHunderedData) {
-          setPlayData(TopOneHunderedData);
+        //  setPlayData(TopOneHunderedData);
         } else {
-          setPlayData([]);
+        //  setPlayData([]);
         }
       } catch (error) {
         console.error("Error fetching user puzzles:", error);
@@ -52,8 +52,24 @@ export default function LeaderboardScreen() {
         }}
         data={playData}
         keyExtractor={(item) => item.playerID+item.puzzleID}
-        renderItem={({ item }) => (
-        <View></View>
+        renderItem={({ item, index }) => (
+          <View style={GeneralStyle.profileSection}>
+            {
+              index === 0 ? (
+                <Ionicons name="trophy" size={24} color={'#FFD700'} />
+              ) : index === 1 ? (
+                <Ionicons name="trophy" size={24} color={'#C0C0C0'} />
+              ) : index === 2 ? (
+                <Ionicons name="trophy" size={24} color={'#CE8946'} />
+              ) : (
+                <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
+              )
+            }
+        <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
+          <Text style={TextStyles.LargeText}>{item.name}</Text>
+          <Text style={TextStyles.mediumText}>{item.score}</Text>
+        </View>
+        </View>
           //  <PuzzleSection onPress={(()=>{})} item={item} />
         )}
         ListEmptyComponent={() => (
