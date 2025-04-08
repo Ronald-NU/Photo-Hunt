@@ -65,17 +65,17 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
         Alert.alert("Error", "Puzzle image not found.");
         return;
       }
-
+      // leads to GamePuzzle
+      const pathname = "/(protected)/(tabs)/(mapstack)/puzzle";
       // Navigate to puzzle screen in the profilestack
       router.push({
-        pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+        pathname: pathname,
         params: {
           imageUri: puzzleData.photoURL,
           difficulty: getDifficultyText(puzzleData.difficulty),
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
-          isFromMyPuzzles: "true"
         }
       });
     } catch (error) {

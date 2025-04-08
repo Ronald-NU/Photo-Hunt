@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,7 +19,7 @@ export default function ProfilePuzzleScreen() {
       <Stack.Screen 
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={handleBack}>
+            <TouchableOpacity onPress={()=>handleBack()}>
               <Text style={styles.headerButton}>Back</Text>
             </TouchableOpacity>
           ),
