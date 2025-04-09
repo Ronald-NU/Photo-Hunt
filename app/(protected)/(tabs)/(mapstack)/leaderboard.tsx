@@ -9,10 +9,10 @@ import { getLocalLeaderBoard } from "@/Firebase/firebaseHelperUsers";
 
 export default function LeaderboardScreen() {
   const [playData, setPlayData] = useState<PlayData[]>([
-    {playerID: '4123123', puzzleID: '412123', name: 'Ronald', score: 4000},
-    {playerID: '412', puzzleID: '412123', name: 'Ronald', score: 3000},
-    {playerID: '41', puzzleID: '412123', name: 'Ronald', score: 2000},
-    {playerID: '4123123', puzzleID: '5', name: 'Ronald', score: 1000}]);
+    {playerId: '4123123', puzzleId: '412123', name: 'Ronald', score: 4000},
+    {playerId: '412', puzzleId: '412123', name: 'Ronald', score: 3000},
+    {playerId: '41', puzzleId: '412123', name: 'Ronald', score: 2000},
+    {playerId: '4123123', puzzleId: '5', name: 'Ronald', score: 1000}]);
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -50,7 +50,7 @@ export default function LeaderboardScreen() {
           paddingBottom: 100
         }}
         data={playData}
-        keyExtractor={(item) => item.playerID+item.puzzleID}
+        keyExtractor={(item) => item.playerId+item.puzzleId}
         renderItem={({ item, index }) => (
           <View style={GeneralStyle.profileSection}>
             {

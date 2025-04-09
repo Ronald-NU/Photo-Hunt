@@ -8,8 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getPuzzleData } from "@/Firebase/firebaseHelperPuzzles";
 import { getUserData } from "@/Firebase/firebaseHelperUsers";
 import { useLocalSearchParams } from "expo-router";
-import { colors } from "@/constants/Colors";
-import PuzzleSection from "@/components/PuzzleSection";
 
 export default function MyPuzzlesScreen() {
   const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
@@ -74,15 +72,18 @@ export default function MyPuzzlesScreen() {
         return;
       }
 
-      const pathname = "/(protected)/(tabs)/(profilestack)/puzzle";
+      // 导航到拼图页面，根据完成状态决定是否进入游戏模式
       router.push({
-        pathname,
+        pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
         params: {
           imageUri: puzzleData.photoURL,
           difficulty: getDifficultyText(puzzleData.difficulty),
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
+          isFromMyPuzzles: "true",
+          isCompleted: puzzle.isCompleted ? "true" : "false",
+          currentMoves: puzzle.moves?.toString() || "0"
         }
       });
     } catch (error) {
@@ -112,7 +113,7 @@ export default function MyPuzzlesScreen() {
         }} 
       />
       <FlatList
-        style={GeneralStyle.list}
+        style={styles.list}
         contentContainerStyle={{ 
           flexGrow: 1,
           paddingBottom: 100
@@ -120,7 +121,27 @@ export default function MyPuzzlesScreen() {
         data={puzzles}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <PuzzleSection onPress={()=>handlePuzzlePress(item)} item={item} />
+          <TouchableOpacity 
+            style={styles.puzzleItem}
+            onPress={() => handlePuzzlePress(item)}
+          >
+            <View style={styles.puzzleInfo}>
+              <Text style={styles.puzzleName} numberOfLines={1} ellipsizeMode="tail">
+                {item.name}
+              </Text>
+              {item.isCompleted && (
+                <View style={styles.completedBadge}>
+                  <Text style={styles.completedText}>完成</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.rightContent}>
+              {item.isCompleted && item.moves && (
+                <Text style={styles.movesText}>{item.moves} 步</Text>
+              )}
+              <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
+            </View>
+          </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>
@@ -144,6 +165,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  list: {
+    flex: 1,
+    width: '100%',
+    padding: 15,
+  },
+  puzzleItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    marginVertical: 5,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  puzzleInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rightContent: {
+    alignItems: 'flex-end',
+  },
+  puzzleName: {
+    fontSize: 18,
+    fontWeight: '500',
+    flex: 1,
+    marginRight: 10,
+  },
+  difficulty: {
+    fontSize: 16,
+    color: '#666',
+    minWidth: 80,
+    textAlign: 'right',
+  },
   emptyContainer: {
     flex: 1,
     alignItems: 'center',
@@ -158,7 +221,7 @@ const styles = StyleSheet.create({
   },
   emptySubText: {
     fontSize: 16,
-    color: colors.Grey,
+    color: '#666',
     textAlign: 'center',
   },
   refreshButton: {
@@ -182,11 +245,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 4,
-  },
-  incompleteText: {
-    fontSize: 14,
-    color: '#FF9800',
-    marginBottom: 4,
-    fontWeight: '500',
   },
 });

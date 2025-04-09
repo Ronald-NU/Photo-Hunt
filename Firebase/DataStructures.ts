@@ -31,6 +31,8 @@ export type PuzzleMiniData = {
     id: string;
     name: string;
     difficulty: number;
+    isCompleted?: boolean; // 是否完成
+    moves?: number; // 完成所需的移动次数
 };
 
 // A friend mini structure which stores the name and code of the friend
@@ -44,7 +46,7 @@ export type PuzzleData = {
     creatorID: string;
     name: string;
     geoLocation: geoLocationData;
-    photoURL: string;
+    photoURL: string; // Store image URL instead of base64 data
     difficulty: number;
 };
 
@@ -54,8 +56,8 @@ export type geoLocationData = {
 };
 
 export type PlayData = {
-    puzzleID: string;
-    playerID: string;
+    puzzleId: string;
+    playerId: string;
     name: string;
     score: number;
 };
@@ -65,7 +67,6 @@ export type FriendRequest = {
     friendCode: string;
     requesterCode: string;
     name:string;
-    friendName: string;
     status: STATUS;
 }
 export type STATUS = 'PENDING'|'ACCEPTED'|'REJECTED';
