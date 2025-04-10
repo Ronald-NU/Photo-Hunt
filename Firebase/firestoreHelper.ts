@@ -5,9 +5,9 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
 
 /**
- * 压缩图片
- * @param uri - 图片URI
- * @returns 压缩后的图片URI
+
+ * @param uri 
+ * @returns 
  */
 const compressImage = async (uri: string): Promise<string> => {
   try {
@@ -130,15 +130,14 @@ export const storeImage = async (imageURI: string): Promise<string> => {
     const path = `puzzles/${user.uid}/${fileName}`;
     const storageRef = ref(storage, path);
 
-    console.log("🔥 Reading file as base64...");
-    const base64 = await FileSystem.readAsStringAsync(imageURI, { encoding: FileSystem.EncodingType.Base64 });
-
-    console.log("📦 Base64 length:", base64.length);
-
-    const blob = new Blob([Uint8Array.from(atob(base64), c => c.charCodeAt(0))], { type: 'image/jpeg' });
-
-    console.log("📎 Blob created successfully:", blob.size);
     console.log("🚀 Uploading to:", path);
+
+    // 直接使用 fetch 获取文件数据
+    const response = await fetch(imageURI);
+    if (!response.ok) {
+      throw new Error('Failed to fetch image data');
+    }
+    const blob = await response.blob();
 
     const uploadTask = uploadBytesResumable(storageRef, blob);
 
