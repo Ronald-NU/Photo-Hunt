@@ -12,7 +12,7 @@ import { colors } from '@/constants/Colors';
 import { createPuzzleDocument } from '@/Firebase/firebaseHelperPuzzles';
 import { getAuth } from 'firebase/auth';
 import { PuzzleData } from '@/Firebase/DataStructures';
-import { updateUserDocument } from '@/Firebase/firebaseHelperUsers';
+import { getUserData, updateUserDocument } from '@/Firebase/firebaseHelperUsers';
 import NetInfo from '@react-native-community/netinfo';
 import { storeImage } from '@/Firebase/firestoreHelper';
 
@@ -268,9 +268,9 @@ export default function CameraScreen() {
         }
 
         // Update user's mypuzzles array
-        await updateUserDocument(user.uid, {
-          mypuzzles: [{ id: puzzleId, name: locationName as string, difficulty: parseInt(difficulty as string) }]
-        });
+        const myData = await getUserData(user.uid)
+        myData?.mypuzzles.push({ id: puzzleId, name: locationName as string, difficulty: parseInt(difficulty as string) });
+        await updateUserDocument((myData?.id as string), myData);
 
         Alert.alert("Success", "Puzzle created successfully!");
         router.back();
