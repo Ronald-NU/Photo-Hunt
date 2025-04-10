@@ -15,7 +15,6 @@ import { PuzzleData } from '@/Firebase/DataStructures';
 import { getUserData, updateUserDocument } from '@/Firebase/firebaseHelperUsers';
 import NetInfo from '@react-native-community/netinfo';
 import { storeImage } from '@/Firebase/firestoreHelper';
-import { getUserData } from '@/Firebase/firebaseHelperUsers';
 
 // Helper function to generate unique ID
 const generateUniqueId = () => {
@@ -268,12 +267,6 @@ export default function CameraScreen() {
           throw new Error("Failed to create puzzle document in database");
         }
 
-<<<<<<< HEAD
-        // Update user's mypuzzles array
-        const myData = await getUserData(user.uid)
-        myData?.mypuzzles.push({ id: puzzleId, name: locationName as string, difficulty: parseInt(difficulty as string) });
-        await updateUserDocument((myData?.id as string), myData);
-=======
         // Get current user data
         const userData = await getUserData(user.uid);
         const currentPuzzles = userData?.mypuzzles || [];
@@ -289,7 +282,6 @@ export default function CameraScreen() {
         await updateUserDocument(user.uid, {
           mypuzzles: updatedPuzzles
         });
->>>>>>> 294502f (Refactor image handling in firestoreHelper.ts to use fetch for blob creation instead of base64 conversion. Update CameraScreen to retrieve and update user's mypuzzles array with new puzzle data.)
 
         Alert.alert("Success", "Puzzle created successfully!");
         router.back();
