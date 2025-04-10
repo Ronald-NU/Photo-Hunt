@@ -24,12 +24,11 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const [isLoading, setIsLoading] = useState(true);
   const [currentRegion, setCurrentRegion] = useState<Region>(DEFAULT_REGION);
   const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
-  const [userData, setUserData] = useState<any>(null);
   const router = useRouter();
   const { user } = useUser();
 
   useEffect(() => {
-    //console.log('LocationManager received puzzles:', allPuzzles);
+    console.log('LocationManager received puzzles:', allPuzzles);
   }, [allPuzzles]);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        //console.log('Current location:', location);
+        console.log('Current location:', location);
 
         if (isMounted) {
           const newRegion = {
@@ -69,22 +68,6 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
     initializeLocation();
     return () => { isMounted = false; };
   }, []);
-
-  // 获取用户数据
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user?.uid) {
-        try {
-          const data = await getUserData(user.uid);
-          setUserData(data);
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-        }
-      }
-    };
-    
-    fetchUserData();
-  }, [user]);
 
   const handleMapPress = useCallback(async (event: MapPressEvent) => {
     try {
@@ -110,42 +93,18 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const handlePuzzlePress = useCallback(async (puzzle: PuzzleData) => {
     console.log('Puzzle pressed:', puzzle);
     
-    // 使用已获取的userData，无需再次请求
-    let isCompleted = false;
-    let currentMoves = 0;
-    
-    if (userData && userData.mypuzzles) {
-      const userPuzzle = userData.mypuzzles.find((p:PuzzleData)  => 
-        p.name === puzzle.name && 
-        Math.abs(p.difficulty - puzzle.difficulty) < 0.1
-      );
-      
-      if (userPuzzle) {
-        isCompleted = !!userPuzzle.isCompleted;
-        currentMoves = userPuzzle.moves || 0;
-      }
-    }
-    
-    // 根据拼图完成状态决定跳转到哪个页面
-    const pathname = isCompleted
-      ? "/(protected)/(tabs)/(mapstack)/puzzle"   // 已完成 - 跳转到查看页面
-      : "/(protected)/(tabs)/(newgamestack)/puzzle"; // 未完成 - 跳转到游戏页面
-    
+    // Navigate to marker screen
     router.push({
-      pathname,
+      pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
       params: {
+        puzzleId: puzzle.id,
+        puzzleName: puzzle.name,
+        creatorId: puzzle.creatorID,
+        difficulty: puzzle.difficulty.toString(),
         imageUri: puzzle.photoURL,
-        difficulty: puzzle.difficulty === 3 ? "Easy" : puzzle.difficulty === 4 ? "Medium" : "Hard",
-        locationName: puzzle.name,
-        latitude: puzzle.geoLocation.latitude.toString(),
-        longitude: puzzle.geoLocation.longitude.toString(),
-        isFromMyPuzzles: "false",
-        isFromMap: "true",
-        isCompleted: isCompleted ? "true" : "false",
-        currentMoves: currentMoves.toString()
       }
     });
-  }, [router, userData]);
+  }, [router]);
 
   if (isLoading) {
     return (
@@ -178,20 +137,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
 
       {allPuzzles.map((puzzle) => {
         console.log('Rendering puzzle marker:', puzzle);
-        
-        // 检查用户是否已完成此拼图
-        const isPuzzleCompleted = userData?.mypuzzles?.some((p:PuzzleData) => 
-          p.name === puzzle.name && 
-          Math.abs(p.difficulty - puzzle.difficulty) < 0.1 
-          //&& p.isCompleted
-        );
-        
         const getMarkerColor = (difficulty: number) => {
-          // 如果拼图已完成，使用不同颜色
-          if (isPuzzleCompleted) {
-            return '#9C27B0'; // 紫色表示已完成
-          }
-          
           switch (difficulty) {
             case 3: // Easy
               return '#4CAF50'; // 绿色
@@ -213,7 +159,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
             }}
             pinColor={getMarkerColor(puzzle.difficulty)}
             title={puzzle.name}
-            description={`${isPuzzleCompleted ? 'Completed - ' : ''}Difficulty: ${puzzle.difficulty === 3 ? 'Easy' : puzzle.difficulty === 4 ? 'Medium' : 'Hard'}`}
+            description={`Difficulty: ${puzzle.difficulty === 3 ? 'Easy' : puzzle.difficulty === 4 ? 'Medium' : 'Hard'}`}
             onPress={() => handlePuzzlePress(puzzle)}
           />
         );
