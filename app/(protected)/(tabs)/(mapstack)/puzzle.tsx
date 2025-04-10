@@ -12,15 +12,19 @@ export default function MapPuzzleScreen() {
   const { imageUri, difficulty, locationName } = params;
 
   const handleBack = () => {
-    router.back();
+    router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
   };
+
+  const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
+  const imageURI = (imageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUri as string).split('token=')[1];
+  
 
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <Stack.Screen 
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={handleBack}>
+            <TouchableOpacity onPress={()=>handleBack()} onPressIn={()=>handleBack()}>
               <Text style={styles.headerButton}>Back</Text>
             </TouchableOpacity>
           ),
@@ -44,7 +48,7 @@ export default function MapPuzzleScreen() {
             height: Dimensions.get('window').width - 40,
             resizeMode: 'contain'
           }}
-          source={{ uri: imageUri as string }}
+          source={{ uri: imageURI as string }}
         />
       </View>
     </SafeAreaView>

@@ -46,7 +46,7 @@ export default function LeaderboardScreen() {
           paddingBottom: 100
         }}
         data={playData}
-        keyExtractor={(item) => item.playerID+item.puzzleID}
+        keyExtractor={(item) => item.playerID+item.puzzleID+item.name+item.score}
         renderItem={({ item, index }) => (
           <View style={GeneralStyle.profileSection}>
             {
