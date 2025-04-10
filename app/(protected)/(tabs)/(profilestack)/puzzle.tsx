@@ -6,20 +6,21 @@ import { GeneralStyle } from "@/constants/Styles";
 import { colors } from '@/constants/Colors';
 
 export default function ProfilePuzzleScreen() {
-  const params = useLocalSearchParams();
   const router = useRouter();
-  const { imageUri, difficulty, locationName } = params;
+  const { imageUri, difficulty, locationName } = useLocalSearchParams();
 
   const handleBack = () => {
     router.back();
   };
-
+  const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
+  const imageURI = (imageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUri as string).split('token=')[1];
+  console.log(imageURI as string);
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <Stack.Screen 
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={()=>handleBack()}>
+            <TouchableOpacity onPress={()=>handleBack()} onPressIn={() => handleBack()}>
               <Text style={styles.headerButton}>Back</Text>
             </TouchableOpacity>
           ),
@@ -40,9 +41,9 @@ export default function ProfilePuzzleScreen() {
             height: Dimensions.get('window').width - 40,
             resizeMode: 'contain'
           }}
-          source={{ uri: imageUri as string }}
-        />
-      </View>
+          source={{ uri: imageURI as string }}
+          />
+          </View>
     </SafeAreaView>
   );
 }
