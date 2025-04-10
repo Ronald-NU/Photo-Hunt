@@ -55,7 +55,7 @@ return (
             </View>
         </Modal>
      {
-        <TouchableOpacity onPress={() => setVisible(true)}>
+        <TouchableOpacity onPress={() => setVisible(true)} onPressIn={() => setVisible(true)}>
           <Ionicons name="notifications-outline" size={24} color="gold"/>
         </TouchableOpacity>
      } 

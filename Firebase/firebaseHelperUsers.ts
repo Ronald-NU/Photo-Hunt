@@ -86,6 +86,8 @@ Update User document in the database
 */
 export const updateUserDocument = async (docId: string, data: any) => {
     try {
+        console.log(data);
+        
         await updateDoc(doc(db, CollectionUser, docId), data);
         return true;
     } catch (e) {

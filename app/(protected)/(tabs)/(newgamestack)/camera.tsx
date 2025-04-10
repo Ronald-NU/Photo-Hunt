@@ -246,7 +246,16 @@ export default function CameraScreen() {
         );
         return;
       }
-
+      var difVal = 4;
+      if(difficulty === 'Easy') {
+        difVal = 3;
+      }
+      if(difficulty === 'Medium') {
+        difVal = 4;
+      }
+      if(difficulty === 'Hard') {
+        difVal = 5;
+      }
       const puzzleId = generateUniqueId();
       const puzzleData: PuzzleData = {
         id: puzzleId,
@@ -257,7 +266,7 @@ export default function CameraScreen() {
           longitude: location.coords.longitude
         },
         photoURL: photoURL,
-        difficulty: parseInt(difficulty as string)
+        difficulty: difVal
       };
 
       // Create puzzle document
@@ -270,19 +279,26 @@ export default function CameraScreen() {
         // Get current user data
         const userData = await getUserData(user.uid);
         const currentPuzzles = userData?.mypuzzles || [];
-
+        if(userData) {
         // Add new puzzle to the array
-        const updatedPuzzles = [...currentPuzzles, {
+        var difVal = 4;
+        if(difficulty === 'Easy') {
+          difVal = 3;
+        }
+        if(difficulty === 'Medium') {
+          difVal = 4;
+        }
+        if(difficulty === 'Hard') {
+          difVal = 5;
+        }
+        userData.mypuzzles = [...currentPuzzles, {
           id: puzzleId,
           name: locationName as string,
-          difficulty: parseInt(difficulty as string)
+          difficulty: difVal
         }];
-
         // Update user's mypuzzles array with the combined list
-        await updateUserDocument(user.uid, {
-          mypuzzles: updatedPuzzles
-        });
-
+        await updateUserDocument(userData?.id as string, userData);
+        }
         Alert.alert("Success", "Puzzle created successfully!");
         router.back();
       } catch (dbError: unknown) {

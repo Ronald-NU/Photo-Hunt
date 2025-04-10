@@ -28,7 +28,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const { user } = useUser();
 
   useEffect(() => {
-    console.log('LocationManager received puzzles:', allPuzzles);
+    //console.log('LocationManager received puzzles:', allPuzzles);
   }, [allPuzzles]);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        console.log('Current location:', location);
+      //  console.log('Current location:', location);
 
         if (isMounted) {
           const newRegion = {
@@ -91,7 +91,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   }, [onLocationSelect]);
 
   const handlePuzzlePress = useCallback(async (puzzle: PuzzleData) => {
-    console.log('Puzzle pressed:', puzzle);
+   // console.log('Puzzle pressed:', puzzle);
     
     // Navigate to marker screen
     router.push({
@@ -136,7 +136,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       )}
 
       {allPuzzles.map((puzzle) => {
-        console.log('Rendering puzzle marker:', puzzle);
+        //console.log('Rendering puzzle marker:', puzzle);
         const getMarkerColor = (difficulty: number) => {
           switch (difficulty) {
             case 3: // Easy
