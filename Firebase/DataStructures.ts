@@ -56,8 +56,8 @@ export type geoLocationData = {
 };
 
 export type PlayData = {
-    puzzleId: string;
-    playerId: string;
+    puzzleID: string;
+    playerID: string;
     name: string;
     score: number;
 };
@@ -65,6 +65,7 @@ export type PlayData = {
 export type FriendRequest = {
     id?: string;
     friendCode: string;
+    friendName: string;
     requesterCode: string;
     name:string;
     status: STATUS;
