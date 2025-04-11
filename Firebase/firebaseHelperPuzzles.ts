@@ -49,7 +49,7 @@ export const getPuzzleData = async (id: string): Promise<PuzzleData | null> => {
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            console.log('Checking document:', doc.id, data);
+            //console.log('Checking document:', doc.id, data);
             if (data.id === id) {
                 foundPuzzle = {
                     id: data.id,
@@ -95,16 +95,16 @@ export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
             
             var loc = data.geoLocation as geoLocationData;
             const distance = haversineDistance(loc, currentLocation);
-            console.log('Distance calculation:', {
+           /* console.log('Distance calculation:', {
                 puzzleName: data.name,
                 puzzleLocation: loc,
                 currentLocation: currentLocation,
                 distance: distance
             });
-            
+            */
             //return puzzles within 100 miles
             if (distance <= 100) {
-                console.log('Adding puzzle to nearby list:', data.name);
+               // console.log('Adding puzzle to nearby list:', data.name);
                 nearbyPuzzles.push(data as PuzzleData);
             } else {
                 console.log('Puzzle too far:', data.name, 'Distance:', distance);
@@ -112,7 +112,8 @@ export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
         });
         
         console.log('Final nearby puzzles count:', nearbyPuzzles.length);
-        console.log('Nearby puzzles:', nearbyPuzzles.map(p => ({ name: p.name, distance: haversineDistance(p.geoLocation, currentLocation) })));
+        //console.log('Nearby puzzles:', 
+        nearbyPuzzles.map(p => ({ name: p.name, distance: haversineDistance(p.geoLocation, currentLocation) }));
         return nearbyPuzzles;
     } catch (e) {
         console.error("Error getting local puzzles:", e);
