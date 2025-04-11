@@ -108,11 +108,16 @@ class Node {
   }
 
   isGoal(): boolean {
-    // For a sliding puzzle, the goal state is when all pieces are in order
-    // with the empty tile in the last position
-    return this.state.every((value, index) => 
-      index === this.state.length - 1 ? value === this.state.length - 1 : value === index
-    );
+    // For a sliding puzzle, the goal state is when all pieces except the empty tile are in order
+    // The empty tile is the piece with value equal to totalPieces - 1
+    for (let i = 0; i < this.state.length; i++) {
+      const value = this.state[i];
+      // Skip the empty tile
+      if (value === this.state.length - 1) continue;
+      // Check if the piece is in its correct position
+      if (value !== i) return false;
+    }
+    return true;
   }
 
   // For equality comparisons in the closed set
@@ -324,7 +329,8 @@ export default function MapPuzzleScreen() {
         puzzleID: puzzleId as string,
         playerID: auth.currentUser.uid,
         name: auth.currentUser.displayName || 'Anonymous',
-        score: moves
+        score: moves,
+        isCompleted: isComplete
       };
       
       const result = await updatePlayDataDocument(playId, playData);
@@ -415,12 +421,37 @@ export default function MapPuzzleScreen() {
     setPieces([...nextPieces]);
     setHidden(nextHidden);
 
-    // Check if puzzle is complete
-    const isCorrect = nextPieces.every((piece, index) => piece === index);
-    if (isCorrect) {
+    // Check if puzzle is complete (all pieces except the empty tile are in correct position)
+    let isCorrect = true;
+    for (let i = 0; i < nextPieces.length; i++) {
+      const value = nextPieces[i];
+      // Skip the empty tile
+      if (value === totalPieces - 1) continue;
+      // Check if the piece is in its correct position
+      if (value !== i) {
+        isCorrect = false;
+        break;
+      }
+    }
+
+    if (isCorrect && !isComplete) {
       setIsComplete(true);
       // Save final moves when puzzle is completed
-      saveMovesToFirebase();
+      saveMovesToFirebase().then(() => {
+        Alert.alert(
+          "Congratulations!",
+          `You completed the puzzle in ${moves} moves!`,
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                // Navigate back to marker screen
+                router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+              }
+            }
+          ]
+        );
+      });
     }
   };
 

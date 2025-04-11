@@ -60,6 +60,7 @@ export type PlayData = {
     playerID: string;
     name: string;
     score: number;
+    isCompleted?: boolean;
 };
 
 export type FriendRequest = {
