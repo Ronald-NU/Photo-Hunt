@@ -497,6 +497,34 @@ export default function MapPuzzleScreen() {
     animateMove();
   };
 
+  // Add global effect to check completion status
+  useEffect(() => {
+    if (pieces.length === totalPieces) {
+      const isCorrect = pieces.every((value, index) => 
+        value === totalPieces - 1 ? true : value === index
+      );
+      if (isCorrect && !isComplete) {
+        setIsComplete(true);
+        // Save final moves when puzzle is completed
+        saveMovesToFirebase().then(() => {
+          Alert.alert(
+            "Congratulations! 🎉",
+            `You completed the puzzle in ${moves} moves!`,
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  // Navigate back to marker screen
+                  router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+                }
+              }
+            ]
+          );
+        });
+      }
+    }
+  }, [pieces, totalPieces, isComplete, moves]);
+
   const giveHint = async () => {
     console.log('Give hint called with:', { hidden, isComplete, isSolving });
     if (isComplete || isSolving) return;
