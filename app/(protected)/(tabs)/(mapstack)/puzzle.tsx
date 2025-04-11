@@ -19,59 +19,209 @@ const PUZZLE_SIZE = {
   'Hard': 5, // 5x5 grid
 };
 
-const getBestHintMove = (current: number[], hidden: number, gridSize: number): number[] | null => {
-  const getManhattanDistance = (a: number[], b: number[]) =>
-    Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+// Node class for A* search
+class Node {
+  state: number[];
+  parent: Node | null;
+  g: number;  // cost from start
+  h: number;  // heuristic (estimated cost to goal)
+  f: number;  // total cost (g + h)
+  hiddenIndex: number;
+  move: number | null; // The piece that was moved to reach this state
 
-  const indexToCoord = (index: number) => [Math.floor(index / gridSize), index % gridSize];
-  const coordToIndex = (row: number, col: number) => row * gridSize + col;
-
-  const hiddenCoord = indexToCoord(hidden);
-  const directions = [
-    [0, 1],  // right
-    [1, 0],  // down
-    [0, -1], // left
-    [-1, 0], // up
-  ];
-
-  let bestMove = null;
-  let bestScore = Infinity;
-
-  // Check each piece adjacent to the empty space
-  for (const [dr, dc] of directions) {
-    const nr = hiddenCoord[0] + dr;
-    const nc = hiddenCoord[1] + dc;
-
-    if (nr < 0 || nc < 0 || nr >= gridSize || nc >= gridSize) continue;
-
-    const swapIndex = coordToIndex(nr, nc);
-    const pieceToMove = current[swapIndex];
-    
-    // Skip if this piece is already in the correct position
-    const currentCoord = indexToCoord(swapIndex);
-    const correctCoord = indexToCoord(pieceToMove);
-    if (currentCoord[0] === correctCoord[0] && currentCoord[1] === correctCoord[1]) continue;
-
-    // Try the move
-    const swapped = [...current];
-    [swapped[hidden], swapped[swapIndex]] = [swapped[swapIndex], swapped[hidden]];
-    
-    // Calculate improvement for this specific piece
-    const movedPieceNewCoord = indexToCoord(hidden);
-    const movedPieceNewDistance = getManhattanDistance(movedPieceNewCoord, correctCoord);
-    const movedPieceOldDistance = getManhattanDistance(currentCoord, correctCoord);
-    const pieceImprovement = movedPieceOldDistance - movedPieceNewDistance;
-
-    // Score based only on this piece's improvement
-    const score = -pieceImprovement; // Negative because lower score is better
-
-    if (score < bestScore) {
-      bestScore = score;
-      bestMove = swapped;
-    }
+  constructor(state: number[], parent: Node | null, g: number, hiddenIndex: number, gridSize: number, move: number | null = null) {
+    this.state = state;
+    this.parent = parent;
+    this.g = g;
+    this.hiddenIndex = hiddenIndex;
+    this.move = move;
+    this.h = this.calculateHeuristic(gridSize);
+    this.f = this.g + this.h;
   }
 
-  return bestMove;
+  calculateHeuristic(gridSize: number): number {
+    let h = 0;
+    let linearConflicts = 0;
+
+    // Calculate Manhattan distance and linear conflicts
+    for (let i = 0; i < this.state.length; i++) {
+      const value = this.state[i];
+      if (value === this.state.length - 1) continue; // Skip the empty tile (labeled as last index)
+
+      const currentRow = Math.floor(i / gridSize);
+      const currentCol = i % gridSize;
+      const targetRow = Math.floor(value / gridSize);
+      const targetCol = value % gridSize;
+
+      // Manhattan distance
+      h += Math.abs(currentRow - targetRow) + Math.abs(currentCol - targetCol);
+
+      // Check for linear conflicts in row
+      if (currentRow === targetRow) {
+        for (let j = i + 1; j < (currentRow + 1) * gridSize; j++) {
+          const otherValue = this.state[j];
+          if (otherValue === this.state.length - 1) continue;
+          const otherTargetRow = Math.floor(otherValue / gridSize);
+          if (otherTargetRow === currentRow && 
+              ((value > otherValue && i < j) || (value < otherValue && i > j))) {
+            linearConflicts += 2;
+          }
+        }
+      }
+
+      // Check for linear conflicts in column
+      if (currentCol === targetCol) {
+        for (let j = i + gridSize; j < this.state.length; j += gridSize) {
+          const otherValue = this.state[j];
+          if (otherValue === this.state.length - 1) continue;
+          const otherTargetCol = otherValue % gridSize;
+          if (otherTargetCol === currentCol &&
+              ((value > otherValue && i < j) || (value < otherValue && i > j))) {
+            linearConflicts += 2;
+          }
+        }
+      }
+    }
+
+    return h + linearConflicts;
+  }
+
+  getNextStates(gridSize: number): Node[] {
+    const nextStates: Node[] = [];
+    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]]; // up, down, left, right
+    const currentRow = Math.floor(this.hiddenIndex / gridSize);
+    const currentCol = this.hiddenIndex % gridSize;
+
+    for (const [dr, dc] of directions) {
+      const newRow = currentRow + dr;
+      const newCol = currentCol + dc;
+      
+      if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize) {
+        const newHiddenIndex = newRow * gridSize + newCol;
+        const newState = [...this.state];
+        const movedPiece = newState[newHiddenIndex];
+        [newState[this.hiddenIndex], newState[newHiddenIndex]] = [newState[newHiddenIndex], newState[this.hiddenIndex]];
+        nextStates.push(new Node(newState, this, this.g + 1, newHiddenIndex, gridSize, movedPiece));
+      }
+    }
+    return nextStates;
+  }
+
+  isGoal(): boolean {
+    // For a sliding puzzle, the goal state is when all pieces are in order
+    // with the empty tile in the last position
+    return this.state.every((value, index) => 
+      index === this.state.length - 1 ? value === this.state.length - 1 : value === index
+    );
+  }
+
+  // For equality comparisons in the closed set
+  getStateString(): string {
+    return this.state.join(',');
+  }
+}
+
+// A* search implementation
+const aStarSearch = (initial: number[], hiddenIndex: number, gridSize: number, maxNodes: number = 10000): Node[] | null => {
+  const startNode = new Node(initial, null, 0, hiddenIndex, gridSize);
+  
+  // Use a priority queue for the open set (nodes to be evaluated)
+  const openSet: Node[] = [startNode];
+  
+  // Use a Map for the closed set (already evaluated nodes)
+  const closedSet = new Map<string, number>();
+  
+  let nodesEvaluated = 0;
+  
+  while (openSet.length > 0 && nodesEvaluated < maxNodes) {
+    nodesEvaluated++;
+    
+    // Sort by f value and get the node with the lowest f
+    openSet.sort((a, b) => a.f - b.f);
+    const current = openSet.shift()!;
+    
+    // Check if we've reached the goal
+    if (current.isGoal()) {
+      // Reconstruct path
+      const path: Node[] = [];
+      let node: Node | null = current;
+      while (node !== null) {
+        path.unshift(node);
+        node = node.parent;
+      }
+      return path;
+    }
+    
+    // Add to closed set
+    closedSet.set(current.getStateString(), current.f);
+    
+    // Get next possible states
+    const nextStates = current.getNextStates(gridSize);
+    
+    for (const nextNode of nextStates) {
+      const nextStateString = nextNode.getStateString();
+      
+      // Skip if we've already evaluated this state with a better score
+      if (closedSet.has(nextStateString) && closedSet.get(nextStateString)! <= nextNode.f) {
+        continue;
+      }
+      
+      // Check if state is already in open set
+      const existingIndex = openSet.findIndex(node => node.getStateString() === nextStateString);
+      
+      if (existingIndex === -1) {
+        // State not in open set, add it
+        openSet.push(nextNode);
+      } else if (nextNode.f < openSet[existingIndex].f) {
+        // If this path to the state is better, update it
+        openSet[existingIndex] = nextNode;
+      }
+    }
+  }
+  
+  console.log(`A* search terminated after evaluating ${nodesEvaluated} nodes without finding solution`);
+  return null; // No solution found within node limit
+};
+
+// Function to get a hint move
+const getBestHintMove = (current: number[], hidden: number, gridSize: number): number[] | null => {
+  // Try a full A* search with a limit to prevent too much computation
+  const path = aStarSearch(current, hidden, gridSize, 1000);
+  
+  if (path && path.length > 1) {
+    // Return the next state from the optimal path
+    return path[1].state;
+  }
+  
+  // Fallback to a simpler heuristic if A* is too expensive
+  const startNode = new Node(current, null, 0, hidden, gridSize);
+  const nextStates = startNode.getNextStates(gridSize);
+  
+  if (nextStates.length === 0) return null;
+  
+  // Find the move that most improves the heuristic score
+  nextStates.sort((a, b) => a.h - b.h);
+  return nextStates[0].state;
+};
+
+// Add solvability check function
+const isSolvable = (tiles: number[], gridSize: number): boolean => {
+  const inversions = tiles.reduce((inv, val, i) => {
+    for (let j = i + 1; j < tiles.length; j++) {
+      if (tiles[i] !== tiles.length - 1 && tiles[j] !== tiles.length - 1 && tiles[i] > tiles[j]) {
+        inv++;
+      }
+    }
+    return inv;
+  }, 0);
+
+  const blankRowFromBottom = gridSize - Math.floor(tiles.indexOf(tiles.length - 1) / gridSize);
+
+  if (gridSize % 2 === 1) {
+    return inversions % 2 === 0;
+  } else {
+    return (inversions + blankRowFromBottom) % 2 === 0;
+  }
 };
 
 export default function MapPuzzleScreen() {
@@ -88,6 +238,8 @@ export default function MapPuzzleScreen() {
   const [isSolving, setIsSolving] = useState(false);
   const [playId, setPlayId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [lastHint, setLastHint] = useState<string | null>(null);
+  const [hintPiece, setHintPiece] = useState<number | null>(null);
 
   // Load saved moves from Firebase
   useEffect(() => {
@@ -134,30 +286,38 @@ export default function MapPuzzleScreen() {
 
   // Auto-save moves every 1.5 seconds when moves change
   useEffect(() => {
-    if (moves !== null && moves > 0 && playId && !isSaving) {
+    if (moves !== null && moves > 0 && playId) {
       const debounce = setTimeout(async () => {
-        await saveMovesToFirebase();
+        if (!isSaving) {
+          await saveMovesToFirebase();
+        }
       }, 1500);
       return () => clearTimeout(debounce);
     }
   }, [moves, playId]);
 
   const saveMovesToFirebase = async () => {
-    if (!auth.currentUser || !puzzleId || !playId || isSaving) {
+    // 检查必需的数据
+    if (!auth.currentUser || !puzzleId || !playId) {
       console.error('Cannot save: missing required data', {
         hasUser: !!auth.currentUser,
         hasPuzzleId: !!puzzleId,
-        hasPlayId: !!playId,
-        isSaving
+        hasPlayId: !!playId
       });
       return false;
     }
-    
+
     if (moves === null) {
       console.error('Cannot save: moves is null');
       return false;
     }
-    
+
+    // 如果已经在保存中，直接返回
+    if (isSaving) {
+      console.log('Already saving, skipping this save');
+      return false;
+    }
+
     try {
       setIsSaving(true);
       const playData: PlayData = {
@@ -179,6 +339,7 @@ export default function MapPuzzleScreen() {
       console.error('Error saving moves:', error);
       return false;
     } finally {
+      // 确保在 finally 中重置 isSaving 状态
       setIsSaving(false);
     }
   };
@@ -226,14 +387,20 @@ export default function MapPuzzleScreen() {
   useEffect(() => {
     // Initialize puzzle pieces
     const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
-    // Only shuffle pieces if not in view mode
-    for (let i = initialPieces.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [initialPieces[i], initialPieces[j]] = [initialPieces[j], initialPieces[i]];
-    }
+    let shuffledPieces: number[];
+    
+    // Keep shuffling until we get a solvable configuration
+    do {
+      shuffledPieces = [...initialPieces];
+      for (let i = shuffledPieces.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledPieces[i], shuffledPieces[j]] = [shuffledPieces[j], shuffledPieces[i]];
+      }
+    } while (!isSolvable(shuffledPieces, gridSize));
+
     const hiddenIndex = totalPieces - 1;
     setHidden(hiddenIndex);
-    setPieces(initialPieces);
+    setPieces(shuffledPieces);
     console.log('Initialized puzzle with hidden index:', hiddenIndex);
   }, [totalPieces]);
 
@@ -307,15 +474,35 @@ export default function MapPuzzleScreen() {
       setHidden(totalPieces - 1);
       return;
     }
-    const hint = getBestHintMove(pieces, hidden, gridSize);
-    if (hint) {
-      setPieces(hint);
-      setHidden(hint.indexOf(totalPieces - 1));
-      setMoves(prev => (prev !== null ? prev + 1 : 1));
-      // Add vibration feedback for hint
+
+    try {
+      // 确保振动反馈
       Vibration.vibrate(50);
-      // Save moves after hint
-      await saveMovesToFirebase();
+      
+      const hint = getBestHintMove(pieces, hidden, gridSize);
+      if (hint) {
+        const newHiddenIndex = hint.indexOf(totalPieces - 1);
+        console.log('Applying hint move:', {
+          currentState: pieces,
+          hintState: hint,
+          oldHidden: hidden,
+          newHidden: newHiddenIndex
+        });
+        
+        // 使用 requestAnimationFrame 来优化状态更新
+        requestAnimationFrame(() => {
+          setPieces(hint);
+          setHidden(newHiddenIndex);
+          setMoves(prev => (prev !== null ? prev + 1 : 1));
+        });
+        
+        // 异步保存移动
+        await saveMovesToFirebase();
+      } else {
+        console.log('No hint available');
+      }
+    } catch (error) {
+      console.error('Error in giveHint:', error);
     }
   };
 
