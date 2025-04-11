@@ -1,7 +1,7 @@
 // firebaseSetup.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
+import { initializeAuth, getAuth, getReactNativePersistence, Auth } from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -23,7 +23,7 @@ if (getApps().length === 0) {
   app = getApp();
 }
 
-let auth;
+let auth: Auth;
 try {
   auth = getAuth(app);
 } catch (error) {
