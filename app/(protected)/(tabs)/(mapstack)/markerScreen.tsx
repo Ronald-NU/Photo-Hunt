@@ -122,8 +122,8 @@ export default function MarkerScreen() {
                 <FlatList
                   style={GeneralStyle.list}
                   contentContainerStyle={{ 
-                    flexGrow: 1,
-                    paddingBottom: 100
+                    flexGrow: 0,
+                    paddingBottom: 20
                   }}
                   data={topScores}
                   keyExtractor={(item) => (item.playerID+item.playerID+item.score)}
@@ -222,8 +222,9 @@ const styles = StyleSheet.create({
   },
   scoresContainer: {
     width: '100%',
-    height: '40%',
-    marginBottom: 30,
+
+    flex: 0.8,
+    marginBottom: 20,
   },
   scoreRow: {
     flexDirection: 'row',
@@ -252,7 +253,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
-    height: 50,
+
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+
   },
   playButtonText: {
     color: colors.White,
