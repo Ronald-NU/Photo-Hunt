@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Vibration } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Vibration, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
@@ -8,6 +8,9 @@ import NotificationManager from '@/components/NotificationManager';
 import PuzzleSection from '@/components/PuzzleSection';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { Ionicons } from '@expo/vector-icons';
+import { auth } from '@/Firebase/firebaseSetup';
+import { getPuzzleLeaderBoard, createPlayDocument, updatePlayDataDocument } from '@/Firebase/firebaseHelperPlayData';
+import { PlayData, PuzzleData } from '@/Firebase/DataStructures';
 
 
 const PUZZLE_SIZE = {
@@ -34,20 +37,6 @@ const getBestHintMove = (current: number[], hidden: number, gridSize: number): n
   let bestMove = null;
   let bestScore = Infinity;
 
-  // Calculate current total distance
-  const getTotalDistance = (pieces: number[]) => {
-    let total = 0;
-    for (let i = 0; i < pieces.length; i++) {
-      if (i === hidden) continue;
-      const currentCoord = indexToCoord(i);
-      const correctCoord = indexToCoord(pieces[i]);
-      total += getManhattanDistance(currentCoord, correctCoord);
-    }
-    return total;
-  };
-
-  const currentTotalDistance = getTotalDistance(current);
-
   // Check each piece adjacent to the empty space
   for (const [dr, dc] of directions) {
     const nr = hiddenCoord[0] + dr;
@@ -67,21 +56,14 @@ const getBestHintMove = (current: number[], hidden: number, gridSize: number): n
     const swapped = [...current];
     [swapped[hidden], swapped[swapIndex]] = [swapped[swapIndex], swapped[hidden]];
     
-    // Calculate new total distance
-    const newTotalDistance = getTotalDistance(swapped);
-    
-    // Calculate individual piece improvements
+    // Calculate improvement for this specific piece
     const movedPieceNewCoord = indexToCoord(hidden);
     const movedPieceNewDistance = getManhattanDistance(movedPieceNewCoord, correctCoord);
     const movedPieceOldDistance = getManhattanDistance(currentCoord, correctCoord);
     const pieceImprovement = movedPieceOldDistance - movedPieceNewDistance;
 
-    // Score the move based on multiple factors
-    const score = (
-      newTotalDistance * 0.7 + // Overall state improvement (70% weight)
-      (currentTotalDistance - newTotalDistance) * 0.3 + // Total improvement (30% weight)
-      (pieceImprovement > 0 ? -10 : 10) // Bonus for improving the moved piece
-    );
+    // Score based only on this piece's improvement
+    const score = -pieceImprovement; // Negative because lower score is better
 
     if (score < bestScore) {
       bestScore = score;
@@ -96,15 +78,144 @@ export default function MapPuzzleScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   
-  const { imageUri, difficulty, locationName } = params;
-  const [moves, setMoves] = useState(0);
+  const { imageUri, difficulty, locationName, puzzleId } = params;
+  console.log('Received params:', { puzzleId, imageUri, difficulty, locationName });
+  
+  const [moves, setMoves] = useState<number | null>(null);
   const [pieces, setPieces] = useState<number[]>([]);
   const [hidden, setHidden] = useState<number | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [isSolving, setIsSolving] = useState(false);
+  const [playId, setPlayId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleBack = () => {
-    router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+  // Load saved moves from Firebase
+  useEffect(() => {
+    const loadSavedMoves = async () => {
+      console.log('Loading saved moves with:', { puzzleId, hasUser: !!auth.currentUser });
+      if (!auth.currentUser || !puzzleId) {
+        console.log('Cannot load saved moves:', { hasUser: !!auth.currentUser, hasPuzzleId: !!puzzleId });
+        return;
+      }
+      
+      try {
+        const leaderboard = await getPuzzleLeaderBoard(puzzleId as string);
+        console.log('Got leaderboard:', leaderboard);
+        if (Array.isArray(leaderboard)) {
+          const userPlay = leaderboard.find(play => play.playerID === auth.currentUser?.uid);
+          console.log('Found user play:', userPlay);
+          if (userPlay) {
+            setMoves(userPlay.score);
+            setPlayId(userPlay.id);
+          } else {
+            // Create new play record if none exists
+            const playData: PlayData = {
+              puzzleID: puzzleId as string,
+              playerID: auth.currentUser.uid,
+              name: auth.currentUser.displayName || 'Anonymous',
+              score: 0
+            };
+            console.log('Creating new play record with:', playData);
+            const newPlayId = await createPlayDocument(playData);
+            console.log('Got new play ID:', newPlayId);
+            if (newPlayId && typeof newPlayId === 'string') {
+              setPlayId(newPlayId);
+              setMoves(0);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved moves:', error);
+      }
+    };
+
+    loadSavedMoves();
+  }, [auth.currentUser, puzzleId]);
+
+  // Auto-save moves every 1.5 seconds when moves change
+  useEffect(() => {
+    if (moves !== null && moves > 0 && playId && !isSaving) {
+      const debounce = setTimeout(async () => {
+        await saveMovesToFirebase();
+      }, 1500);
+      return () => clearTimeout(debounce);
+    }
+  }, [moves, playId]);
+
+  const saveMovesToFirebase = async () => {
+    if (!auth.currentUser || !puzzleId || !playId || isSaving) {
+      console.error('Cannot save: missing required data', {
+        hasUser: !!auth.currentUser,
+        hasPuzzleId: !!puzzleId,
+        hasPlayId: !!playId,
+        isSaving
+      });
+      return false;
+    }
+    
+    if (moves === null) {
+      console.error('Cannot save: moves is null');
+      return false;
+    }
+    
+    try {
+      setIsSaving(true);
+      const playData: PlayData = {
+        puzzleID: puzzleId as string,
+        playerID: auth.currentUser.uid,
+        name: auth.currentUser.displayName || 'Anonymous',
+        score: moves
+      };
+      
+      const result = await updatePlayDataDocument(playId, playData);
+      if (result === true) {
+        console.log('Successfully saved moves:', moves);
+        return true;
+      } else {
+        console.error('Failed to save moves:', result);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving moves:', error);
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleBack = async () => {
+    if (moves !== null && moves > 0) {
+      Alert.alert(
+        "Save Progress?",
+        "Do you want to save your progress before leaving?",
+        [
+          {
+            text: "Save & Leave",
+            onPress: async () => {
+              const saved = await saveMovesToFirebase();
+              if (saved) {
+                router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+              } else {
+                Alert.alert("Error", "Failed to save progress. Please try again.");
+              }
+            }
+          },
+          {
+            text: "Leave Without Saving",
+            onPress: () => {
+              router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+            },
+            style: "destructive"
+          },
+          {
+            text: "Cancel",
+            style: "cancel"
+          }
+        ]
+      );
+    } else {
+      router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+    }
   };
 
   const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
@@ -131,16 +242,18 @@ export default function MapPuzzleScreen() {
     const piecesChanged = nextPieces.some((piece, index) => piece !== pieces[index]);
     if (piecesChanged) {
       Vibration.vibrate(50); // Only vibrate if pieces moved
+      setMoves(prev => (prev !== null ? prev + 1 : 1));
     }
 
     setPieces([...nextPieces]);
     setHidden(nextHidden);
-    setMoves(prev => prev + 1);
 
     // Check if puzzle is complete
     const isCorrect = nextPieces.every((piece, index) => piece === index);
     if (isCorrect) {
       setIsComplete(true);
+      // Save final moves when puzzle is completed
+      saveMovesToFirebase();
     }
   };
 
@@ -186,7 +299,7 @@ export default function MapPuzzleScreen() {
     animateMove();
   };
 
-  const giveHint = () => {
+  const giveHint = async () => {
     console.log('Give hint called with:', { hidden, isComplete, isSolving });
     if (isComplete || isSolving) return;
     if (hidden === null) {
@@ -198,9 +311,11 @@ export default function MapPuzzleScreen() {
     if (hint) {
       setPieces(hint);
       setHidden(hint.indexOf(totalPieces - 1));
-      setMoves(prev => prev + 1);
+      setMoves(prev => (prev !== null ? prev + 1 : 1));
       // Add vibration feedback for hint
       Vibration.vibrate(50);
+      // Save moves after hint
+      await saveMovesToFirebase();
     }
   };
 
@@ -237,7 +352,7 @@ export default function MapPuzzleScreen() {
 
       <View style={styles.puzzleContainer}>
         <View style={styles.puzzleWrapper}>
-          <Text style={styles.movesText}>Moves: {moves}</Text>
+          <Text style={styles.movesText}>Moves: {moves !== null ? moves : '...'}</Text>
           {pieces.length > 0?
           <PicturePuzzle
                   size={Dimensions.get('window').width - 40}

@@ -3,7 +3,7 @@ import { db } from "./firebaseSetup";
 import { CollectionPlay, PlayData, PuzzleData } from "@/Firebase/DataStructures";
 
 //New Leaderboard Creation (called before puzzle has been created)
-export const createPlayDocument = async (data: PuzzleData) => {
+export const createPlayDocument = async (data: PlayData) => {
     try {
         const docRef = await addDoc(collection(db, CollectionPlay), data);
         return docRef.id;
@@ -12,16 +12,15 @@ export const createPlayDocument = async (data: PuzzleData) => {
     }
 }
 
-
 //querys the puzzle leaderboard data by querying the playdata collection
 export const getPuzzleLeaderBoard = async (puzzleID: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionPlay));
-        var leaderboard:PlayData[] = []; 
+        const leaderboard: (PlayData & { id: string })[] = []; 
         querySnapshot.forEach((doc) => {
-            var docData = doc.data() as PlayData;
+            const docData = doc.data() as PlayData;
             if (puzzleID === docData.puzzleID) {
-                leaderboard.push(doc.data() as PlayData);
+                leaderboard.push({ ...docData, id: doc.id });
             }
         });
         return leaderboard;
