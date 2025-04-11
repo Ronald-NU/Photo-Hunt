@@ -53,12 +53,22 @@ export default function MarkerScreen() {
     router.push({
       pathname: "/(protected)/(tabs)/(mapstack)/puzzle",
       params: {
-        imageUri,
-        difficulty,
+        imageUri: imageUri,
+        difficulty: getDifficultyText(parseInt(difficulty as string)),
         locationName: puzzleName,
         puzzleId,
       }
     });
+  };
+
+
+  const getDifficultyText = (difficulty: number) => {
+    switch(difficulty) {
+      case 3: return "Easy";
+      case 4: return "Medium";
+      case 5: return "Hard";
+      default: return "Unknown";
+    }
   };
 
   const renderDifficultyStars = () => {
@@ -212,7 +222,7 @@ const styles = StyleSheet.create({
   },
   scoresContainer: {
     width: '100%',
-    flex: 1,
+    height: '40%',
     marginBottom: 30,
   },
   scoreRow: {
@@ -242,7 +252,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
-    marginTop: 'auto',
+    height: 50,
   },
   playButtonText: {
     color: colors.White,
