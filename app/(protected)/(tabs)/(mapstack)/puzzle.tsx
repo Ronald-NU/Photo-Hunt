@@ -30,9 +30,7 @@ export default function MapPuzzleScreen() {
 
   const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
   const imageURI = (imageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUri as string).split('token=')[1];
-  const source = React.useMemo(() => ({
-    uri: imageURI,
-  }), []);
+  const source = React.useMemo(() => ({ uri: imageURI }), [imageURI]);
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
   const totalPieces = gridSize * gridSize;
   useEffect(() => {
