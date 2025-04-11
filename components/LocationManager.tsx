@@ -91,7 +91,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   }, [onLocationSelect]);
 
   const handlePuzzlePress = useCallback(async (puzzle: PuzzleData) => {
-   // console.log('Puzzle pressed:', puzzle);
+    console.log('Puzzle pressed:', puzzle);
     
     // Navigate to marker screen
     router.push({
@@ -136,7 +136,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       )}
 
       {allPuzzles.map((puzzle) => {
-        //console.log('Rendering puzzle marker:', puzzle);
+        console.log('Rendering puzzle marker:', puzzle);
         const getMarkerColor = (difficulty: number) => {
           switch (difficulty) {
             case 3: // Easy

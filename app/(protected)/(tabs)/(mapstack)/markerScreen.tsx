@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { getPuzzleLeaderBoard } from '@/Firebase/firebaseHelperPlayData';
 import { getUserData } from '@/Firebase/firebaseHelperUsers';
 import { PlayData } from '@/Firebase/DataStructures';
 import NotificationManager from '@/components/NotificationManager';
+import { GeneralStyle, TextStyles } from '@/constants/Styles';
 
 const STAR_COLORS = {
   filled: '#FFD700', // Gold color for filled stars
@@ -20,16 +21,11 @@ export default function MarkerScreen() {
   const { puzzleId, puzzleName, creatorId, difficulty, imageUri } = params;
   const [creatorName, setCreatorName] = useState('');
   const [topScores, setTopScores] = useState<PlayData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const loadCreatorName = async () => {
-      const creator = await getUserData(creatorId as string);
-      if (creator) {
-        setCreatorName(creator.name);
-      }
-    };
 
-    const loadLeaderboard = async () => {
+  const fetchPlayData = useCallback(async () => {
+        setIsLoading(true);
       const leaderboardScores = await getPuzzleLeaderBoard(puzzleId as string);
       if (leaderboardScores && Array.isArray(leaderboardScores)) {
         // Sort by score (lower is better)
@@ -38,11 +34,20 @@ export default function MarkerScreen() {
           .slice(0, 5);
         setTopScores(sortedScores);
       }
-    };
+      setIsLoading(false);
+      }, []);
 
+  useEffect(() => {
+    setIsLoading(true);
+    const loadCreatorName = async () => {
+      const creator = await getUserData(creatorId as string);
+      if (creator) {
+        setCreatorName(creator.name);
+      }
+    };
     loadCreatorName();
-    loadLeaderboard();
-  }, [creatorId, puzzleId]);
+    fetchPlayData();
+  }, [creatorId, puzzleId, fetchPlayData]);
 
   const handlePlay = () => {
     router.push({
@@ -78,7 +83,7 @@ export default function MarkerScreen() {
       <Stack.Screen
         options={{
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.back()} onPressIn={() => router.back()}>
               <Text style={styles.headerButton}>Back</Text>
             </TouchableOpacity>
           ),
@@ -104,19 +109,46 @@ export default function MarkerScreen() {
 
         <View style={styles.scoresContainer}>
           <Text style={styles.sectionTitle}>Top Scores</Text>
-          {topScores.map((score, index) => (
-            <View key={index} style={styles.scoreRow}>
-              <Text style={styles.rankText}>{index + 1}st</Text>
-              <View style={styles.scoreBar}>
-                <View 
-                  style={[
-                    styles.scoreBarFill, 
-                    { width: `${(score.score / (topScores[0]?.score || 1)) * 100}%` }
-                  ]} 
+                <FlatList
+                  style={GeneralStyle.list}
+                  contentContainerStyle={{ 
+                    flexGrow: 1,
+                    paddingBottom: 100
+                  }}
+                  data={topScores}
+                  keyExtractor={(item) => (item.playerID+item.playerID+item.score)}
+                  renderItem={({ item, index }) => (
+                    <View style={[GeneralStyle.profileSection]}>
+                      {
+                        index === 0 ? (
+                          <Ionicons name="trophy" size={24} color={'#FFD700'} />
+                        ) : index === 1 ? (
+                          <Ionicons name="trophy" size={24} color={'#C0C0C0'} />
+                        ) : index === 2 ? (
+                          <Ionicons name="trophy" size={24} color={'#CE8946'} />
+                        ) : (
+                          <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
+                        )
+                      }
+                  <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
+                    <Text style={TextStyles.LargeText}>{item.name}</Text>
+                    <Text style={TextStyles.mediumText}>{item.score}</Text>
+                  </View>
+                  </View>
+                  )}
+                  ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>Leaderboard Couldn't Load</Text>
+                      <Text style={styles.emptySubText}>Refresh the Leaderboard!</Text>
+                    </View>
+                  )}
+                  refreshing={isLoading}
+                  onRefresh={fetchPlayData}
+                  showsVerticalScrollIndicator={true}
+                  initialNumToRender={10}
+                  maxToRenderPerBatch={10}
+                  windowSize={5}
                 />
-              </View>
-            </View>
-          ))}
         </View>
 
         <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
@@ -180,6 +212,7 @@ const styles = StyleSheet.create({
   },
   scoresContainer: {
     width: '100%',
+    flex: 1,
     marginBottom: 30,
   },
   scoreRow: {
@@ -215,5 +248,26 @@ const styles = StyleSheet.create({
     color: colors.White,
     fontSize: 18,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 50,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  emptySubText: {
+    fontSize: 16,
+    color: colors.Grey,
+    textAlign: 'center',
   },
 }); 
