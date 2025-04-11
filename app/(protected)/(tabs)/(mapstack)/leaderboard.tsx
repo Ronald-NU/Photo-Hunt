@@ -51,11 +51,11 @@ export default function LeaderboardScreen() {
           <View style={GeneralStyle.profileSection}>
             {
               index === 0 ? (
-                <Ionicons name="trophy" size={24} color={'#FFD700'} />
+                <Ionicons name="trophy" size={24} color={colors.Gold} />
               ) : index === 1 ? (
-                <Ionicons name="trophy" size={24} color={'#C0C0C0'} />
+                <Ionicons name="trophy" size={24} color={colors.Silver} />
               ) : index === 2 ? (
-                <Ionicons name="trophy" size={24} color={'#CE8946'} />
+                <Ionicons name="trophy" size={24} color={colors.Bronze} />
               ) : (
                 <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
               )
