@@ -105,7 +105,18 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       }
     });
   }, [router]);
-
+  const getMarkerColor = (difficulty: number) => {
+    switch (difficulty) {
+      case 3: // Easy
+        return '#4CAF50'; // 绿色
+      case 4: // Medium
+        return '#FFC107'; // 黄色
+      case 5: // Hard
+        return '#F44336'; // 红色
+      default:
+        return '#2196F3'; // 默认蓝色
+    }
+  };
   if (isLoading) {
     return (
       <View style={[styles.map, styles.loadingContainer]}>
@@ -136,19 +147,6 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       )}
 
       {allPuzzles.map((puzzle) => {
-        console.log('Rendering puzzle marker:', puzzle);
-        const getMarkerColor = (difficulty: number) => {
-          switch (difficulty) {
-            case 3: // Easy
-              return '#4CAF50'; // 绿色
-            case 4: // Medium
-              return '#FFC107'; // 黄色
-            case 5: // Hard
-              return '#F44336'; // 红色
-            default:
-              return '#2196F3'; // 默认蓝色
-          }
-        };
 
         return (
           <Marker
