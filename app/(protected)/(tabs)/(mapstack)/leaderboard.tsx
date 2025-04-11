@@ -65,7 +65,6 @@ export default function LeaderboardScreen() {
           <Text style={TextStyles.mediumText}>{item.score}</Text>
         </View>
         </View>
-          //  <PuzzleSection onPress={(()=>{})} item={item} />
         )}
         ListEmptyComponent={() => (
           <View style={styles.emptyContainer}>

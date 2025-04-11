@@ -14,7 +14,6 @@ export default function ProfilePuzzleScreen() {
   };
   const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
   const imageURI = (imageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUri as string).split('token=')[1];
-  console.log(imageURI as string);
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <Stack.Screen 
@@ -35,6 +34,7 @@ export default function ProfilePuzzleScreen() {
       />
 
       <View style={styles.puzzleContainer}>
+        
         <Image
           style={{
             width: Dimensions.get('window').width - 40,

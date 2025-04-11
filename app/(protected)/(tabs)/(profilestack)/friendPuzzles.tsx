@@ -14,6 +14,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
  const params = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  
 
   const getDifficultyText = (difficulty: number) => {
     switch(difficulty) {
@@ -68,6 +69,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
       // leads to GamePuzzle
       const pathname = "/(protected)/(tabs)/(mapstack)/puzzle";
       // Navigate to puzzle screen in the profilestack
+      console.log("puzzleData", puzzleData);
       router.push({
         pathname: pathname,
         params: {
