@@ -236,6 +236,9 @@ export default function MapPuzzleScreen() {
   const { imageUri, difficulty, locationName, puzzleId } = params;
   console.log('Received params:', { puzzleId, imageUri, difficulty, locationName });
   
+  const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
+  const totalPieces = gridSize * gridSize;
+  
   const [moves, setMoves] = useState<number | null>(null);
   const [pieces, setPieces] = useState<number[]>([]);
   const [hidden, setHidden] = useState<number | null>(null);
@@ -264,6 +267,14 @@ export default function MapPuzzleScreen() {
           if (userPlay) {
             setMoves(userPlay.score);
             setPlayId(userPlay.id);
+            // 如果拼图已经完成，立即设置完成状态
+            if (userPlay.isCompleted) {
+              setIsComplete(true);
+              // 设置正确的拼图状态
+              const correctPieces = Array.from({ length: totalPieces }, (_, i) => i);
+              setPieces(correctPieces);
+              setHidden(totalPieces - 1);
+            }
           } else {
             // Create new play record if none exists
             const playData: PlayData = {
@@ -287,7 +298,7 @@ export default function MapPuzzleScreen() {
     };
 
     loadSavedMoves();
-  }, [auth.currentUser, puzzleId]);
+  }, [auth.currentUser, puzzleId, totalPieces]);
 
   // Auto-save moves every 1.5 seconds when moves change
   useEffect(() => {
@@ -388,8 +399,6 @@ export default function MapPuzzleScreen() {
   const objectPath = encodeURIComponent((imageUri as string).split('/o/')[1].split('?')[0]);
   const imageURI = (imageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUri as string).split('token=')[1];
   const source = React.useMemo(() => ({ uri: imageURI }), [imageURI]);
-  const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
-  const totalPieces = gridSize * gridSize;
   useEffect(() => {
     // Initialize puzzle pieces
     const initialPieces = Array.from({ length: totalPieces }, (_, i) => i);
@@ -573,6 +582,8 @@ export default function MapPuzzleScreen() {
     }
   };
 
+  const isPuzzleLocked = isComplete;
+
   return (
     <SafeAreaView style={GeneralStyle.container}>
       <Stack.Screen 
@@ -612,10 +623,32 @@ export default function MapPuzzleScreen() {
                   size={Dimensions.get('window').width - 40}
                   pieces={pieces}
                   hidden={hidden}
-                  onChange={handleChange}
+                  onChange={isPuzzleLocked ? () => {} : handleChange}
                   source={source}
                 />
             :null}
+          {isComplete && (
+            <View style={styles.overlay}>
+              <Text style={styles.completedText}>🎉 Puzzle Completed!</Text>
+              <TouchableOpacity
+                style={styles.verifyButton}
+                onPress={() => {
+                  router.push({
+                    pathname: "/(protected)/(tabs)/(mapstack)/validateCamera",
+                    params: {
+                      puzzleId,
+                      playId,
+                      moves: moves?.toString(),
+                      originalImageUri: imageUri,
+                      locationName
+                    }
+                  });
+                }}
+              >
+                <Text style={styles.verifyText}>Verify</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -667,5 +700,32 @@ const styles = StyleSheet.create({
   },
   hintButtonDisabled: {
     opacity: 0.5,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 99,
+  },
+  completedText: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  verifyButton: {
+    backgroundColor: colors.Primary,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  verifyText: {
+    color: 'white',
+    fontSize: 16,
   },
 }); 

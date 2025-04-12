@@ -32,7 +32,7 @@ export default function ValidatePuzzleScreen() {
         {
           text: "Leave",
           style: "destructive",
-          onPress: () => router.push('/(protected)/(tabs)/(mapstack)/map')
+          onPress: () => router.replace("/(protected)/(tabs)/(mapstack)/map")
         }
       ]
     );
@@ -41,6 +41,7 @@ export default function ValidatePuzzleScreen() {
   const handleTakePhoto = async () => {
     try {
       setLoading(true);
+      setIsProcessing(true);
       
       // Request camera permissions
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -95,16 +96,7 @@ export default function ValidatePuzzleScreen() {
                 {
                   text: 'OK',
                   onPress: () => {
-                    router.push({
-                      pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
-                      params: {
-                        puzzleId: puzzleId,
-                        puzzleName: locationName,
-                        creatorId: auth.currentUser?.uid,
-                        difficulty: difficulty,
-                        imageUri: originalImageUri
-                      }
-                    });
+                    router.replace("/(protected)/(tabs)/(mapstack)/map");
                   },
                 },
               ]
@@ -132,16 +124,7 @@ export default function ValidatePuzzleScreen() {
                     {
                       text: 'OK',
                       onPress: () => {
-                        router.push({
-                          pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
-                          params: {
-                            puzzleId: puzzleId,
-                            puzzleName: locationName,
-                            creatorId: auth.currentUser?.uid,
-                            difficulty: difficulty,
-                            imageUri: originalImageUri
-                          }
-                        });
+                        router.replace("/(protected)/(tabs)/(mapstack)/map");
                       },
                     },
                   ]
@@ -175,6 +158,7 @@ export default function ValidatePuzzleScreen() {
       );
     } finally {
       setLoading(false);
+      setIsProcessing(false);
     }
   };
 

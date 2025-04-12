@@ -9,6 +9,7 @@ import { getUserData } from '@/Firebase/firebaseHelperUsers';
 import { PlayData } from '@/Firebase/DataStructures';
 import NotificationManager from '@/components/NotificationManager';
 import { GeneralStyle, TextStyles } from '@/constants/Styles';
+import { auth } from '@/Firebase/firebaseSetup';
 
 const STAR_COLORS = {
   filled: colors.Gold, // Gold color for filled stars
