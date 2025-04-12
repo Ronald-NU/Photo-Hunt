@@ -512,10 +512,18 @@ export default function MapPuzzleScreen() {
             `You completed the puzzle in ${moves} moves!`,
             [
               {
-                text: "OK",
+                text: "Verify",
                 onPress: () => {
-                  // Navigate back to marker screen
-                  router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
+                  router.push({
+                    pathname: "/(protected)/(tabs)/(mapstack)/validateCamera",
+                    params: {
+                      puzzleId,
+                      playId,
+                      moves: moves?.toString(),
+                      originalImageUri: imageUri,
+                      locationName
+                    }
+                  });
                 }
               }
             ]

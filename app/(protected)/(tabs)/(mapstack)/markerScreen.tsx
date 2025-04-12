@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/Colors';
@@ -35,7 +35,13 @@ export default function MarkerScreen() {
         setTopScores(sortedScores);
       }
       setIsLoading(false);
-      }, []);
+      }, [puzzleId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPlayData();
+    }, [fetchPlayData])
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -126,7 +132,7 @@ export default function MarkerScreen() {
                     paddingBottom: 20
                   }}
                   data={topScores}
-                  keyExtractor={(item) => (item.playerID+item.playerID+item.score)}
+                  keyExtractor={(item) => item.id || `${item.playerID}-${item.puzzleID}-${item.score}`}
                   renderItem={({ item, index }) => (
                     <View style={[GeneralStyle.profileSection]}>
                       {

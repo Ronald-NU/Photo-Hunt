@@ -56,11 +56,15 @@ export type geoLocationData = {
 };
 
 export type PlayData = {
+    id?: string;  // Optional because it's added after fetching from Firestore
     puzzleID: string;
     playerID: string;
     name: string;
     score: number;
     isCompleted?: boolean;
+    isPhotoVerified?: boolean;
+    verificationTimestamp?: number;
+    imageSimilarity?: number;
 };
 
 export type FriendRequest = {
