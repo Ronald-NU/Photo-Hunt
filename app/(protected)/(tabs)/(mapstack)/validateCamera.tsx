@@ -160,7 +160,7 @@ export default function ValidatePuzzleScreen() {
                       text: 'OK',
                       onPress: () => {
                         console.log('Navigating to marker screen with success');
-                        router.replace({
+                        router.dismissTo({
                           pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
                           params: {
                             puzzleId,
