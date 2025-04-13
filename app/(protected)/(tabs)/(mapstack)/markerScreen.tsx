@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
@@ -19,24 +19,29 @@ const STAR_COLORS = {
 export default function MarkerScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { puzzleId, puzzleName, creatorId, difficulty, imageUri } = params;
+  const { puzzleId, puzzleName, creatorId, difficulty, imageUri, verified } = params;
   const [creatorName, setCreatorName] = useState('');
   const [topScores, setTopScores] = useState<PlayData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (verified === 'true') {
+      Alert.alert("Verified", "Puzzle verified successfully! 🎉");
+    }
+  }, [verified]);
 
   const fetchPlayData = useCallback(async () => {
-        setIsLoading(true);
-      const leaderboardScores = await getPuzzleLeaderBoard(puzzleId as string);
-      if (leaderboardScores && Array.isArray(leaderboardScores)) {
-        // Sort by score (lower is better)
-        const sortedScores = leaderboardScores
-          .sort((a: PlayData, b: PlayData) => a.score - b.score)
-          .slice(0, 5);
-        setTopScores(sortedScores);
-      }
-      setIsLoading(false);
-      }, [puzzleId]);
+    setIsLoading(true);
+    const leaderboardScores = await getPuzzleLeaderBoard(puzzleId as string);
+    if (leaderboardScores && Array.isArray(leaderboardScores)) {
+      // Sort by score (lower is better)
+      const sortedScores = leaderboardScores
+        .sort((a: PlayData, b: PlayData) => a.score - b.score)
+        .slice(0, 5);
+      setTopScores(sortedScores);
+    }
+    setIsLoading(false);
+  }, [puzzleId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -68,7 +73,6 @@ export default function MarkerScreen() {
     });
   };
 
-
   const getDifficultyText = (difficulty: number) => {
     switch(difficulty) {
       case 3: return "Easy";
@@ -96,7 +100,7 @@ export default function MarkerScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GeneralStyle.container}>
       <Stack.Screen
         options={{
           headerLeft: () => (
@@ -126,51 +130,53 @@ export default function MarkerScreen() {
 
         <View style={styles.scoresContainer}>
           <Text style={styles.sectionTitle}>Top Scores</Text>
-                <FlatList
-                  style={GeneralStyle.list}
-                  contentContainerStyle={{ 
-                    flexGrow: 0,
-                    paddingBottom: 20
-                  }}
-                  data={topScores}
-                  keyExtractor={(item) => item.id || `${item.playerID}-${item.puzzleID}-${item.score}`}
-                  renderItem={({ item, index }) => (
-                    <View style={[GeneralStyle.profileSection]}>
-                      {
-                        index === 0 ? (
-                          <Ionicons name="trophy" size={24} color={colors.Gold} />
-                        ) : index === 1 ? (
-                          <Ionicons name="trophy" size={24} color={colors.Silver} />
-                        ) : index === 2 ? (
-                          <Ionicons name="trophy" size={24} color={colors.Bronze} />
-                        ) : (
-                          <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
-                        )
-                      }
-                  <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
-                    <Text style={TextStyles.LargeText}>{item.name}</Text>
-                    <Text style={TextStyles.mediumText}>{item.score}</Text>
-                  </View>
-                  </View>
-                  )}
-                  ListEmptyComponent={() => (
-                    <View style={styles.emptyContainer}>
-                      <Text style={styles.emptyText}>Leaderboard Couldn't Load</Text>
-                      <Text style={styles.emptySubText}>Refresh the Leaderboard!</Text>
-                    </View>
-                  )}
-                  refreshing={isLoading}
-                  onRefresh={fetchPlayData}
-                  showsVerticalScrollIndicator={true}
-                  initialNumToRender={10}
-                  maxToRenderPerBatch={10}
-                  windowSize={5}
-                />
+          <FlatList
+            style={GeneralStyle.list}
+            contentContainerStyle={{ 
+              flexGrow: 1,
+              paddingBottom: 100
+            }}
+            data={topScores}
+            keyExtractor={(item) => `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
+            renderItem={({ item, index }) => (
+              <View style={GeneralStyle.profileSection}>
+                {
+                  index === 0 ? (
+                    <Ionicons name="trophy" size={24} color={colors.Gold} />
+                  ) : index === 1 ? (
+                    <Ionicons name="trophy" size={24} color={colors.Silver} />
+                  ) : index === 2 ? (
+                    <Ionicons name="trophy" size={24} color={colors.Bronze} />
+                  ) : (
+                    <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
+                  )
+                }
+                <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
+                  <Text style={TextStyles.LargeText}>{item.name}</Text>
+                  <Text style={TextStyles.mediumText}>{item.score}</Text>
+                </View>
+              </View>
+            )}
+            ListEmptyComponent={() => (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Leaderboard Couldn't Load</Text>
+                <Text style={styles.emptySubText}>Refresh the Leaderboard!</Text>
+              </View>
+            )}
+            onRefresh={fetchPlayData}
+            refreshing={isLoading}
+            showsVerticalScrollIndicator={true}
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+          />
         </View>
 
-        <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
-          <Text style={styles.playButtonText}>Play/Resume</Text>
-        </TouchableOpacity>
+        {verified !== 'true' && (
+          <TouchableOpacity style={styles.playButton} onPress={handlePlay}>
+            <Text style={styles.playButtonText}>Play/Resume</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -229,7 +235,6 @@ const styles = StyleSheet.create({
   },
   scoresContainer: {
     width: '100%',
-
     flex: 0.8,
     marginBottom: 20,
   },
@@ -260,11 +265,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 25,
-
     width: '100%',
     alignItems: 'center',
     marginBottom: 20,
-
   },
   playButtonText: {
     color: colors.White,

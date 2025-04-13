@@ -1,8 +1,8 @@
 // app/(protected)/(tabs)/(mapstack)/validateCamera.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack, usePathname } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 import { colors } from '@/constants/Colors';
@@ -12,13 +12,28 @@ import { auth } from '@/Firebase/firebaseSetup';
 import { Ionicons } from '@expo/vector-icons';
 import { PlayData } from '@/Firebase/DataStructures';
 import { createPlayDocument } from '@/Firebase/firebaseHelperPlayData';
+import { router } from 'expo-router';
+
+function getDifficultyNumber(text: string): number {
+  switch (text) {
+    case "Easy": return 3;
+    case "Medium": return 4;
+    case "Hard": return 5;
+    default: return 0;
+  }
+}
 
 export default function ValidatePuzzleScreen() {
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const params = useLocalSearchParams();
   const { puzzleId, playId, moves, originalImageUri, locationName, difficulty } = params;
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log('Current path is:', pathname);
+  }, [pathname]);
 
   const handleBack = () => {
     Alert.alert(
@@ -32,7 +47,9 @@ export default function ValidatePuzzleScreen() {
         {
           text: "Leave",
           style: "destructive",
-          onPress: () => router.replace("/(protected)/(tabs)/(mapstack)/map")
+          onPress: () => {
+            router.back();
+          }
         }
       ]
     );
@@ -96,7 +113,18 @@ export default function ValidatePuzzleScreen() {
                 {
                   text: 'OK',
                   onPress: () => {
-                    router.replace("/(protected)/(tabs)/(mapstack)/map");
+                    console.log('Navigating to marker screen with success');
+                    router.replace({
+                      pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
+                      params: {
+                        puzzleId,
+                        difficulty: getDifficultyNumber(difficulty as string),
+                        imageUri: originalImageUri,
+                        puzzleName: locationName,
+                        creatorId: auth.currentUser?.uid,
+                        verified: 'true',
+                      },
+                    });
                   },
                 },
               ]
@@ -124,7 +152,19 @@ export default function ValidatePuzzleScreen() {
                     {
                       text: 'OK',
                       onPress: () => {
-                        router.replace("/(protected)/(tabs)/(mapstack)/map");
+                        console.log('Navigating to marker screen with success');
+                        router.replace({
+                          pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
+                          params: {
+                            puzzleId,
+                            playId,
+                            difficulty: getDifficultyNumber(difficulty as string),
+                            imageUri: originalImageUri,
+                            puzzleName: locationName,
+                            creatorId: auth.currentUser?.uid,
+                            verified: 'true',
+                          },
+                        });
                       },
                     },
                   ]

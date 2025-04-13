@@ -15,6 +15,7 @@ export default function MapStackLayout() {
           headerBackTitle: "Back to Map"
         }} 
       />
+      <Stack.Screen name="validateCamera" options={{ title: "Verify Completion", headerShown: true, headerBackTitle: "Back" }} />
     </Stack>
   );
 }
