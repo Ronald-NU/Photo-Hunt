@@ -29,6 +29,7 @@
 <li>Implemented notifications for users that can be set on individual puzzles that can be set a specified time</li>
 <li>Implemented leaderboards and scoring mechanism and updated users scores</li>
 <li>Bug fixes for puzzles and firebase image storage and retrieval</li>
+<li>Implemented photo comparision between puzzle photo and verification photo using Azure Computer Vision</li>
 </l>
 
 <h3>Sisi You</h3>
@@ -144,6 +145,10 @@
     <img src="screenshots/profile.PNG" alt="Profile Screen" style="width: 40%;">
     <p><strong>Profile Screen</strong></p>
   </div>
+  <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/notificationPopup.png" alt="Notification Pop up" style="width: 40%;">
+    <p><strong>Notification Pop Up</strong></p>
+  </div>
     <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/reminder.png" alt="Reminder Screen" style="width: 40%;">
     <p><strong>Reminder Screen</strong></p>
@@ -256,6 +261,7 @@ Play records contain:
 - playerId (string): ID of the player
 - name (string): Player's name
 - score (number): Score achieved
+- move (number): moves made
 
 #### Supporting Types
 
@@ -401,6 +407,17 @@ Play records contain:
     <li>Returns storage reference path</li>
   </ul>
 </li>
+<li><b>uploadImageAzureFirebase</b>
+  <ul>
+  <li>uploads image for purpose for photo verification</li>
+  <li>returns the storage download url</li>
+  </ul>
+</li>
+<li><b>deleteImage</b>
+  <ul>
+  <li>deletes stored based on downloadurl of image</li>
+  </ul>
+</li>
 </l>
 
 <h2>Firestore Security Rules</h2>
@@ -484,6 +501,19 @@ npm install
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "your-cert-url"
+}
+```
+
+<h4>Azure Computer Vision</h4>
+<p>The app requires a Azure Computer Vision API for photo comparision. Follow these steps:</p>
+
+1. Create a file named `azure-endpoints.js` in the `config` directory
+2. Contact the development team to obtain the service account credentials
+3. The file structure should look like this:
+```javascript
+export const azureEndpoints = {
+  "Endpoint":"your-endpoint/vision/v3.2/analyze?visualFeatures=Tags,Description",
+  "Key":"your-key"  
 }
 ```
 
