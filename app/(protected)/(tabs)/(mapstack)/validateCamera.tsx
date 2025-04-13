@@ -15,6 +15,8 @@ import { createPlayDocument } from '@/Firebase/firebaseHelperPlayData';
 import { router } from 'expo-router';
 import { useUser } from '@/components/UserContext';
 import { scoreCalulation } from '@/components/HelperFunctions';
+import { compareImagesAzure } from '@/utils/azureImageComparison';
+import { deleteImage, uploadImageAzureFirebase } from '@/Firebase/firestoreHelper';
 
 function getDifficultyNumber(text: string): number {
   switch (text) {
@@ -90,9 +92,16 @@ export default function ValidatePuzzleScreen() {
         throw new Error('Failed to capture photo');
       }
 
-      // Compare images
       const comparisonResult = await compareImages(originalImageUri as string, photo.uri);
-      
+      const imageUrl = await uploadImageAzureFirebase(photo.uri, 'verificationPhotos');
+      const objectPath = encodeURIComponent((originalImageUri as string).split('/o/')[1].split('?')[0]);
+      const neworiginalimageURI = (originalImageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUrl as string).split('token=')[1];
+      const results = await compareImagesAzure(neworiginalimageURI, imageUrl)
+      console.log('Comparison results:', results);
+      if(results != undefined) {
+      comparisonResult.similarity = parseFloat(results.score);
+      comparisonResult.isSimilar = parseFloat(results.score) > 64; // Adjust threshold as needed
+      }
       if (comparisonResult.isSimilar) {
         try {
           // Update verification results
@@ -117,8 +126,7 @@ export default function ValidatePuzzleScreen() {
               [
                 {
                   text: 'OK',
-                  onPress: () => {
-                    console.log(difficulty)
+                  onPress: async () => {
                     console.log('Navigating to marker screen with success');
                     router.dismissTo({
                       pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
@@ -131,6 +139,7 @@ export default function ValidatePuzzleScreen() {
                         verified: 'true',
                       },
                     });
+                    await deleteImage(imageUrl);
                   },
                 },
               ]
@@ -158,7 +167,7 @@ export default function ValidatePuzzleScreen() {
                   [
                     {
                       text: 'OK',
-                      onPress: () => {
+                      onPress: async () => {
                         console.log('Navigating to marker screen with success');
                         router.dismissTo({
                           pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
@@ -172,6 +181,7 @@ export default function ValidatePuzzleScreen() {
                             verified: 'true',
                           },
                         });
+                        await deleteImage(imageUrl);
                       },
                     },
                   ]

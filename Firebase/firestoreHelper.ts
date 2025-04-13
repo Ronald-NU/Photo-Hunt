@@ -1,9 +1,8 @@
 import { storage } from "./firebaseSetup";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
-
 /**
 
  * @param uri 
@@ -163,5 +162,44 @@ export const storeImage = async (imageURI: string): Promise<string> => {
   } catch (err) {
     console.error("🔥 Upload failed:", err);
     throw err;
+  }
+};
+
+export const uploadImageAzureFirebase = async (fileUri: string, folderPath: string): Promise<string> => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+
+    // Create unique filename
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const storageRef = ref(storage, `${folderPath}/${user.uid}/${fileName}`);
+
+    // Read file as blob
+    const response = await fetch(fileUri);
+    if (!response.ok) throw new Error(`Failed to read file: ${response.statusText}`);
+    const blob = await response.blob();
+
+    // Upload the file
+    const uploadTask = uploadBytesResumable(storageRef, blob);
+    const snapshot = await uploadTask;
+
+    // Get download URL
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+export const deleteImage = async (downloadURL: string) => {
+  try {
+    const storageRef = ref(storage, downloadURL);
+    await deleteObject(storageRef);
+    console.log('File deleted successfully');
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw error;
   }
 };
