@@ -27,6 +27,7 @@
 </li>
 <li>Enhanced UI/UX with bottom tab bar improvements and navigation flow optimization</li>
 <li>Implemented notifications for users that can be set on individual puzzles that can be set a specified time</li>
+<li>Implemented leaderboards and scoring mechanism and updated users scores</li>
 <li>Bug fixes for puzzles and firebase image storage and retrieval</li>
 </l>
 
