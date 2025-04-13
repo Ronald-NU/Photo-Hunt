@@ -36,8 +36,8 @@ export default function MarkerScreen() {
       // Sort by score (lower is better)
       const completedGames = leaderboardScores.filter((score: PlayData) => score.isCompleted === true);
       const sortedScores = completedGames
-        .sort((a: PlayData, b: PlayData) => a.score - b.score)
-        .slice(0, 5);
+        .sort((a: PlayData, b: PlayData) => b.score - a.score)
+        .slice(0, 10); // Get top 10 scores
       setTopScores(sortedScores);
     }
     setIsLoading(false);
