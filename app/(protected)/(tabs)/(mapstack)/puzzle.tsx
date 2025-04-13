@@ -234,7 +234,7 @@ export default function MapPuzzleScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
 
-  const { user } = useUser();
+  const { user, id } = useUser();
   
   const { imageUri, difficulty, locationName, puzzleId, creatorId } = params;
   console.log('Received params:', { puzzleId, imageUri, difficulty, locationName });
@@ -268,7 +268,7 @@ export default function MapPuzzleScreen() {
           const userPlay = leaderboard.find(play => play.playerID === auth.currentUser?.uid);
           console.log('Found user play:', userPlay);
           if (userPlay) {
-            setMoves(userPlay.score);
+            setMoves(userPlay.moves);
             setPlayId(userPlay.id);
             // 如果拼图已经完成，立即设置完成状态
             if (userPlay.isCompleted) {
@@ -284,6 +284,7 @@ export default function MapPuzzleScreen() {
               puzzleID: puzzleId as string,
               playerID: auth.currentUser.uid,
               name: auth.currentUser.displayName || 'Anonymous',
+              moves: 0,
               score: 0
             };
             console.log('Creating new play record with:', playData);
@@ -343,11 +344,12 @@ export default function MapPuzzleScreen() {
         puzzleID: puzzleId as string,
         playerID: auth.currentUser.uid,
         name: user?.name || 'Anonymous',
+        moves: moves,
         score: moves,
         isCompleted: isComplete
       };
       
-      const result = await updatePlayDataDocument(playId, playData);
+      const result = await updatePlayDataDocument(playId, playData, id);
       if (result === true) {
         console.log('Successfully saved moves:', moves);
         return true;

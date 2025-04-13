@@ -30,7 +30,7 @@ export default function ValidatePuzzleScreen() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useLocalSearchParams();
-  const { user } = useUser();
+  const { user, id } = useUser();
   const { puzzleId, playId, moves, originalImageUri, locationName, difficulty, creatorId } = params;
   const [loading, setLoading] = useState(false);
 
@@ -97,7 +97,8 @@ export default function ValidatePuzzleScreen() {
         try {
           // Update verification results
           const updatedData: Partial<PlayData> = {
-            name: auth.currentUser?.displayName || 'Anonymous',
+            name: user?.name || 'Anonymous',
+            moves: parseInt(moves as string),
             isPhotoVerified: true,
             verificationTimestamp: Date.now(),
             imageSimilarity: comparisonResult.similarity,
@@ -106,7 +107,7 @@ export default function ValidatePuzzleScreen() {
           };
 
           // Try to update document
-          const updateResult = await updatePlayDataDocument(playId as string, updatedData as PlayData);
+          const updateResult = await updatePlayDataDocument(playId as string, updatedData as PlayData, id);
           
           if (updateResult === true) {
             // Show success message
@@ -141,6 +142,7 @@ export default function ValidatePuzzleScreen() {
                 puzzleID: puzzleId as string,
                 playerID: auth.currentUser.uid,
                 name: user?.name || 'Anonymous',
+                moves: parseInt(moves as string),
                 score: scoreCalulation(parseInt(moves as string),getDifficultyNumber(difficulty as string)),
                 isCompleted: true,
                 isPhotoVerified: true,

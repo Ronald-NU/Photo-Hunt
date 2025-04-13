@@ -34,7 +34,7 @@ export default function MarkerScreen() {
     const leaderboardScores = await getPuzzleLeaderBoard(puzzleId as string);
     if (leaderboardScores && Array.isArray(leaderboardScores)) {
       // Sort by score (lower is better)
-      const completedGames = leaderboardScores.filter((score: PlayData) => score.isCompleted === true);
+      const completedGames = leaderboardScores.filter((score: PlayData) => score.isCompleted === true && score.isPhotoVerified === true);
       const sortedScores = completedGames
         .sort((a: PlayData, b: PlayData) => b.score - a.score)
         .slice(0, 10); // Get top 10 scores

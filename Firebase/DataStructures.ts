@@ -60,6 +60,7 @@ export type PlayData = {
     puzzleID: string;
     playerID: string;
     name: string;
+    moves: number;
     score: number;
     isCompleted?: boolean;
     isPhotoVerified?: boolean;
