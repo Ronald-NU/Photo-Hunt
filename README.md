@@ -59,6 +59,7 @@
       <ul>
         <li>Interactive sliding puzzle gameplay</li>
         <li>Move tracking and scoring</li>
+        <li>Hint functions to help solve puzzles using A* algotithms</li>
         <li>Firebase integration for puzzle storage</li>
       </ul>
     </li>
@@ -97,6 +98,34 @@
         <li>Puzzle preview functionality</li>
         <li>Dynamic navigation handling</li>
         <li>Optimized image rendering</li>
+      </ul>
+    </li>
+  </ul>
+</li>
+
+<li>Puzzle Verification and Scoring System:
+  <ul>
+    <li>Enhanced MarkerScreen with:
+      <ul>
+        <li>Dynamic difficulty display system</li>
+        <li>Real-time top scores leaderboard</li>
+        <li>Weighted scoring based on difficulty</li>
+        <li>Integrated play/resume functionality</li>
+      </ul>
+    </li>
+    <li>Developed ValidateCamera system:
+      <ul>
+        <li>Photo verification workflow</li>
+        <li>Real-time image comparison</li>
+        <li>Score calculation and leaderboard updates</li>
+        <li>Completion status management</li>
+      </ul>
+    </li>
+    <li>Implemented Image Comparison System:
+      <ul>
+        <li>Image feature extraction</li>
+        <li>Similarity calculation algorithms</li>
+        <li>Threshold-based verification</li>
       </ul>
     </li>
   </ul>
@@ -140,8 +169,16 @@
     <p><strong>Camera Screen</strong></p>
   </div>
     <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/marker.PNG" alt="Marker Screen" style="width: 40%;">
+    <p><strong>Marker Screen</strong></p>
+  </div>
+     <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/puzzle.PNG" alt="Puzzle Screen" style="width: 40%;">
     <p><strong>Puzzle Screen</strong></p>
+  </div>
+      <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/validation.PNG" alt="validateCamera Screen" style="width: 40%;">
+    <p><strong>validateCamera Screen</strong></p>
   </div>
 </div>
 
