@@ -137,7 +137,7 @@ export default function MarkerScreen() {
               paddingBottom: 100
             }}
             data={topScores}
-            keyExtractor={(item) => `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
+            keyExtractor={(item) => item.id || `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
             renderItem={({ item, index }) => (
               <View style={GeneralStyle.profileSection}>
                 {
