@@ -13,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { PlayData } from '@/Firebase/DataStructures';
 import { createPlayDocument } from '@/Firebase/firebaseHelperPlayData';
 import { router } from 'expo-router';
+import { useUser } from '@/components/UserContext';
+import { scoreCalulation } from '@/components/HelperFunctions';
 
 function getDifficultyNumber(text: string): number {
   switch (text) {
@@ -28,7 +30,8 @@ export default function ValidatePuzzleScreen() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useLocalSearchParams();
-  const { puzzleId, playId, moves, originalImageUri, locationName, difficulty } = params;
+  const { user } = useUser();
+  const { puzzleId, playId, moves, originalImageUri, locationName, difficulty, creatorId } = params;
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -94,10 +97,11 @@ export default function ValidatePuzzleScreen() {
         try {
           // Update verification results
           const updatedData: Partial<PlayData> = {
+            name: auth.currentUser?.displayName || 'Anonymous',
             isPhotoVerified: true,
             verificationTimestamp: Date.now(),
             imageSimilarity: comparisonResult.similarity,
-            score: parseInt(moves as string),
+            score: scoreCalulation(parseInt(moves as string),getDifficultyNumber(difficulty as string)),
             isCompleted: true
           };
 
@@ -113,15 +117,16 @@ export default function ValidatePuzzleScreen() {
                 {
                   text: 'OK',
                   onPress: () => {
+                    console.log(difficulty)
                     console.log('Navigating to marker screen with success');
-                    router.replace({
+                    router.dismissTo({
                       pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
                       params: {
                         puzzleId,
                         difficulty: getDifficultyNumber(difficulty as string),
                         imageUri: originalImageUri,
                         puzzleName: locationName,
-                        creatorId: auth.currentUser?.uid,
+                        creatorId: creatorId,
                         verified: 'true',
                       },
                     });
@@ -135,8 +140,8 @@ export default function ValidatePuzzleScreen() {
               const newPlayData: PlayData = {
                 puzzleID: puzzleId as string,
                 playerID: auth.currentUser.uid,
-                name: auth.currentUser.displayName || 'Anonymous',
-                score: parseInt(moves as string),
+                name: user?.name || 'Anonymous',
+                score: scoreCalulation(parseInt(moves as string),getDifficultyNumber(difficulty as string)),
                 isCompleted: true,
                 isPhotoVerified: true,
                 verificationTimestamp: Date.now(),
@@ -161,7 +166,7 @@ export default function ValidatePuzzleScreen() {
                             difficulty: getDifficultyNumber(difficulty as string),
                             imageUri: originalImageUri,
                             puzzleName: locationName,
-                            creatorId: auth.currentUser?.uid,
+                            creatorId: creatorId,
                             verified: 'true',
                           },
                         });

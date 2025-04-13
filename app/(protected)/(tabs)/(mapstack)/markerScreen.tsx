@@ -9,7 +9,6 @@ import { getUserData } from '@/Firebase/firebaseHelperUsers';
 import { PlayData } from '@/Firebase/DataStructures';
 import NotificationManager from '@/components/NotificationManager';
 import { GeneralStyle, TextStyles } from '@/constants/Styles';
-import { auth } from '@/Firebase/firebaseSetup';
 
 const STAR_COLORS = {
   filled: colors.Gold, // Gold color for filled stars
@@ -35,7 +34,8 @@ export default function MarkerScreen() {
     const leaderboardScores = await getPuzzleLeaderBoard(puzzleId as string);
     if (leaderboardScores && Array.isArray(leaderboardScores)) {
       // Sort by score (lower is better)
-      const sortedScores = leaderboardScores
+      const completedGames = leaderboardScores.filter((score: PlayData) => score.isCompleted === true);
+      const sortedScores = completedGames
         .sort((a: PlayData, b: PlayData) => a.score - b.score)
         .slice(0, 5);
       setTopScores(sortedScores);
@@ -69,6 +69,7 @@ export default function MarkerScreen() {
         difficulty: getDifficultyText(parseInt(difficulty as string)),
         locationName: puzzleName,
         puzzleId,
+        creatorId
       }
     });
   };

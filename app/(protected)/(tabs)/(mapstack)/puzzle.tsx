@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth } from '@/Firebase/firebaseSetup';
 import { getPuzzleLeaderBoard, createPlayDocument, updatePlayDataDocument } from '@/Firebase/firebaseHelperPlayData';
 import { PlayData, PuzzleData } from '@/Firebase/DataStructures';
+import { useUser } from '@/components/UserContext';
 
 
 const PUZZLE_SIZE = {
@@ -232,8 +233,10 @@ const isSolvable = (tiles: number[], gridSize: number): boolean => {
 export default function MapPuzzleScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
+
+  const { user } = useUser();
   
-  const { imageUri, difficulty, locationName, puzzleId } = params;
+  const { imageUri, difficulty, locationName, puzzleId, creatorId } = params;
   console.log('Received params:', { puzzleId, imageUri, difficulty, locationName });
   
   const gridSize = PUZZLE_SIZE[difficulty as keyof typeof PUZZLE_SIZE];
@@ -339,7 +342,7 @@ export default function MapPuzzleScreen() {
       const playData: PlayData = {
         puzzleID: puzzleId as string,
         playerID: auth.currentUser.uid,
-        name: auth.currentUser.displayName || 'Anonymous',
+        name: user?.name || 'Anonymous',
         score: moves,
         isCompleted: isComplete
       };
@@ -446,21 +449,7 @@ export default function MapPuzzleScreen() {
     if (isCorrect && !isComplete) {
       setIsComplete(true);
       // Save final moves when puzzle is completed
-      saveMovesToFirebase().then(() => {
-        Alert.alert(
-          "Congratulations!",
-          `You completed the puzzle in ${moves} moves!`,
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                // Navigate back to marker screen
-                router.canGoBack() ? router.back() : router.push('/(protected)/(tabs)/(mapstack)/map');
-              }
-            }
-          ]
-        );
-      });
+      saveMovesToFirebase();
     }
   };
 
@@ -515,32 +504,10 @@ export default function MapPuzzleScreen() {
       if (isCorrect && !isComplete) {
         setIsComplete(true);
         // Save final moves when puzzle is completed
-        saveMovesToFirebase().then(() => {
-          Alert.alert(
-            "Congratulations! 🎉",
-            `You completed the puzzle in ${moves} moves!`,
-            [
-              {
-                text: "Verify",
-                onPress: () => {
-                  router.push({
-                    pathname: "/(protected)/(tabs)/(mapstack)/validateCamera",
-                    params: {
-                      puzzleId,
-                      playId,
-                      moves: moves?.toString(),
-                      originalImageUri: imageUri,
-                      locationName
-                    }
-                  });
-                }
-              }
-            ]
-          );
-        });
+        saveMovesToFirebase()
       }
     }
-  }, [pieces, totalPieces, isComplete, moves]);
+    }, [pieces, totalPieces, isComplete, moves]);
 
   const giveHint = async () => {
     console.log('Give hint called with:', { hidden, isComplete, isSolving });
@@ -553,7 +520,7 @@ export default function MapPuzzleScreen() {
 
     try {
       // 确保振动反馈
-      Vibration.vibrate(50);
+      Vibration.vibrate(20);
       
       const hint = getBestHintMove(pieces, hidden, gridSize);
       if (hint) {
@@ -640,7 +607,9 @@ export default function MapPuzzleScreen() {
                       playId,
                       moves: moves?.toString(),
                       originalImageUri: imageUri,
-                      locationName
+                      locationName,
+                      creatorId,
+                      difficulty
                     }
                   });
                 }}

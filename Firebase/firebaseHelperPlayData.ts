@@ -1,5 +1,5 @@
 import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
-import { db } from "./firebaseSetup";
+import { auth, db } from "./firebaseSetup";
 import { CollectionPlay, PlayData, PuzzleData } from "@/Firebase/DataStructures";
 
 //New Leaderboard Creation (called before puzzle has been created)
@@ -32,7 +32,19 @@ export const getPuzzleLeaderBoard = async (puzzleID: string) => {
 // updates the play data of a specific player for a for the database
 export const updatePlayDataDocument = async (id: string, data: PlayData) => {
     try {
-        await updateDoc(doc(db, CollectionPlay, id), data);
+        console.log("Updating play data for ID:", id, "with data:", data);
+        await updateDoc(doc(db, CollectionPlay, id), data).then( async () => {
+            console.log("Play data updated successfully");
+            const querySnapshot = await getDocs(collection(db, CollectionPlay));
+            const playerData: (PlayData)[] = []; 
+            querySnapshot.forEach((doc) => {
+            const docData = doc.data() as PlayData;
+            if (auth.currentUser?.uid === docData.playerID) {
+                playerData.push({ ...docData, id: doc.id });
+            }
+            console.log("Player data:", playerData);
+        });
+        })
         return true;
     } catch (e) {
         return e;

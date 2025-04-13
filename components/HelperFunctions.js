@@ -18,3 +18,9 @@ const haversineDistance = (coord1, coord2) => {
   
     return R * c; // Distance in miles
   };
+
+  export const scoreCalulation = (moves, size) => {
+    var score = size*500*size;
+    score = score - Math.floor(moves/100)*100-Math.floor(moves/10)*25;
+  return score
+  }
