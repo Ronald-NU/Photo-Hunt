@@ -1,7 +1,7 @@
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import * as Notifications from "expo-notifications";
-import React, { useState } from "react";
-import { Alert, Button, Modal, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Button, Modal, View, Text, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/Colors";
@@ -24,7 +24,13 @@ export const NotificationManager = ({title}:NotificationType) => {
     const [visible, setVisible] = useState(false);
     const [time, setTime] = useState<Date>(new Date());
     const [timeVal, setTimeVal] = useState<string>(`${new Date().getHours()}:${new Date().getMinutes()}`);
+    const [showPicker, setShowPicker] = useState(false);
 
+    useEffect(()=>{
+      if(Platform.OS === 'ios'){
+      setShowPicker(true);
+      }
+    },[])
 return (
     <View style={{justifyContent:'center', alignItems:'center'}}>
         <Modal visible={visible} animationType='slide' transparent={true}>
@@ -34,17 +40,21 @@ return (
             <Text style={[TextStyles.mediumText, {color:colors.Black, textAlign:'center', paddingVertical:16}]}>
                 Schedule a daily notification for {title} at the time below to continue your Photo Hunt!
             </Text>
-            <DateTimePicker
+           {Platform.OS !== 'ios'?<Button onPress={() => setShowPicker(true)} title='Select Time'/>:null}
+           {showPicker && <DateTimePicker
                 mode="time"
+                display="spinner"
                 value={time}
                 onChange={(event: any, selectedDate: Date | undefined) => {
                     if (selectedDate) {
                         setTime(selectedDate);
                         setTimeVal(`${selectedDate.getHours()}:${selectedDate.getMinutes()}`);
+                        Platform.OS !== 'ios'?setShowPicker(false):null;
                     }
                 }}
             />
-            <View style={{flexDirection:'row',justifyContent:'space-between', width:'90%'}}>
+              }
+            <View style={{flexDirection:'row',justifyContent:'space-between', width:'90%', paddingVertical:10}}>
             <Button title='Schedule Notification' onPress={() => {
                 scheduleNotificationHandler(title, timeVal);
                 setVisible(false)}}/>
