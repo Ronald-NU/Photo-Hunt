@@ -9,6 +9,7 @@ import { getUserData } from '@/Firebase/firebaseHelperUsers';
 import { PlayData } from '@/Firebase/DataStructures';
 import NotificationManager from '@/components/NotificationManager';
 import { GeneralStyle, TextStyles } from '@/constants/Styles';
+import { LeaderboardItem } from '@/components/LeaderboardItem';
 
 const STAR_COLORS = {
   filled: colors.Gold, // Gold color for filled stars
@@ -140,23 +141,7 @@ export default function MarkerScreen() {
             data={topScores}
             keyExtractor={(item) => item.id || `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
             renderItem={({ item, index }) => (
-              <View style={GeneralStyle.profileSection}>
-                {
-                  index === 0 ? (
-                    <Ionicons name="trophy" size={24} color={colors.Gold} />
-                  ) : index === 1 ? (
-                    <Ionicons name="trophy" size={24} color={colors.Silver} />
-                  ) : index === 2 ? (
-                    <Ionicons name="trophy" size={24} color={colors.Bronze} />
-                  ) : (
-                    <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
-                  )
-                }
-                <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
-                  <Text style={TextStyles.LargeText}>{item.name}</Text>
-                  <Text style={TextStyles.mediumText}>{item.score}</Text>
-                </View>
-              </View>
+              <LeaderboardItem item={item} index={index} />
             )}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
