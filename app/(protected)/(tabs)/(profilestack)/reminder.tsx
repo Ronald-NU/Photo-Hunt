@@ -4,7 +4,7 @@ import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { GeneralStyle } from "@/constants/Styles";
-import NotificationManager, { cancelAllNotifications, cancelNotificationByIdentifier, getAllScheduledNotifications } from "@/components/NotificationManager";
+import { cancelAllNotifications, cancelNotificationByIdentifier, getAllScheduledNotifications } from "@/components/NotificationManager";
 import { NotificationRequest } from "expo-notifications";
 import TouchableButton from "@/components/TouchableButton";
 import { colors } from "@/constants/Colors";

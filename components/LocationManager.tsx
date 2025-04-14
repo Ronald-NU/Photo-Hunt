@@ -5,7 +5,6 @@ import { StyleSheet, Alert, View, ActivityIndicator } from 'react-native';
 import { SelectedLocation } from '@/app/(protected)/(tabs)/(mapstack)';
 import { PuzzleData } from '@/Firebase/DataStructures';
 import { useRouter } from 'expo-router';
-import { getUserData } from '@/Firebase/firebaseHelperUsers';
 import { useUser } from '@/components/UserContext';
 
 interface LocationManagerProps {

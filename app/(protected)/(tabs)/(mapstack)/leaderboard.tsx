@@ -1,7 +1,6 @@
 import { useFocusEffect } from "expo-router";
 import { View, Text, StyleSheet, SafeAreaView, FlatList, Alert } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
-import { GeneralStyle, TextStyles } from "@/constants/Styles";
+import { GeneralStyle } from "@/constants/Styles";
 import { colors } from "@/constants/Colors";
 import { useCallback, useState } from "react";
 import { PlayData } from "@/Firebase/DataStructures";

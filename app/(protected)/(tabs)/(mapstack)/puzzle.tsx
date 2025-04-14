@@ -5,12 +5,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 import { colors } from '@/constants/Colors';
 import NotificationManager from '@/components/NotificationManager';
-import PuzzleSection from '@/components/PuzzleSection';
 import { PicturePuzzle } from 'react-native-picture-puzzle';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '@/Firebase/firebaseSetup';
 import { getPuzzleLeaderBoard, createPlayDocument, updatePlayDataDocument } from '@/Firebase/firebaseHelperPlayData';
-import { PlayData, PuzzleData } from '@/Firebase/DataStructures';
+import { PlayData } from '@/Firebase/DataStructures';
 import { useUser } from '@/components/UserContext';
 
 
@@ -589,7 +588,7 @@ export default function MapPuzzleScreen() {
           <Text style={styles.movesText}>Moves: {moves !== null ? moves : '...'}</Text>
           {pieces.length > 0?
           <PicturePuzzle
-                  size={Dimensions.get('window').width - 40}
+                  size={Math.round(Dimensions.get('window').width) - 40}
                   pieces={pieces}
                   hidden={hidden}
                   onChange={isPuzzleLocked ? () => {} : handleChange}

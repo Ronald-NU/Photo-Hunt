@@ -78,6 +78,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
+          puzzleId: puzzleData.id,
         }
       });
     } catch (error) {
@@ -95,7 +96,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
   }
 
   return (
-    <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
+    <SafeAreaView style={[GeneralStyle.container, { flex: 1}]}>
       <Stack.Screen 
         options={{ 
           title: `${params.name}'s Puzzles`,

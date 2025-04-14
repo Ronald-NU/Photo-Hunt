@@ -1,7 +1,7 @@
 import { colors } from "@/constants/Colors";
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import React from "react";
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Modal, StyleSheet } from "react-native";
 import TouchableButton from "./TouchableButton";
 
 interface ModalProps {

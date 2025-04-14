@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Button, TouchableOpacity, Platform, Alert, ActivityIndicator } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GeneralStyle, TextStyles } from "@/constants/Styles";
+import { GeneralStyle } from "@/constants/Styles";
 import { validateImage } from '@/utils/imageValidation';
 import * as FileSystem from 'expo-file-system';
 import { colors } from '@/constants/Colors';
