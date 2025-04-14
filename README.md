@@ -1,6 +1,8 @@
 <h1>Photo Hunt</h1>
 <h2>Description</h2>
 <p>Photo Hunt is an interactive puzzle game that turns your city into an adventure! Capture photos of unique locations, transform them into sliding puzzles, and challenge your friends to solve and find them. Using AI-powered image recognition, the app verifies if players take photos at the correct location before completing the puzzle and competing against their friends and others on the leaderboards!</p>
+<h3>Demo</h3>
+<p><a href="https://www.youtube.com/watch?v=18Sh4UxvZps">https://www.youtube.com/watch?v=18Sh4UxvZps</a></p>
 <h2>Contributions</h2>
 <p>All the contributions to the project currently!</p>
 <h3>Ronald Mundell</h3>
