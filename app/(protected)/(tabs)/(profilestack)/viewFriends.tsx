@@ -118,8 +118,8 @@ export default function ViewFriendsScreen() {
 };
 
   return (
-    <SafeAreaView style={[GeneralStyle.container, {paddingTop: '8%'}]}>
-      <View style={{height:40, width:'90%', marginBottom: 10, flexDirection:'row', 
+    <SafeAreaView style={[GeneralStyle.container]}>
+      <View style={{paddingTop:10, width:'90%', marginBottom: 10, flexDirection:'row', 
         justifyContent:'space-evenly',
         alignContent:'space-between'}}>
        <View style={[GeneralStyle.searchContainer,{width:'20%', flexGrow:1, marginRight:10}]}>
