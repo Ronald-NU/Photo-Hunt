@@ -5,6 +5,8 @@ import { StyleSheet, Alert, View, ActivityIndicator } from 'react-native';
 import { SelectedLocation } from '@/app/(protected)/(tabs)/(mapstack)';
 import { PuzzleData } from '@/Firebase/DataStructures';
 import { useRouter } from 'expo-router';
+import { getUserData } from '@/Firebase/firebaseHelperUsers';
+import { useUser } from '@/components/UserContext';
 
 interface LocationManagerProps {
   onLocationSelect: (location: SelectedLocation | null) => void;
@@ -23,6 +25,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const [currentRegion, setCurrentRegion] = useState<Region>(DEFAULT_REGION);
   const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
   const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
     //console.log('LocationManager received puzzles:', allPuzzles);
@@ -43,7 +46,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
         const location = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Balanced,
         });
-        //console.log('Current location:', location);
+      //  console.log('Current location:', location);
 
         if (isMounted) {
           const newRegion = {
@@ -87,22 +90,33 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
     }
   }, [onLocationSelect]);
 
-  const handlePuzzlePress = useCallback((puzzle: PuzzleData) => {
-    //console.log('Puzzle pressed:', puzzle);
+  const handlePuzzlePress = useCallback(async (puzzle: PuzzleData) => {
+    console.log('Puzzle pressed:', puzzle);
+    
+    // Navigate to marker screen
     router.push({
-      pathname: "/(protected)/(tabs)/(mapstack)/puzzle",
+      pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
       params: {
+        puzzleId: puzzle.id,
+        puzzleName: puzzle.name,
+        creatorId: puzzle.creatorID,
+        difficulty: puzzle.difficulty.toString(),
         imageUri: puzzle.photoURL,
-        difficulty: puzzle.difficulty === 3 ? "Easy" : puzzle.difficulty === 4 ? "Medium" : "Hard",
-        locationName: puzzle.name,
-        latitude: puzzle.geoLocation.latitude.toString(),
-        longitude: puzzle.geoLocation.longitude.toString(),
-        isFromMyPuzzles: "false",
-        isFromMap: "true"
       }
     });
   }, [router]);
-
+  const getMarkerColor = (difficulty: number) => {
+    switch (difficulty) {
+      case 3: // Easy
+        return '#4CAF50'; // 绿色
+      case 4: // Medium
+        return '#FFC107'; // 黄色
+      case 5: // Hard
+        return '#F44336'; // 红色
+      default:
+        return '#2196F3'; // 默认蓝色
+    }
+  };
   if (isLoading) {
     return (
       <View style={[styles.map, styles.loadingContainer]}>
@@ -133,19 +147,6 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
       )}
 
       {allPuzzles.map((puzzle) => {
-        //console.log('Rendering puzzle marker:', puzzle);
-        const getMarkerColor = (difficulty: number) => {
-          switch (difficulty) {
-            case 3: // Easy
-              return '#4CAF50'; // 绿色
-            case 4: // Medium
-              return '#FFC107'; // 黄色
-            case 5: // Hard
-              return '#F44336'; // 红色
-            default:
-              return '#2196F3'; // 默认蓝色
-          }
-        };
 
         return (
           <Marker

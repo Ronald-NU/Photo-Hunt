@@ -9,6 +9,17 @@ import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import { validateImage } from '@/utils/imageValidation';
 import * as FileSystem from 'expo-file-system';
 import { colors } from '@/constants/Colors';
+import { createPuzzleDocument } from '@/Firebase/firebaseHelperPuzzles';
+import { getAuth } from 'firebase/auth';
+import { PuzzleData } from '@/Firebase/DataStructures';
+import { getUserData, updateUserDocument } from '@/Firebase/firebaseHelperUsers';
+import NetInfo from '@react-native-community/netinfo';
+import { storeImage } from '@/Firebase/firestoreHelper';
+
+// Helper function to generate unique ID
+const generateUniqueId = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+};
 
 export default function CameraScreen() {
   const router = useRouter();
@@ -50,7 +61,8 @@ export default function CameraScreen() {
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.7,
+        exif: false,
       });
       
       console.log('Camera result:', result);
@@ -59,10 +71,9 @@ export default function CameraScreen() {
         const originalUri = result.assets[0].uri;
         console.log('Original image URI:', originalUri);
 
-        // 生成一个唯一的文件名
+        // Generate a unique filename
         const fileName = `photo_${Date.now()}.jpg`;
         const newUri = `${FileSystem.cacheDirectory}${fileName}`;
-
 
         await FileSystem.copyAsync({
           from: originalUri,
@@ -71,11 +82,9 @@ export default function CameraScreen() {
 
         console.log('New image URI:', newUri);
         
-
         const fileInfo = await FileSystem.getInfoAsync(newUri);
         console.log('New image exists check:', fileInfo);
         
-
         const validation = await validateImage(newUri);
         console.log('Validation result:', validation);
         
@@ -113,23 +122,205 @@ export default function CameraScreen() {
     }
   };
 
-  const handleCreatePuzzle = () => {
+  const checkNetworkConnection = async () => {
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        Alert.alert(
+          "Network Error",
+          "Please check your internet connection and try again.",
+          [{ text: "OK" }]
+        );
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Network check error:', error);
+      return false;
+    }
+  };
+
+  const compressImage = async (uri: string): Promise<string> => {
+    try {
+      // First, get the image info
+      const imageInfo = await FileSystem.getInfoAsync(uri);
+      if (!imageInfo.exists) {
+        throw new Error('Image file does not exist');
+      }
+
+      // If the image is already small enough, return the original
+      if (imageInfo.size && imageInfo.size < 500 * 1024) { // 500KB
+        return uri;
+      }
+
+      // Create a compressed version
+      const compressedUri = `${FileSystem.cacheDirectory}compressed_${Date.now()}.jpg`;
+      
+      // Use ImageManipulator to compress the image
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.3, // More aggressive compression
+        base64: false,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        throw new Error('Image compression failed');
+      }
+
+      // Copy the compressed image to our cache directory
+      await FileSystem.copyAsync({
+        from: result.assets[0].uri,
+        to: compressedUri
+      });
+
+      return compressedUri;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      throw error;
+    }
+  };
+
+  const uploadImageToFirebase = async (uri: string): Promise<string> => {
+    try {
+      // Check network connection first
+      const isConnected = await checkNetworkConnection();
+      if (!isConnected) {
+        throw new Error("No network connection");
+      }
+
+      console.log('Starting image upload process...');
+      console.log('File path:', uri);
+
+      // Use the storeImage function from firestoreHelper
+      const photoURL = await storeImage(uri);
+      console.log('Image uploaded successfully:', photoURL);
+
+      return photoURL;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      throw error;
+    }
+  };
+
+  const createPuzzleInBackground = async () => {
     if (!location) {
       Alert.alert("Error", "Location data is not available. Please try again.");
       return;
     }
 
-    // Navigate to puzzle screen with all necessary data
-    router.push({
-      pathname: "puzzle",
-      params: {
-        imageUri,
-        difficulty,
-        locationName,
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+    // Check network connection first
+    const isConnected = await checkNetworkConnection();
+    if (!isConnected) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("User not authenticated. Please sign in again.");
       }
-    });
+
+      // Upload image to Firebase Storage
+      let photoURL;
+      try {
+        console.log('Uploading image to Firebase Storage...');
+        photoURL = await uploadImageToFirebase(imageUri);
+        console.log('Image uploaded successfully:', photoURL);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        Alert.alert(
+          "Error",
+          "Failed to upload image. Please try again.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+      var difVal = 4;
+      if(difficulty === 'Easy') {
+        difVal = 3;
+      }
+      if(difficulty === 'Medium') {
+        difVal = 4;
+      }
+      if(difficulty === 'Hard') {
+        difVal = 5;
+      }
+      const puzzleId = generateUniqueId();
+      const puzzleData: PuzzleData = {
+        id: puzzleId,
+        creatorID: user.uid,
+        name: locationName as string,
+        geoLocation: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude
+        },
+        photoURL: photoURL,
+        difficulty: difVal
+      };
+
+      // Create puzzle document
+      try {
+        const createdPuzzleId = await createPuzzleDocument(user.uid, puzzleData);
+        if (!createdPuzzleId) {
+          throw new Error("Failed to create puzzle document in database");
+        }
+
+        // Get current user data
+        const userData = await getUserData(user.uid);
+        const currentPuzzles = userData?.mypuzzles || [];
+        if(userData) {
+        // Add new puzzle to the array
+        var difVal = 4;
+        if(difficulty === 'Easy') {
+          difVal = 3;
+        }
+        if(difficulty === 'Medium') {
+          difVal = 4;
+        }
+        if(difficulty === 'Hard') {
+          difVal = 5;
+        }
+        userData.mypuzzles = [...currentPuzzles, {
+          id: puzzleId,
+          name: locationName as string,
+          difficulty: difVal
+        }];
+        // Update user's mypuzzles array with the combined list
+        await updateUserDocument(userData?.id as string, userData);
+        }
+        Alert.alert("Success", "Puzzle created successfully!");
+        router.back();
+      } catch (dbError: unknown) {
+        console.error('Database operation failed:', dbError);
+        const errorMessage = dbError instanceof Error ? dbError.message : 'Unknown database error';
+        Alert.alert(
+          "Database Error",
+          `Failed to save puzzle: ${errorMessage}`,
+          [{ text: "OK" }]
+        );
+      }
+    } catch (error: unknown) {
+      console.error('Error creating puzzle:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      Alert.alert(
+        "Error",
+        `Failed to create puzzle: ${errorMessage}`,
+        [{ text: "OK" }]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -158,7 +349,6 @@ export default function CameraScreen() {
                   });
                 }}
               />
-
             </View>
           ) : (
             <Text style={styles.label}>No image taken yet.</Text>
@@ -177,11 +367,11 @@ export default function CameraScreen() {
           {imageUri && (
             <TouchableOpacity
               style={[styles.button, styles.primaryButton]}
-              onPress={handleCreatePuzzle}
+              onPress={createPuzzleInBackground}
               disabled={loading}
             >
               <Text style={[styles.buttonText, styles.primaryButtonText]}>
-                Create Puzzle
+                Save Puzzle
               </Text>
             </TouchableOpacity>
           )}
@@ -207,11 +397,9 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 12,
-
     backgroundColor: '#f5f5f5',
   },
   imageContainer: {
-
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -248,20 +436,15 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   primaryButton: {
     backgroundColor: '#00A9E0',
   },
   buttonText: {
-    fontSize: 16,
+    textAlign: 'center',
     color: colors.Grey,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '500',
   },
   primaryButtonText: {
     color: colors.White,

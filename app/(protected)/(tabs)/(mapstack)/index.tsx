@@ -12,7 +12,6 @@ import * as Location from 'expo-location';
 import { colors } from '@/constants/Colors';
 import * as Notifications from 'expo-notifications';
 import { verifyPermissions } from '@/components/NotificationManager';
-import Constants from 'expo-constants';
 
 export interface SelectedLocation {
   name: string;

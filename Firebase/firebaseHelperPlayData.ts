@@ -1,9 +1,11 @@
 import { collection, addDoc, doc, deleteDoc, getDocs, updateDoc } from "firebase/firestore"; 
-import { db } from "./firebaseSetup";
+import { auth, db } from "./firebaseSetup";
 import { CollectionPlay, PlayData, PuzzleData } from "@/Firebase/DataStructures";
+import { updateUserDocument } from "./firebaseHelperUsers";
+import { useUser } from "@/components/UserContext";
 
 //New Leaderboard Creation (called before puzzle has been created)
-export const createPlayDocument = async (data: PuzzleData) => {
+export const createPlayDocument = async (data: PlayData) => {
     try {
         const docRef = await addDoc(collection(db, CollectionPlay), data);
         return docRef.id;
@@ -12,16 +14,15 @@ export const createPlayDocument = async (data: PuzzleData) => {
     }
 }
 
-
 //querys the puzzle leaderboard data by querying the playdata collection
 export const getPuzzleLeaderBoard = async (puzzleID: string) => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionPlay));
-        var leaderboard:PlayData[] = []; 
+        const leaderboard: (PlayData & { id: string })[] = []; 
         querySnapshot.forEach((doc) => {
-            var docData = doc.data() as PlayData;
-            if (puzzleID === docData.puzzleId) {
-                leaderboard.push(doc.data() as PlayData);
+            const docData = doc.data() as PlayData;
+            if (puzzleID === docData.puzzleID) {
+                leaderboard.push({ ...docData, id: doc.id });
             }
         });
         return leaderboard;
@@ -31,9 +32,26 @@ export const getPuzzleLeaderBoard = async (puzzleID: string) => {
 }
 
 // updates the play data of a specific player for a for the database
-export const updatePlayDataDocument = async (id: string, data: PlayData) => {
+export const updatePlayDataDocument = async (playid: string, data: PlayData, userId: string) => {
     try {
-        await updateDoc(doc(db, CollectionPlay, id), data);
+        await updateDoc(doc(db, CollectionPlay, playid), data);
+        if (data.isPhotoVerified) {
+            console.log("Play data updated successfully");
+            var score = 0;
+            const querySnapshot = await getDocs(collection(db, CollectionPlay));
+            const playerData: (PlayData)[] = []; 
+            querySnapshot.forEach((doc) => {
+            const docData = doc.data() as PlayData;
+            if (auth.currentUser?.uid === docData.playerID && docData.isPhotoVerified) {
+                playerData.push({ ...docData, id: doc.id });
+                score = score + docData.score;
+            }
+        });
+        await updateUserDocument(userId, {
+            score: score
+        });
+        console.log("Player data:", playerData, "Score:", score);
+    }
         return true;
     } catch (e) {
         return e;

@@ -1,9 +1,10 @@
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import * as Notifications from "expo-notifications";
 import React, { useState } from "react";
-import { Alert, Button, Modal, View, Text } from "react-native";
+import { Alert, Button, Modal, View, Text, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import TouchableButton from "./TouchableButton";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/Colors";
 
 export  const verifyPermissions = async () => {
@@ -32,7 +33,7 @@ return (
                     <View style={GeneralStyle.modalContainer}>
             <Text style={[GeneralStyle.title,{color:colors.Black}]}>{title}</Text>
             <Text style={[TextStyles.mediumText, {color:colors.Black, textAlign:'center', paddingVertical:16}]}>
-                Schedule a daily notification for {title} at a specific time to continue your Photo Hunt!
+                Schedule a daily notification for {title} at the time below to continue your Photo Hunt!
             </Text>
             <DateTimePicker
                 mode="time"
@@ -54,7 +55,9 @@ return (
             </View>
         </Modal>
      {
-        <TouchableButton title='Set a Reminder' onPress={() => setVisible(true)}/>
+        <TouchableOpacity onPress={() => setVisible(true)} onPressIn={() => setVisible(true)}>
+          <Ionicons name="notifications-outline" size={24} color="gold"/>
+        </TouchableOpacity>
      } 
     </View>
   )
@@ -66,7 +69,7 @@ export const scheduleNotificationHandler = async (title:string, time:string) => 
       await Notifications.scheduleNotificationAsync({
         content: {
           title: title,
-          body: `Remember to attempt Photo Hunt ${title}!`,
+          body: `Come back to your ${title} Photo Hunt!`,
         },
         trigger: {type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: parseInt(time.split(':')[0]), minute: parseInt(time.split(':')[1])},
       });
@@ -85,10 +88,14 @@ export const scheduleNotificationHandler = async (title:string, time:string) => 
     return scheduled;
   }
 
-  export async function cancelNotificationById(notificationId: string) {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
-    console.log(`Notification with ID ${notificationId} cancelled`);
+  export async function cancelAllNotifications() {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    for (const notification of scheduled) {
+      await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+    }
+    console.log('All notifications cancelled');
   }
+
   export async function cancelNotificationByIdentifier(identifier: string) {
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
     const notification = scheduled.find((n) => n.identifier === identifier);

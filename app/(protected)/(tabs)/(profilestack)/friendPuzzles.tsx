@@ -14,6 +14,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
  const params = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  
 
   const getDifficultyText = (difficulty: number) => {
     switch(difficulty) {
@@ -25,12 +26,14 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
   };
 
   const fetchUserPuzzles = useCallback(async () => {
-    if (!params.code) return;
     
+    if (!params.code) return;
+    console.log(params.code);
     setIsLoading(true);
     try {
       // Get fresh user data from the database
-      const userData = await getFriend(Array.isArray(params.code) ? params.code[0] : params.code) as UserData;
+      const userData = await getFriend(params.code as string) as UserData;
+      console.log(userData);
       if (userData && userData.mypuzzles) {
         setPuzzles(userData.mypuzzles);
       } else {
@@ -63,17 +66,18 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
         Alert.alert("Error", "Puzzle image not found.");
         return;
       }
-
+      // leads to GamePuzzle
+      const pathname = "/(protected)/(tabs)/(mapstack)/puzzle";
       // Navigate to puzzle screen in the profilestack
+      console.log("puzzleData", puzzleData);
       router.push({
-        pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
+        pathname: pathname,
         params: {
           imageUri: puzzleData.photoURL,
           difficulty: getDifficultyText(puzzleData.difficulty),
           locationName: puzzleData.name,
           latitude: puzzleData.geoLocation.latitude.toString(),
           longitude: puzzleData.geoLocation.longitude.toString(),
-          isFromMyPuzzles: "true"
         }
       });
     } catch (error) {
@@ -94,7 +98,7 @@ const [puzzles, setPuzzles] = useState<PuzzleMiniData[]>([]);
     <SafeAreaView style={[GeneralStyle.container, { flex: 1 }]}>
       <Stack.Screen 
         options={{ 
-          title: `${params.name} Puzzles`,
+          title: `${params.name}'s Puzzles`,
           headerRight: () => (
             <TouchableOpacity onPress={fetchUserPuzzles}>
               <Text style={styles.refreshButton}>Refresh</Text>

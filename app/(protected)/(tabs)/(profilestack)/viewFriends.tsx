@@ -2,7 +2,7 @@ import ProfileNavSections from "@/components/ProfileNavSections";
 import { useUser } from "@/components/UserContext";
 import { GeneralStyle } from "@/constants/Styles";
 import { FriendMiniData, FriendRequest } from "@/Firebase/DataStructures";
-import { router, useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,6 +16,7 @@ export default function ViewFriendsScreen() {
   const [friends, setFriends] = useState<FriendMiniData[]>([]);
   const [requests, setRequsts] = useState<FriendRequest[]>([]);
   const {user, id} = useUser();
+  const router = useRouter();
  const [searchQuery, setSearchQuery] = useState('');
   const [refresh, setRefresh] = useState(false);
   useFocusEffect(

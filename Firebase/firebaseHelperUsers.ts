@@ -86,6 +86,8 @@ Update User document in the database
 */
 export const updateUserDocument = async (docId: string, data: any) => {
     try {
+        console.log(data);
+        
         await updateDoc(doc(db, CollectionUser, docId), data);
         return true;
     } catch (e) {
@@ -94,17 +96,18 @@ export const updateUserDocument = async (docId: string, data: any) => {
 }
 
 //querys the puzzle leaderboard data by querying the playdata collection
-export const getLocalLeaderBoard = async (location: geoLocationData) => {
+export const getLocalLeaderBoard = async () => {
     try {
         const querySnapshot = await getDocs(collection(db, CollectionUser)); 
         var leaderboard : UserData[] = [];
         querySnapshot.forEach((doc) => {
             var docData = doc.data() as UserData
-            //within 100 miles of a location add to the leaderboard array
-            if (Math.abs(docData.geoLocation.latitude - location.latitude) < 1 && Math.abs(docData.geoLocation.longitude - location.longitude) < 1) {
-                leaderboard.push(docData as UserData);
-            }
-        });
+            leaderboard.push(docData as UserData);
+        }); 
+        // Sort to only keep the top 100 players
+        leaderboard.sort((a, b) => b.score - a.score);
+        leaderboard = leaderboard.slice(0, 100);
+        console.log(leaderboard)
         return leaderboard;
     } catch (e) {
         return e;

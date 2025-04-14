@@ -6,7 +6,7 @@
 <h3>Ronald Mundell</h3>
 <p><a href="https://northeastern-my.sharepoint.com/:v:/g/personal/mundell_r_northeastern_edu/EZr8R2x1DWxGr4flVdmqEoUBCb0oMJN_SYaRO2ERJ7RP5A?e=yJxoDd">CodeWalk Iteration 1</a></p>
 <p><a href="https://northeastern-my.sharepoint.com/:v:/r/personal/mundell_r_northeastern_edu/Documents/Iteration2-CodeWalk.webm?csf=1&web=1&e=HAjOdX">CodeWalk Iteration 2</a></p>
-<p><a href="">CodeWalk Iteration 3</a></p>
+<p><a href="https://northeastern-my.sharepoint.com/:v:/r/personal/mundell_r_northeastern_edu/Documents/Iteration3-CodeWalk.webm?csf=1&web=1&e=OpsxCi&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 3</a></p>
 <l>
 <li>Setup of app and github</li>
 <li>Created CRUD operations for the collections found under <b>CRUD Operations</b></li>
@@ -26,14 +26,18 @@
   </ul>
 </li>
 <li>Enhanced UI/UX with bottom tab bar improvements and navigation flow optimization</li>
+<li>Implemented notifications for users that can be set on individual puzzles that can be set a specified time</li>
+<li>Implemented leaderboards and scoring mechanism and updated users scores</li>
+<li>Bug fixes for puzzles and firebase image storage and retrieval</li>
+<li>Implemented photo comparision between puzzle photo and verification photo using Azure Computer Vision</li>
 </l>
 
 <h3>Sisi You</h3>
 <p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EYIvINBagmhDoKTRfQYpvfUB3Q7I3Oq9YSaQTKU2tHNTBA?e=MqnbYw">CodeWalk Iteration 1</a></p>
 
-<p><a hre32WZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 2</a></p>
+<p><a href="32WZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 2</a></p>
 <l>
-
+<p><a href="https://northeastern.sharepoint.com/:v:/s/111396/EWLnzzoNTg1Hn-LhLIL-FbIBOGAW8yjCdHySez7bA4jUfw?e=UIWR0c&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D">CodeWalk Iteration 3</a></p>
 
 <li>New Game Creation System:
   <ul>
@@ -56,6 +60,7 @@
       <ul>
         <li>Interactive sliding puzzle gameplay</li>
         <li>Move tracking and scoring</li>
+        <li>Hint functions to help solve puzzles using A* algotithms</li>
         <li>Firebase integration for puzzle storage</li>
       </ul>
     </li>
@@ -98,6 +103,34 @@
     </li>
   </ul>
 </li>
+
+<li>Puzzle Verification and Scoring System:
+  <ul>
+    <li>Enhanced MarkerScreen with:
+      <ul>
+        <li>Dynamic difficulty display system</li>
+        <li>Real-time top scores leaderboard</li>
+        <li>Weighted scoring based on difficulty</li>
+        <li>Integrated play/resume functionality</li>
+      </ul>
+    </li>
+    <li>Developed ValidateCamera system:
+      <ul>
+        <li>Photo verification workflow</li>
+        <li>Real-time image comparison</li>
+        <li>Score calculation and leaderboard updates</li>
+        <li>Completion status management</li>
+      </ul>
+    </li>
+    <li>Implemented Image Comparison System:
+      <ul>
+        <li>Image feature extraction</li>
+        <li>Similarity calculation algorithms</li>
+        <li>Threshold-based verification</li>
+      </ul>
+    </li>
+  </ul>
+</li>
 </l>
 
 <h2>Naviagtion</h2>
@@ -111,6 +144,10 @@
     <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/profile.PNG" alt="Profile Screen" style="width: 40%;">
     <p><strong>Profile Screen</strong></p>
+  </div>
+  <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/notificationPopup.png" alt="Notification Pop up" style="width: 40%;">
+    <p><strong>Notification Pop Up</strong></p>
   </div>
     <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/reminder.png" alt="Reminder Screen" style="width: 40%;">
@@ -137,8 +174,16 @@
     <p><strong>Camera Screen</strong></p>
   </div>
     <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/marker.PNG" alt="Marker Screen" style="width: 40%;">
+    <p><strong>Marker Screen</strong></p>
+  </div>
+     <div style="width: 25%; margin-bottom: 20px;">
     <img src="screenshots/puzzle.PNG" alt="Puzzle Screen" style="width: 40%;">
     <p><strong>Puzzle Screen</strong></p>
+  </div>
+      <div style="width: 25%; margin-bottom: 20px;">
+    <img src="screenshots/validation.PNG" alt="validateCamera Screen" style="width: 40%;">
+    <p><strong>validateCamera Screen</strong></p>
   </div>
 </div>
 
@@ -216,6 +261,7 @@ Play records contain:
 - playerId (string): ID of the player
 - name (string): Player's name
 - score (number): Score achieved
+- move (number): moves made
 
 #### Supporting Types
 
@@ -361,6 +407,17 @@ Play records contain:
     <li>Returns storage reference path</li>
   </ul>
 </li>
+<li><b>uploadImageAzureFirebase</b>
+  <ul>
+  <li>uploads image for purpose for photo verification</li>
+  <li>returns the storage download url</li>
+  </ul>
+</li>
+<li><b>deleteImage</b>
+  <ul>
+  <li>deletes stored based on downloadurl of image</li>
+  </ul>
+</li>
 </l>
 
 <h2>Firestore Security Rules</h2>
@@ -444,6 +501,19 @@ npm install
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "your-cert-url"
+}
+```
+
+<h4>Azure Computer Vision</h4>
+<p>The app requires a Azure Computer Vision API for photo comparision. Follow these steps:</p>
+
+1. Create a file named `azure-endpoints.js` in the `config` directory
+2. Contact the development team to obtain the service account credentials
+3. The file structure should look like this:
+```javascript
+export const azureEndpoints = {
+  "Endpoint":"your-endpoint/vision/v3.2/analyze?visualFeatures=Tags,Description",
+  "Key":"your-key"  
 }
 ```
 

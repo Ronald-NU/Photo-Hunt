@@ -1,29 +1,84 @@
-// app/(protected)/(tabs)/leaderboard.tsx
-import { useRouter } from "expo-router";
-
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { View, Text, StyleSheet, SafeAreaView, FlatList, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { GeneralStyle, TextStyles } from "@/constants/Styles";
 import { colors } from "@/constants/Colors";
+import { useCallback, useState } from "react";
+import { PlayData } from "@/Firebase/DataStructures";
+import { getLocalLeaderBoard } from "@/Firebase/firebaseHelperUsers";
 
 export default function LeaderboardScreen() {
-  const router = useRouter();
+  const [playData, setPlayData] = useState<PlayData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+
+    const fetchPlayData = useCallback(async () => {
+      setIsLoading(true);
+      try {
+        // Get fresh user data from the database
+        const TopOneHunderedData = await getLocalLeaderBoard() as PlayData[];
+        if (TopOneHunderedData) {
+          setPlayData(TopOneHunderedData);
+        } else {
+          setPlayData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching user puzzles:", error);
+        Alert.alert("Error", "Failed to load leaderboard. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
+  
+    useFocusEffect(
+      useCallback(() => {
+        fetchPlayData();
+      }, [fetchPlayData])
+    );
 
   return (
 <SafeAreaView style={styles.container}>
-      {
-        /*
-        <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Leaderboard</Text>
-      </View>
-      */
-      }
-      
       <View style={styles.content}>
-        <Text style={TextStyles.mediumText}>Leaderboard Content</Text>
+      <FlatList
+        style={GeneralStyle.list}
+        contentContainerStyle={{ 
+          flexGrow: 1,
+          paddingBottom: 100
+        }}
+        data={playData}
+        keyExtractor={(item) => `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
+        renderItem={({ item, index }) => (
+          <View style={GeneralStyle.profileSection}>
+            {
+              index === 0 ? (
+                <Ionicons name="trophy" size={24} color={colors.Gold} />
+              ) : index === 1 ? (
+                <Ionicons name="trophy" size={24} color={colors.Silver} />
+              ) : index === 2 ? (
+                <Ionicons name="trophy" size={24} color={colors.Bronze} />
+              ) : (
+                <Text style={[TextStyles.LargeText,{textAlign:'center'}]}> {index + 1}</Text>
+              )
+            }
+        <View style={{flexDirection: 'row', justifyContent:'space-between', width:'80%'}}>
+          <Text style={TextStyles.LargeText}>{item.name}</Text>
+          <Text style={TextStyles.mediumText}>{item.score}</Text>
+        </View>
+        </View>
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Leaderboard Couldn't Load</Text>
+            <Text style={styles.emptySubText}>Refresh the Leaderboard!</Text>
+          </View>
+        )}
+        onRefresh={fetchPlayData}
+        refreshing={isLoading}
+        showsVerticalScrollIndicator={true}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+      />
       </View>
 </SafeAreaView>);
 }
@@ -51,5 +106,26 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 50,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  emptySubText: {
+    fontSize: 16,
+    color: colors.Grey,
+    textAlign: 'center',
   },
 });
