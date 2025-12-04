@@ -1,8 +1,5 @@
 import * as FileSystem from 'expo-file-system';
-import * as rs from 'jsrsasign';
-
-// 导入服务账号凭据
-const serviceAccountCredentials = require('../config/service-account.json');
+import { googleCloudApiKey } from '@/config/google-cloud-api-key';
 
 interface VisionLabel {
   description: string;
@@ -76,16 +73,13 @@ export async function validateImage(uri: string): Promise<ValidationResult> {
       ]
     };
 
-    // 使用服务账号凭据构建认证头
-    const authHeader = await generateAuthHeader(serviceAccountCredentials);
-    
-    const apiUrl = 'https://vision.googleapis.com/v1/images:annotate';
+    // 使用 API key 进行认证
+    const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${googleCloudApiKey}`;
     console.log('Calling Vision API...');
 
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${authHeader}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody)
@@ -144,66 +138,3 @@ export async function validateImage(uri: string): Promise<ValidationResult> {
     };
   }
 }
-
-// 生成 Google Cloud 认证头
-async function generateAuthHeader(credentials: any) {
-  const now = Math.floor(Date.now() / 1000);
-  const expiry = now + 3600; // 1 hour from now
-
-  const jwtHeader = {
-    alg: 'RS256',
-    typ: 'JWT',
-    kid: credentials.private_key_id
-  };
-
-  const jwtClaimSet = {
-    iss: credentials.client_email,
-    sub: credentials.client_email,
-    aud: 'https://vision.googleapis.com/',
-    iat: now,
-    exp: expiry
-  };
-
-  // Base64Url encode header and claim set
-  const encodedHeader = btoa(JSON.stringify(jwtHeader))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-    
-  const encodedClaimSet = btoa(JSON.stringify(jwtClaimSet))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-  // Create signature input
-  const signatureInput = `${encodedHeader}.${encodedClaimSet}`;
-
-  // Sign using RS256
-  const signature = await signWithPrivateKey(credentials.private_key, signatureInput);
-
-  // Combine to form JWT
-  return `${signatureInput}.${signature}`;
-}
-
-// 使用私钥签名
-async function signWithPrivateKey(privateKey: string, input: string): Promise<string> {
-  try {
-    // 创建签名对象
-    const sig = new rs.KJUR.crypto.Signature({ "alg": "SHA256withRSA" });
-    
-    // 初始化私钥
-    sig.init(privateKey);
-    
-    // 更新要签名的数据
-    sig.updateString(input);
-    
-    // 生成签名
-    const signatureBytes = sig.sign();
-    
-    // 转换为 Base64URL 格式
-    return rs.hextob64u(signatureBytes);
-  } catch (error) {
-    console.error('Error signing with private key:', error);
-    throw error;
-  }
-} 

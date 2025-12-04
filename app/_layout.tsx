@@ -1,34 +1,45 @@
 import { UserProvider } from "@/components/UserContext";
 import { auth } from "@/Firebase/firebaseSetup";
-import { router, Stack, useSegments } from "expo-router";
+import { useRouter, Stack, useSegments } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { SelectedLocationProvider } from "@/components/SelectedLocationContext";
 
 export default function RootLayout() {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [isReady, setIsReady] = useState(false);
     const segments = useSegments();
+    const router = useRouter();
 
     useEffect(() => {
-        onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
           if (user) {        
             setUserLoggedIn(true);
           } else {
             setUserLoggedIn(false);
           }
-        })
+          // Mark as ready after first auth state check
+          setIsReady(true);
+        });
+        
+        return () => unsubscribe();
       }, []);
 
       useEffect(() => {
-        if (userLoggedIn && segments[0] === "(auth)")
-        {
-        router.replace("/(protected)/");
+        // Only navigate after component is mounted and ready
+        if (!isReady || segments.length === 0) {
+          return;
         }
-        else if (!userLoggedIn && segments[0] === "(protected)")      
-        {
-        router.replace("/(auth)/login");
+
+        const inAuthGroup = segments[0] === "(auth)";
+        const inProtectedGroup = segments[0] === "(protected)";
+
+        if (userLoggedIn && inAuthGroup) {
+          router.replace("/(protected)/");
+        } else if (!userLoggedIn && inProtectedGroup) {
+          router.replace("/(auth)/login");
         }
-   }, [userLoggedIn]);
+   }, [userLoggedIn, isReady, segments]);
    
     return   (
     <UserProvider>

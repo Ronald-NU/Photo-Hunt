@@ -12,6 +12,8 @@ import * as Location from 'expo-location';
 import { colors } from '@/constants/Colors';
 import * as Notifications from 'expo-notifications';
 import { verifyPermissions } from '@/components/NotificationManager';
+import { auth } from '@/Firebase/firebaseSetup';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export interface SelectedLocation {
   name: string;
@@ -41,7 +43,13 @@ export default function MapScreen() {
     });
   }
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: true })
+    handleNotification: async () => ({ 
+      shouldShowAlert: true, 
+      shouldPlaySound: true, 
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true
+    })
   });
     }
     }
@@ -67,6 +75,12 @@ export default function MapScreen() {
 
   const fetchPuzzles = useCallback(async () => {
     try {
+
+      if (!auth.currentUser) {
+        console.log('User not logged in, skipping puzzle fetch');
+        return;
+      }
+      
       //console.log('Fetching puzzles...');
       const currentLocation = await getCurrentLocation();
      // console.log('Current location:', currentLocation);
@@ -98,10 +112,28 @@ export default function MapScreen() {
     }
   }, [selectedLocation]);
 
+  // 监听认证状态变化，确保用户登录后再获取 puzzles
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log('User logged in, fetching puzzles...');
+        fetchPuzzles();
+      } else {
+        console.log('User logged out, clearing puzzles...');
+        setAllPuzzles([]);
+      }
+    });
+    
+    return () => unsubscribe();
+  }, [fetchPuzzles]);
+
   useFocusEffect(
     useCallback(() => {
-      //console.log('Map screen focused, fetching puzzles...');
-      fetchPuzzles();
+      // 只在用户已登录时获取 puzzles
+      if (auth.currentUser) {
+        //console.log('Map screen focused, fetching puzzles...');
+        fetchPuzzles();
+      }
     }, [fetchPuzzles])
   );
 
@@ -294,13 +326,14 @@ const styles = StyleSheet.create({
   },
   instructionContainer: {
     position: 'absolute',
-    top: 100,
+    top: '50%',
     left: 20,
     right: 20,
     backgroundColor: 'rgba(0,0,0,0.7)',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
+    transform: [{ translateY: -50 }],
   },
   instructionText: {
     color: 'white',
@@ -309,23 +342,23 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     position: 'absolute',
-    top: 110,
-    left: 20,
-    right: 20,
+    top: 106,
+    left: 15,
+    right: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
     zIndex: 10,
     backgroundColor: colors.White,
     borderRadius: 8,
-    padding: 8,
-    shadowColor: colors.White,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+    overflow: 'hidden',
   },
   filterButton: {
     paddingHorizontal: 12,
@@ -334,6 +367,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     minWidth: 65,
     alignItems: 'center',
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   filterButtonActive: {
     backgroundColor: '#2196F3',

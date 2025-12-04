@@ -8,13 +8,12 @@ const config: ExpoConfig = {
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
   splash: {
-    image: "./assets/splash.png",
+    image: "./assets/splash-icon.png",
     resizeMode: "contain",
     backgroundColor: "#ffffff"
   },
   assetBundlePatterns: [
-    "**/*",
-    "config/service-account.json"
+    "**/*"
   ],
   ios: {
     supportsTablet: true,
@@ -27,12 +26,22 @@ const config: ExpoConfig = {
     },
     package: "com.photohunt.app"
   },
+  web: {
+    favicon: "./assets/favicon.png"
+  },
+  plugins: [
+    "expo-router",
+    [
+      "expo-image-picker",
+      {
+        cameraPermission: "The app needs access to your camera."
+      }
+    ]
+  ],
+  scheme: "photo-hunt",
   extra: {
     googleCloudApiKey: process.env.EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY,
   },
-  plugins: [
-    "expo-router"
-  ]
 }
 
-export default config; 
+export default config;

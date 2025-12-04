@@ -46,7 +46,17 @@ export default function LeaderboardScreen() {
           paddingBottom: 100
         }}
         data={playData}
-        keyExtractor={(item) => `${item.playerID}-${item.puzzleID}-${item.name}-${item.score}`}
+        keyExtractor={(item, index) => {
+          // 优先使用 id，如果不存在则使用组合 key，最后使用 index
+          if (item.id) {
+            return item.id;
+          }
+          const playerID = item.playerID || 'unknown';
+          const puzzleID = item.puzzleID || 'unknown';
+          const name = item.name || 'unknown';
+          const score = item.score ?? 0;
+          return `${playerID}-${puzzleID}-${name}-${score}-${index}`;
+        }}
         renderItem={({ item, index }) => (
           <LeaderboardItem item={item} index={index} />
         )}

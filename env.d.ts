@@ -5,4 +5,7 @@ declare module '@env' {
     export const FIREBASE_STORAGE_BUCKET: string;
     export const FIREBASE_MESSAGING_SENDER_ID: string;
     export const FIREBASE_APP_ID: string;
+    export const AZURE_VISION_ENDPOINT: string;
+    export const AZURE_VISION_KEY: string;
+    export const GOOGLE_CLOUD_API_KEY: string;
   }

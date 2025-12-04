@@ -1,5 +1,5 @@
 import { collection, addDoc, doc, deleteDoc, getDocs } from "firebase/firestore"; 
-import { db } from "./firebaseSetup";
+import { db, auth } from "./firebaseSetup";
 import { CollectionPuzzle, PuzzleData, geoLocationData } from "@/Firebase/DataStructures";
 
 // Function to calculate distance between two points on Earth
@@ -80,6 +80,14 @@ export const getPuzzleData = async (id: string): Promise<PuzzleData | null> => {
 export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
     try {
         console.log('Fetching local puzzles for location:', currentLocation);
+        // 检查用户认证状态
+        console.log('Current auth user:', auth.currentUser ? {
+            uid: auth.currentUser.uid,
+            email: auth.currentUser.email,
+            isAnonymous: auth.currentUser.isAnonymous
+        } : 'No user logged in');
+        console.log('Collection name:', CollectionPuzzle);
+        
         const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
         const nearbyPuzzles: PuzzleData[] = []; // Store all matching puzzles
         
