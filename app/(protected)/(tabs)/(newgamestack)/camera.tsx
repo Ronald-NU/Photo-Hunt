@@ -7,7 +7,7 @@ import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 import { validateImage } from '@/utils/imageValidation';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { colors } from '@/constants/Colors';
 import { createPuzzleDocument } from '@/Firebase/firebaseHelperPuzzles';
 import { getAuth } from 'firebase/auth';

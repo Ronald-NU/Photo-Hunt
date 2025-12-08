@@ -1,7 +1,5 @@
 import { UserProvider } from "@/components/UserContext";
-import { auth } from "@/Firebase/firebaseSetup";
 import { useRouter, Stack, useSegments } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { SelectedLocationProvider } from "@/components/SelectedLocationContext";
 
@@ -12,17 +10,42 @@ export default function RootLayout() {
     const router = useRouter();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-          if (user) {        
-            setUserLoggedIn(true);
-          } else {
-            setUserLoggedIn(false);
-          }
-          // Mark as ready after first auth state check
-          setIsReady(true);
-        });
+        let unsubscribe: (() => void) | null = null;
+        let timer: NodeJS.Timeout;
         
-        return () => unsubscribe();
+        // Delay Firebase initialization to ensure React Native is fully initialized
+        const initAuth = async () => {
+          try {
+            // Dynamic import to delay Firebase initialization
+            const { auth } = await import("@/Firebase/firebaseSetup");
+            const { onAuthStateChanged } = await import("firebase/auth");
+            
+            unsubscribe = onAuthStateChanged(auth, (user) => {
+              if (user) {        
+                setUserLoggedIn(true);
+              } else {
+                setUserLoggedIn(false);
+              }
+              // Mark as ready after first auth state check
+              setIsReady(true);
+            });
+          } catch (error) {
+            console.error("Firebase initialization error:", error);
+            setIsReady(true); // Set ready even on error to prevent blocking
+          }
+        };
+        
+        // Add a small delay to ensure React Native runtime is ready
+        timer = setTimeout(() => {
+          initAuth();
+        }, 100);
+        
+        return () => {
+          clearTimeout(timer);
+          if (unsubscribe) {
+            unsubscribe();
+          }
+        };
       }, []);
 
       useEffect(() => {

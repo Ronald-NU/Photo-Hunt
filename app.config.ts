@@ -39,6 +39,7 @@ const config: ExpoConfig = {
     ]
   ],
   scheme: "photo-hunt",
+  newArchEnabled: false,
   extra: {
     googleCloudApiKey: process.env.EXPO_PUBLIC_GOOGLE_CLOUD_API_KEY,
   },

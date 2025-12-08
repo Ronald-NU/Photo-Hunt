@@ -2,7 +2,7 @@ import { storage } from "./firebaseSetup";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import * as ImageManipulator from 'expo-image-manipulator';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 /**
 
  * @param uri 

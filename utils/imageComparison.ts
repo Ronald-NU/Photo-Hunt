@@ -1,7 +1,8 @@
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { azureEndpoints } from "../config/azure-endpoints";
 
 interface ImageFeatures {
   averageColor: string;

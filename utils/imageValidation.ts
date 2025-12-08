@@ -1,6 +1,5 @@
-import * as FileSystem from 'expo-file-system';
-import { googleCloudApiKey } from '@/config/google-cloud-api-key';
-
+import * as FileSystem from 'expo-file-system/legacy';
+import { GOOGLE_CLOUD_API_KEY } from '@env';
 interface VisionLabel {
   description: string;
   score: number;
@@ -74,7 +73,7 @@ export async function validateImage(uri: string): Promise<ValidationResult> {
     };
 
     // 使用 API key 进行认证
-    const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${googleCloudApiKey}`;
+    const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_CLOUD_API_KEY}`;
     console.log('Calling Vision API...');
 
     const response = await fetch(apiUrl, {

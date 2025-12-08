@@ -1,4 +1,4 @@
-import { azureEndpoints } from "@/config/azure-endpoints";
+import { azureEndpoints } from "../config/azure-endpoints";
 
 const analyzeImage = async (imageUrl: string) => {
     const response = await fetch(
