@@ -13,6 +13,7 @@ interface ValidationResult {
 
 export async function validateImage(uri: string): Promise<ValidationResult> {
   try {
+    console.log('🔑 GOOGLE_CLOUD_API_KEY prefix:', GOOGLE_CLOUD_API_KEY?.slice(0, 8));
     console.log('Starting image validation for URI:', uri);
 
     // Check if URI exists
@@ -88,6 +89,29 @@ export async function validateImage(uri: string): Promise<ValidationResult> {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('API Error:', errorText);
+      
+      // Check for specific error types
+      try {
+        const errorData = JSON.parse(errorText);
+        const errorReason = errorData.error?.details?.[0]?.reason;
+        
+        if (response.status === 403) {
+          if (errorReason === 'API_KEY_SERVICE_BLOCKED') {
+            console.error('❌ API Key is blocked from accessing Vision API. Please enable Vision API in Google Cloud Console.');
+            return {
+              isValid: false,
+              reason: 'Vision API access is blocked. Please check API Key restrictions in Google Cloud Console.'
+            };
+          } else if (errorReason === 'BILLING_DISABLED') {
+            console.warn('⚠️ Google Cloud Vision API billing not enabled. Skipping validation.');
+            // Skip validation if billing is not enabled
+            return { isValid: true };
+          }
+        }
+      } catch (parseError) {
+        // If we can't parse the error, continue with normal error handling
+      }
+      
       return {
         isValid: false,
         reason: 'Failed to validate image. Please try again.'

@@ -6,7 +6,6 @@ import { useLocalSearchParams, useRouter, Stack, usePathname } from 'expo-router
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GeneralStyle } from "@/constants/Styles";
 import { colors } from '@/constants/Colors';
-import { compareImages } from '@/utils/imageComparison';
 import { updatePlayDataDocument } from '@/Firebase/firebaseHelperPlayData';
 import { auth } from '@/Firebase/firebaseSetup';
 import { PlayData } from '@/Firebase/DataStructures';
@@ -90,16 +89,28 @@ export default function ValidatePuzzleScreen() {
         throw new Error('Failed to capture photo');
       }
 
-      const comparisonResult = await compareImages(originalImageUri as string, photo.uri);
+      // Upload captured photo to Firebase
       const imageUrl = await uploadImageAzureFirebase(photo.uri, 'verificationPhotos');
+      
+      // Fix original image URI encoding if needed
       const objectPath = encodeURIComponent((originalImageUri as string).split('/o/')[1].split('?')[0]);
       const neworiginalimageURI = (originalImageUri as string).split('/o/')[0] + '/o/' + objectPath + '?alt=media&token=' + (imageUrl as string).split('token=')[1];
-      const results = await compareImagesAzure(neworiginalimageURI, imageUrl)
+      
+      // Use Azure comparison only
+      const results = await compareImagesAzure(neworiginalimageURI, imageUrl);
       console.log('Comparison results:', results);
-      if(results != undefined) {
-      comparisonResult.similarity = parseFloat(results.score);
-      comparisonResult.isSimilar = parseFloat(results.score) > 64; // Adjust threshold as needed
-      }
+      
+      // Convert Azure results to ComparisonResult format
+      const SIMILARITY_THRESHOLD = 64; // Azure score threshold (0-100)
+      const azureScore = results ? parseFloat(results.score) : 0;
+      const comparisonResult = {
+        isSimilar: azureScore >= SIMILARITY_THRESHOLD,
+        similarity: azureScore / 100, // Convert to 0-1 scale for consistency
+        reason: azureScore >= SIMILARITY_THRESHOLD 
+          ? undefined 
+          : 'The captured image appears to be different from the original puzzle image'
+      };
+      
       if (comparisonResult.isSimilar) {
         try {
           // Update verification results

@@ -267,15 +267,21 @@ export default function MapPuzzleScreen() {
           const userPlay = leaderboard.find(play => play.playerID === auth.currentUser?.uid);
           console.log('Found user play:', userPlay);
           if (userPlay) {
-            setMoves(userPlay.moves);
             setPlayId(userPlay.id);
-            // 如果拼图已经完成，立即设置完成状态
-            if (userPlay.isCompleted) {
+            // 如果拼图已经完成但未验证，立即设置完成状态
+            if (userPlay.isCompleted && !userPlay.isPhotoVerified) {
               setIsComplete(true);
+              setMoves(userPlay.moves);
               // 设置正确的拼图状态
               const correctPieces = Array.from({ length: totalPieces }, (_, i) => i);
               setPieces(correctPieces);
               setHidden(totalPieces - 1);
+            } else if (userPlay.isPhotoVerified) {
+              // 如果已经验证过，允许用户重新玩，重置 moves 为 0
+              setMoves(0);
+            } else {
+              // 未完成，继续之前的进度
+              setMoves(userPlay.moves);
             }
           } else {
             // Create new play record if none exists
