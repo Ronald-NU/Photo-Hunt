@@ -10,6 +10,7 @@ import { useUser } from '@/components/UserContext';
 interface LocationManagerProps {
   onLocationSelect: (location: SelectedLocation | null) => void;
   allPuzzles?: PuzzleData[];
+  targetRegion?: Region | null;
 }
 
 const DEFAULT_REGION = {
@@ -19,12 +20,21 @@ const DEFAULT_REGION = {
   longitudeDelta: 0.0421,
 };
 
-const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationSelect, allPuzzles = [] }, ref) => {
+const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationSelect, allPuzzles = [], targetRegion }, ref) => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentRegion, setCurrentRegion] = useState<Region>(DEFAULT_REGION);
   const [selectedMarker, setSelectedMarker] = useState<SelectedLocation | null>(null);
   const router = useRouter();
   const { user } = useUser();
+
+  // Update map region when targetRegion prop changes (from search)
+  useEffect(() => {
+    if (targetRegion && ref && typeof ref !== 'function' && ref.current) {
+      console.log('📍 Updating map region from targetRegion:', targetRegion);
+      setCurrentRegion(targetRegion);
+      ref.current.animateToRegion(targetRegion, 1000);
+    }
+  }, [targetRegion, ref]);
 
   useEffect(() => {
     //console.log('LocationManager received puzzles:', allPuzzles);
@@ -107,13 +117,13 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
   const getMarkerColor = (difficulty: number) => {
     switch (difficulty) {
       case 3: // Easy
-        return '#4CAF50'; // 绿色
+        return '#4CAF50'; // Green
       case 4: // Medium
-        return '#FFC107'; // 黄色
+        return '#FFC107'; // Yellow
       case 5: // Hard
-        return '#F44336'; // 红色
+        return '#F44336'; // Red
       default:
-        return '#2196F3'; // 默认蓝色
+        return '#2196F3'; // Default blue
     }
   };
   if (isLoading) {
@@ -128,7 +138,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
     <MapView
       ref={ref}
       style={styles.map}
-      initialRegion={currentRegion}
+      region={currentRegion}
       onPress={handleMapPress}
       showsUserLocation
       showsMyLocationButton
@@ -140,7 +150,7 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
             latitude: selectedMarker.latitude,
             longitude: selectedMarker.longitude,
           }}
-          pinColor="#2196F3"  // 蓝色
+          pinColor="#2196F3"  // Blue
           title={selectedMarker.name}
         />
       )}

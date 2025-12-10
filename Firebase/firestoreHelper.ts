@@ -12,7 +12,7 @@ const compressImage = async (uri: string): Promise<string> => {
   try {
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 1024 } }], // 限制最大宽度为1024px
+      [{ resize: { width: 1024 } }], // Limit maximum width to 1024px
       { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
     );
     return manipResult.uri;
@@ -23,11 +23,11 @@ const compressImage = async (uri: string): Promise<string> => {
 };
 
 /**
- * 通用的文件上传工具函数
- * @param fileUri - 文件URI
- * @param folderPath - 存储路径（不包含文件名）
- * @param metadata - 可选的元数据
- * @returns 文件的下载URL
+ * Generic file upload utility function
+ * @param fileUri - File URI
+ * @param folderPath - Storage path (excluding filename)
+ * @param metadata - Optional metadata
+ * @returns File download URL
  */
 export const uploadAndReturnUrl = async (
   fileUri: string,
@@ -115,9 +115,9 @@ export const uploadAndReturnUrl = async (
 };
 
 /**
- * 专门用于上传谜题图片的函数
- * @param imageURI - 图片URI
- * @returns 图片的下载URL
+ * Function specifically for uploading puzzle images
+ * @param imageURI - Image URI
+ * @returns Image download URL
  */
 export const storeImage = async (imageURI: string): Promise<string> => {
   try {
@@ -131,7 +131,7 @@ export const storeImage = async (imageURI: string): Promise<string> => {
 
     console.log("🚀 Uploading to:", path);
 
-    // 直接使用 fetch 获取文件数据
+    // Directly use fetch to get file data
     const response = await fetch(imageURI);
     if (!response.ok) {
       throw new Error('Failed to fetch image data');

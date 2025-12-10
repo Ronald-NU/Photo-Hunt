@@ -47,7 +47,7 @@ export default function LeaderboardScreen() {
         }}
         data={playData}
         keyExtractor={(item, index) => {
-          // 优先使用 id，如果不存在则使用组合 key，最后使用 index
+          // Prioritize using id, if not available use combined key, finally use index
           if (item.id) {
             return item.id;
           }

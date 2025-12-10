@@ -58,7 +58,7 @@ function ensureInitialized() {
     }
   }
 
-  // 配置 Firestore 设置
+  // Configure Firestore settings
   _db = getFirestore(_app);
   _storage = getStorage(_app);
   _initialized = true;

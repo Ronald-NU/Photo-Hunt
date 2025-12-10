@@ -268,19 +268,19 @@ export default function MapPuzzleScreen() {
           console.log('Found user play:', userPlay);
           if (userPlay) {
             setPlayId(userPlay.id);
-            // 如果拼图已经完成但未验证，立即设置完成状态
+            // If puzzle is completed but not verified, set completion status immediately
             if (userPlay.isCompleted && !userPlay.isPhotoVerified) {
               setIsComplete(true);
               setMoves(userPlay.moves);
-              // 设置正确的拼图状态
+              // Set correct puzzle state
               const correctPieces = Array.from({ length: totalPieces }, (_, i) => i);
               setPieces(correctPieces);
               setHidden(totalPieces - 1);
             } else if (userPlay.isPhotoVerified) {
-              // 如果已经验证过，允许用户重新玩，重置 moves 为 0
+              // If already verified, allow user to replay, reset moves to 0
               setMoves(0);
             } else {
-              // 未完成，继续之前的进度
+              // Not completed, continue previous progress
               setMoves(userPlay.moves);
             }
           } else {
@@ -322,7 +322,7 @@ export default function MapPuzzleScreen() {
   }, [moves, playId]);
 
   const saveMovesToFirebase = async () => {
-    // 检查必需的数据
+    // Check required data
     if (!auth.currentUser || !puzzleId || !playId) {
       console.error('Cannot save: missing required data', {
         hasUser: !!auth.currentUser,
@@ -337,7 +337,7 @@ export default function MapPuzzleScreen() {
       return false;
     }
 
-    // 如果已经在保存中，直接返回
+    // If already saving, return directly
     if (isSaving) {
       console.log('Already saving, skipping this save');
       return false;
@@ -366,7 +366,7 @@ export default function MapPuzzleScreen() {
       console.error('Error saving moves:', error);
       return false;
     } finally {
-      // 确保在 finally 中重置 isSaving 状态
+      // Ensure isSaving state is reset in finally block
       setIsSaving(false);
     }
   };
@@ -526,7 +526,7 @@ export default function MapPuzzleScreen() {
     }
 
     try {
-      // 确保振动反馈
+      // Ensure vibration feedback
       Vibration.vibrate(20);
       
       const hint = getBestHintMove(pieces, hidden, gridSize);
@@ -539,14 +539,14 @@ export default function MapPuzzleScreen() {
           newHidden: newHiddenIndex
         });
         
-        // 使用 requestAnimationFrame 来优化状态更新
+        // Use requestAnimationFrame to optimize state updates
         requestAnimationFrame(() => {
           setPieces(hint);
           setHidden(newHiddenIndex);
           setMoves(prev => (prev !== null ? prev + 1 : 1));
         });
         
-        // 异步保存移动
+        // Asynchronously save moves
         await saveMovesToFirebase();
       } else {
         console.log('No hint available');

@@ -69,7 +69,7 @@ export default function ProfileScreen() {
   <Text style={TextStyles.smallText}>{user?.score!=null?user.score:"Local Leaderboard Score"}</Text>
 </View>
 
-      {/* 按钮列表 */}
+      {/* Button list */}
       <View>
         <ProfileNavSections title="My Puzzles" onPress={user?()=>router.push("myPuzzles"):()=>{}} />
         <ProfileNavSections title="Friends" onPress={user?()=>router.push("viewFriends"):()=>{}} />

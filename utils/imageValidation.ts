@@ -73,7 +73,7 @@ export async function validateImage(uri: string): Promise<ValidationResult> {
       ]
     };
 
-    // 使用 API key 进行认证
+    // Authenticate using API key
     const apiUrl = `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_CLOUD_API_KEY}`;
     console.log('Calling Vision API...');
 

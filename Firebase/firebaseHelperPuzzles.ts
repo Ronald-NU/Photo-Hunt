@@ -77,25 +77,30 @@ export const getPuzzleData = async (id: string): Promise<PuzzleData | null> => {
 }
 
 //querys the database by location puzzles near the user
-export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
+export const getLocalPuzzles = async (currentLocation: geoLocationData, maxDistance: number = 100) => {
     try {
-        console.log('Fetching local puzzles for location:', currentLocation);
-        // 检查用户认证状态
-        console.log('Current auth user:', auth.currentUser ? {
+        console.log('🔍 Fetching local puzzles for location:', currentLocation);
+        // Check user authentication status
+        console.log('👤 Current auth user:', auth.currentUser ? {
             uid: auth.currentUser.uid,
             email: auth.currentUser.email,
             isAnonymous: auth.currentUser.isAnonymous
         } : 'No user logged in');
-        console.log('Collection name:', CollectionPuzzle);
+        console.log('📦 Collection name:', CollectionPuzzle);
         
         const querySnapshot = await getDocs(collection(db, CollectionPuzzle));
         const nearbyPuzzles: PuzzleData[] = []; // Store all matching puzzles
         
-        console.log('Total puzzles in database:', querySnapshot.size);
+        console.log('📊 Total puzzles in database:', querySnapshot.size);
+        
+        if (querySnapshot.size === 0) {
+            console.warn('⚠️ No puzzles found in database');
+            return [];
+        }
         
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            console.log('Processing puzzle:', {
+            console.log('🔎 Processing puzzle:', {
                 id: data.id,
                 name: data.name,
                 location: data.geoLocation
@@ -103,28 +108,32 @@ export const getLocalPuzzles = async (currentLocation: geoLocationData) => {
             
             var loc = data.geoLocation as geoLocationData;
             const distance = haversineDistance(loc, currentLocation);
-           /* console.log('Distance calculation:', {
-                puzzleName: data.name,
-                puzzleLocation: loc,
-                currentLocation: currentLocation,
-                distance: distance
-            });
-            */
-            //return puzzles within 100 miles
-            if (distance <= 100) {
-               // console.log('Adding puzzle to nearby list:', data.name);
+            console.log(`📏 Distance to "${data.name}": ${distance.toFixed(2)} miles`);
+            
+            //return puzzles within maxDistance miles
+            if (distance <= maxDistance) {
+                console.log(`✅ Adding puzzle to nearby list: "${data.name}" (${distance.toFixed(2)} miles away)`);
                 nearbyPuzzles.push(data as PuzzleData);
             } else {
-                console.log('Puzzle too far:', data.name, 'Distance:', distance);
+                console.log(`❌ Puzzle too far: "${data.name}" (${distance.toFixed(2)} miles, limit: 100 miles)`);
             }
         });
         
-        console.log('Final nearby puzzles count:', nearbyPuzzles.length);
-        //console.log('Nearby puzzles:', 
-        nearbyPuzzles.map(p => ({ name: p.name, distance: haversineDistance(p.geoLocation, currentLocation) }));
+        console.log('📊 Final nearby puzzles count:', nearbyPuzzles.length);
+        if (nearbyPuzzles.length > 0) {
+            console.log('✅ Nearby puzzles:', nearbyPuzzles.map(p => ({
+                name: p.name,
+                distance: haversineDistance(p.geoLocation, currentLocation).toFixed(2) + ' miles'
+            })));
+        } else {
+            console.warn('⚠️ No puzzles within 100 miles. Consider:');
+            console.warn('  1. Checking if puzzles exist in database');
+            console.warn('  2. Using a location closer to puzzle locations');
+            console.warn('  3. Increasing the distance limit (currently 100 miles)');
+        }
         return nearbyPuzzles;
     } catch (e) {
-        console.error("Error getting local puzzles:", e);
+        console.error("❌ Error getting local puzzles:", e);
         return [];
     }
 }

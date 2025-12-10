@@ -72,7 +72,7 @@ export default function MyPuzzlesScreen() {
         return;
       }
 
-      // 导航到拼图页面，根据完成状态决定是否进入游戏模式
+      // Navigate to puzzle page, determine whether to enter game mode based on completion status
       router.push({
         pathname: "/(protected)/(tabs)/(profilestack)/puzzle",
         params: {
@@ -131,13 +131,13 @@ export default function MyPuzzlesScreen() {
               </Text>
               {item.isCompleted && (
                 <View style={styles.completedBadge}>
-                  <Text style={styles.completedText}>完成</Text>
+                  <Text style={styles.completedText}>Completed</Text>
                 </View>
               )}
             </View>
             <View style={styles.rightContent}>
               {item.isCompleted && item.moves && (
-                <Text style={styles.movesText}>{item.moves} 步</Text>
+                <Text style={styles.movesText}>{item.moves} moves</Text>
               )}
               <Text style={styles.difficulty}>{getDifficultyText(item.difficulty)}</Text>
             </View>

@@ -50,7 +50,7 @@ export default function RootLayout() {
 
       useEffect(() => {
         // Only navigate after component is mounted and ready
-        if (!isReady || segments.length === 0) {
+        if (!isReady || segments.length < 1) {
           return;
         }
 

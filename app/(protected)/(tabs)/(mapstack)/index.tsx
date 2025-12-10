@@ -112,7 +112,7 @@ export default function MapScreen() {
     }
   }, [selectedLocation]);
 
-  // 监听认证状态变化，确保用户登录后再获取 puzzles
+  // Listen to authentication state changes, ensure puzzles are fetched after user login
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -129,7 +129,7 @@ export default function MapScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // 只在用户已登录时获取 puzzles
+      // Only fetch puzzles when user is logged in
       if (auth.currentUser) {
         //console.log('Map screen focused, fetching puzzles...');
         fetchPuzzles();
