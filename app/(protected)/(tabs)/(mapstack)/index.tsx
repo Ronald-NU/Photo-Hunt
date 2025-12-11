@@ -32,6 +32,8 @@ export default function MapScreen() {
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
   const mapRef = useRef<any>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+  const [targetRegion, setTargetRegion] = useState<Region | null>(null);
+  const [foundPuzzle, setFoundPuzzle] = useState<PuzzleData | null>(null);
 
   useEffect(()=>{
     const NotificationSetup = async () => {
@@ -147,27 +149,76 @@ export default function MapScreen() {
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
-    if (!text.trim()) return;
+    
+    // Clear target region and found puzzle when search is cleared
+    if (!text.trim()) {
+      setTargetRegion(null);
+      setFoundPuzzle(null);
+      return;
+    }
 
-    const foundPuzzle = allPuzzles.find(puzzle => 
-      puzzle.name.toLowerCase().includes(text.toLowerCase())
+    // Search in filtered puzzles first (respects difficulty filter)
+    // If not found, also search in all puzzles (in case it's filtered out)
+    const puzzle = filteredPuzzles.find(p => 
+      p.name.toLowerCase().includes(text.toLowerCase())
+    ) || allPuzzles.find(p => 
+      p.name.toLowerCase().includes(text.toLowerCase())
     );
 
-    if (foundPuzzle) {
+    if (puzzle) {
       const region: Region = {
-        latitude: foundPuzzle.geoLocation.latitude,
-        longitude: foundPuzzle.geoLocation.longitude,
+        latitude: puzzle.geoLocation.latitude,
+        longitude: puzzle.geoLocation.longitude,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       };
-     // console.log('Found puzzle, animating to:', region);
-      mapRef.current?.animateToRegion(region, 1000);
+      
+      console.log('🔍 Found puzzle:', puzzle.name);
+      console.log('📍 Navigating to coordinates:', {
+        latitude: puzzle.geoLocation.latitude,
+        longitude: puzzle.geoLocation.longitude
+      });
+      
+      // Store found puzzle to show in UI
+      setFoundPuzzle(puzzle);
+      
+      // Use targetRegion prop to update map (more reliable than direct ref)
+      setTargetRegion(region);
+      
+      // Also try direct ref as fallback
+      if (mapRef.current) {
+        mapRef.current.animateToRegion(region, 1000);
+      }
+    } else {
+      setFoundPuzzle(null);
+      console.log('❌ Puzzle not found in loaded puzzles:', text);
+      console.log('📊 Total puzzles loaded:', allPuzzles.length);
+      console.log('📋 Available puzzle names:', allPuzzles.map(p => p.name));
+      console.log('💡 Note: Only puzzles within 100 miles are loaded. ' +
+                  'If the puzzle is far away, try moving closer or refreshing.');
     }
   };
 
+  const handleEnterPuzzle = () => {
+    if (!foundPuzzle) return;
+    
+    router.push({
+      pathname: "/(protected)/(tabs)/(mapstack)/markerScreen",
+      params: {
+        puzzleId: foundPuzzle.id,
+        puzzleName: foundPuzzle.name,
+        creatorId: foundPuzzle.creatorID,
+        difficulty: foundPuzzle.difficulty.toString(),
+        imageUri: foundPuzzle.photoURL,
+      }
+    });
+  };
+
   const handleRefresh = useCallback(async () => {
-    // Clear search query
+    // Clear search query, target region, and found puzzle
     setSearchQuery('');
+    setTargetRegion(null);
+    setFoundPuzzle(null);
     // Fetch new puzzles and reset map
     await fetchPuzzles();
   }, [fetchPuzzles]);
@@ -212,7 +263,11 @@ export default function MapScreen() {
           {searchQuery ? (
             <TouchableOpacity 
               style={GeneralStyle.clearButton}
-              onPress={() => setSearchQuery('')}
+              onPress={() => {
+                setSearchQuery('');
+                setFoundPuzzle(null);
+                setTargetRegion(null);
+              }}
             >
               <Ionicons name="close-circle" size={20} color={colors.Grey} />
             </TouchableOpacity>
@@ -258,6 +313,7 @@ export default function MapScreen() {
         ref={mapRef}
         onLocationSelect={handleLocationSelect}
         allPuzzles={filteredPuzzles}
+        targetRegion={targetRegion}
       />
       
       {selectedLocation && (
@@ -266,7 +322,29 @@ export default function MapScreen() {
         </View>
       )}
 
-      {!selectedLocation && (
+      {/* Show found puzzle card when search finds a match */}
+      {foundPuzzle && (
+        <View style={styles.foundPuzzleCard}>
+          <View style={styles.foundPuzzleInfo}>
+            <Ionicons name="location" size={24} color={colors.Primary} />
+            <View style={styles.foundPuzzleTextContainer}>
+              <Text style={styles.foundPuzzleName}>{foundPuzzle.name}</Text>
+              <Text style={styles.foundPuzzleDifficulty}>
+                Difficulty: {foundPuzzle.difficulty === 3 ? 'Easy' : foundPuzzle.difficulty === 4 ? 'Medium' : 'Hard'}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity 
+            style={styles.enterPuzzleButton}
+            onPress={handleEnterPuzzle}
+          >
+            <Text style={styles.enterPuzzleButtonText}>Enter Puzzle</Text>
+            <Ionicons name="arrow-forward" size={20} color={colors.White} />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!selectedLocation && !foundPuzzle && (
         <View style={styles.instructionContainer}>
           <Text style={styles.instructionText}>
             Tap on the map to select a location first
@@ -383,5 +461,57 @@ const styles = StyleSheet.create({
   },
   filterTextActive: {
     color:  colors.White,
+  },
+  foundPuzzleCard: {
+    position: 'absolute',
+    bottom: 120,
+    left: 20,
+    right: 20,
+    backgroundColor: colors.White,
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: colors.Black,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    zIndex: 10,
+  },
+  foundPuzzleInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  foundPuzzleTextContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  foundPuzzleName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.Black,
+    marginBottom: 4,
+  },
+  foundPuzzleDifficulty: {
+    fontSize: 14,
+    color: colors.Grey,
+  },
+  enterPuzzleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.Primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    gap: 8,
+  },
+  enterPuzzleButtonText: {
+    color: colors.White,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

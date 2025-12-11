@@ -52,7 +52,42 @@ const analyzeImage = async (imageUrl: string) => {
     // Handle API errors (network issues, invalid credentials, rate limits, etc.)
     if (!response.ok) {
       const errText = await response.text();
-      throw new Error(`Azure error: ${response.status} - ${errText}`);
+      
+      // Parse error response to provide more specific error messages
+      try {
+        const errorData = JSON.parse(errText);
+        const errorCode = errorData.error?.innererror?.code || errorData.error?.code;
+        const errorMessage = errorData.error?.message || errorData.error?.innererror?.message;
+        
+        // Handle specific error cases
+        if (errorCode === 'InvalidImageSize' || errorMessage?.includes('too large')) {
+          throw new Error(
+            `Image size exceeds Azure Vision API limit (4MB). ` +
+            `Please ensure images are compressed before upload. ` +
+            `Original error: ${errorMessage || 'Image too large'}`
+          );
+        }
+        
+        if (response.status === 401 || response.status === 403) {
+          throw new Error(
+            `Azure Vision API authentication failed. ` +
+            `Please check your API key and endpoint configuration.`
+          );
+        }
+        
+        if (response.status === 429) {
+          throw new Error(
+            `Azure Vision API rate limit exceeded. ` +
+            `Please wait a moment and try again.`
+          );
+        }
+        
+        // Generic error with parsed message
+        throw new Error(`Azure Vision API error: ${errorMessage || errText}`);
+      } catch (parseError) {
+        // If we can't parse the error, use the original error text
+        throw new Error(`Azure error: ${response.status} - ${errText}`);
+      }
     }
   
     // Parse and return JSON response containing AI analysis results
@@ -208,8 +243,17 @@ const analyzeImage = async (imageUrl: string) => {
       
     } catch (err) {
       // Handle errors gracefully (network issues, API failures, etc.)
-      console.error('Error comparing images:', err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Error comparing images:', errorMessage);
+      
+      // Log specific error types for debugging
+      if (errorMessage.includes('too large') || errorMessage.includes('InvalidImageSize')) {
+        console.error('⚠️ Image size issue detected. Images should be compressed to < 4MB before upload.');
+        console.error('💡 Consider resizing images before uploading to Firebase Storage.');
+      }
+      
       // Returns undefined, allowing caller to handle error appropriately
+      // Caller should check for undefined and show user-friendly error message
     } finally {
       // Always return results (or undefined if error occurred)
       return results;

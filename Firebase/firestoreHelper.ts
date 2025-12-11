@@ -8,12 +8,23 @@ import * as FileSystem from 'expo-file-system/legacy';
  * @param uri 
  * @returns 
  */
-const compressImage = async (uri: string): Promise<string> => {
+/**
+ * Compress image to reduce file size
+ * @param uri - Image URI to compress
+ * @param maxWidth - Maximum width (default 1024px)
+ * @param quality - Compression quality 0-1 (default 0.7)
+ * @returns Compressed image URI
+ */
+const compressImage = async (
+  uri: string, 
+  maxWidth: number = 1024, 
+  quality: number = 0.7
+): Promise<string> => {
   try {
     const manipResult = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 1024 } }], // Limit maximum width to 1024px
-      { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+      [{ resize: { width: maxWidth } }], // Limit maximum width
+      { compress: quality, format: ImageManipulator.SaveFormat.JPEG }
     );
     return manipResult.uri;
   } catch (error) {
@@ -165,30 +176,72 @@ export const storeImage = async (imageURI: string): Promise<string> => {
   }
 };
 
+/**
+ * Upload image to Firebase Storage with compression for Azure Vision API compatibility
+ * This function compresses images to ensure they're under Azure's 4MB limit
+ * @param fileUri - Image file URI
+ * @param folderPath - Storage folder path
+ * @returns Download URL of uploaded image
+ */
 export const uploadImageAzureFirebase = async (fileUri: string, folderPath: string): Promise<string> => {
   try {
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) throw new Error("User not authenticated");
 
+    console.log('📸 Starting image upload with compression for Azure compatibility...');
+    
+    // Compress image before upload to ensure it's under Azure's 4MB limit
+    // Azure Vision API has a 4MB limit, so we compress to be safe
+    let finalUri = fileUri;
+    const isImageFile = fileUri.toLowerCase().match(/\.(jpg|jpeg|png|gif|webp)$/);
+    
+    if (isImageFile) {
+      console.log('🔄 Compressing image for Azure Vision API compatibility...');
+      try {
+        // Compress image more aggressively for Azure Vision API
+        // Resize to max 1024px width and 60% quality to ensure < 4MB
+        finalUri = await compressImage(fileUri, 1024, 0.6);
+        console.log('✅ Image compressed successfully');
+      } catch (compressError) {
+        console.warn('⚠️ Compression failed, using original image:', compressError);
+        // Continue with original if compression fails
+      }
+    }
+
     // Create unique filename
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const storageRef = ref(storage, `${folderPath}/${user.uid}/${fileName}`);
 
     // Read file as blob
-    const response = await fetch(fileUri);
+    const response = await fetch(finalUri);
     if (!response.ok) throw new Error(`Failed to read file: ${response.statusText}`);
     const blob = await response.blob();
+    
+    // Log file size for debugging
+    const fileSizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+    console.log(`📊 File size after compression: ${fileSizeMB} MB`);
+    
+    // Check if file is still too large (Azure limit is 4MB)
+    if (blob.size > 4 * 1024 * 1024) {
+      console.error(`❌ File size (${fileSizeMB} MB) exceeds Azure Vision API limit (4MB)`);
+      throw new Error(
+        `Image is too large (${fileSizeMB} MB) even after compression. ` +
+        `Azure Vision API requires images under 4MB.`
+      );
+    }
 
     // Upload the file
+    console.log('📤 Uploading compressed image to Firebase Storage...');
     const uploadTask = uploadBytesResumable(storageRef, blob);
     const snapshot = await uploadTask;
 
     // Get download URL
     const downloadURL = await getDownloadURL(snapshot.ref);
+    console.log('✅ Image uploaded successfully, size:', fileSizeMB, 'MB');
     return downloadURL;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error('❌ Error uploading file:', error);
     throw error;
   }
 };

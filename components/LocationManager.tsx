@@ -29,10 +29,21 @@ const LocationManager = forwardRef<MapView, LocationManagerProps>(({ onLocationS
 
   // Update map region when targetRegion prop changes (from search)
   useEffect(() => {
-    if (targetRegion && ref && typeof ref !== 'function' && ref.current) {
+    if (targetRegion) {
       console.log('📍 Updating map region from targetRegion:', targetRegion);
       setCurrentRegion(targetRegion);
-      ref.current.animateToRegion(targetRegion, 1000);
+      
+      // Try to animate map to target region
+      // Use setTimeout to ensure ref is ready
+      const timer = setTimeout(() => {
+        if (ref && typeof ref !== 'function' && ref.current) {
+          ref.current.animateToRegion(targetRegion, 1000);
+        } else {
+          console.warn('⚠️ MapView ref not ready, region will update on next render');
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [targetRegion, ref]);
 
